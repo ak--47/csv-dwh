@@ -31,8 +31,8 @@ async function main(PARAMS) {
 	const {
 		//general
 		warehouse = "bigquery",
-		batch_size = 100,
-		
+		batch_size = 0,
+
 		//generated data
 		demoDataConfig,
 		event_table_name = '',
@@ -44,36 +44,45 @@ async function main(PARAMS) {
 		//byo data
 		table_name = "foo",
 		csv_file = '',
-		
+
 		//bigquery
 		bigquery_dataset = 'hello-world',
-		
-		
+
+
 
 	} = PARAMS;
 
-	if (!PARAMS || Object.keys(PARAMS).length === 0) {
-		PARAMS = {
-			warehouse,
-			event_table_name,
-			batch_size: 100,
-			bigquery_dataset,
-			csv_file,
-			demoDataConfig,
-			table_name,
-		};
-	}
+	PARAMS = {
+		// @ts-ignore
+		warehouse,
+		event_table_name,
+		batch_size: 0,
+		bigquery_dataset,
+		// @ts-ignore
+		csv_file,
+		demoDataConfig,
+		table_name,
+		...PARAMS
+	};
 
-	//todo: simulation OR CSV file...
+
+
 	let data;
 	let schema;
+
+	// user supplied csv file
 	if (csv_file) {
 		const fileData = await u.load(path.resolve(csv_file));
 		const { data: parsed, errors } = Papa.parse(fileData, { header: true });
 		schema = generateSchema(parsed, 'csv');
 		data = { csvData: parsed };
 	}
-	if (demoDataConfig) data = await dataMaker(demoDataConfig);
+
+	// generated data
+	if (demoDataConfig) {
+		data = await dataMaker(demoDataConfig);
+		//todo: multiple schemas
+	}
 
 	const batched = u.objMap(data, (value) => batchData(value, batch_size));
 	const { eventData, userProfilesData, scdTableData, groupProfilesData, lookupTableData, csvData } = batched;
@@ -85,36 +94,45 @@ async function main(PARAMS) {
 	if (scd_table_name) results.push(await loadCSVtoDataWarehouse(scdTableData, warehouse, PARAMS));
 	if (lookup_table_name) results.push(await loadCSVtoDataWarehouse(lookupTableData, warehouse, PARAMS));
 	if (group_table_name) results.push(await loadCSVtoDataWarehouse(groupProfilesData, warehouse, PARAMS));
+
 	//this is the only one that matters
-	if (table_name) results.push(await loadCSVtoDataWarehouse(csvData, warehouse, PARAMS));
+	if (table_name) results.push(await loadCSVtoDataWarehouse(schema, csvData, warehouse, PARAMS));
 
 	debugger;
 
 }
 
 
-async function loadCSVtoDataWarehouse(batches, warehouse, PARAMS) {
+async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 	let result;
-	switch (warehouse) {
-		case 'bigquery':
-			result = await loadToBigQuery(batches, PARAMS);
-			break;
-		case 'snowflake':
-			// todo
-			// result = await loadToSnowflake(records, schema, PARAMS);
-			break;
-		case 'databricks':
-			// todo
-			// result = await loadToDatabricks(records, schema, PARAMS);
-			break;
-		default:
-			result = Promise.resolve(null);
+	try {
+		switch (warehouse) {
+			case 'bigquery':
+				result = await loadToBigQuery(schema, batches, PARAMS);
+				break;
+			case 'snowflake':
+				// todo
+				// result = await loadToSnowflake(records, schema, PARAMS);
+				break;
+			case 'databricks':
+				// todo
+				// result = await loadToDatabricks(records, schema, PARAMS);
+				break;
+			default:
+				result = Promise.resolve(null);
+		}
+		return result;
 	}
-	return result;
+	catch (e) {
+		console.log('WAREHOUSE ERROR', warehouse);
+		console.error(e);
+		debugger;
+	}
 }
 
 
-function batchData(data, batchSize) {
+function batchData(data, batchSize = 0) {
+	if (!batchSize) return [data];
 	const batches = [];
 	for (let i = 0; i < data.length; i += batchSize) {
 		batches.push(data.slice(i, i + batchSize));
@@ -141,13 +159,6 @@ if (require.main === module) {
 			});
 	});
 }
-
-
-const values = ['123', '45.67', 'true', 'False', '2022-01-01', 'hello', '2022-01-01T00:00:00Z'];
-
-values.forEach(value => {
-	console.log(`${value}: ${inferType(value)}`);
-});
 
 
 

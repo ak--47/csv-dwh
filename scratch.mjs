@@ -11,7 +11,9 @@ const PARAMS = {
 	// demoDataConfig: ecommerce
 	// csv_file: "./testData/events-restive-grotto-unfolding.csv",
 	warehouse: "bigquery",
-	csv_file: "./testData/events-shimmering-skyline-pulsating.csv"
+	csv_file: "./testData/events-shimmering-skyline-pulsating.csv",
+	bigquery_dataset: "csv_dwh",
+	table_name: "babys-first-table"
 };
 const data = await main(PARAMS);
 
