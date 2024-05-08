@@ -44,6 +44,7 @@ async function main(PARAMS) {
 		};
 	}
 
+	//todo: simulation OR CSV file...
 	const simulation = await generateSampleData();
 	const batched = u.objMap(simulation, (value) => batchData(value, batch_size));
 	const { eventData, userProfilesData, scdTableData, groupProfilesData, lookupTableData } = batched;
