@@ -1,11 +1,11 @@
 // @ts-nocheck
-const main = require('./index.js');
+const main = require('../index.js');
 const { execSync } = require("child_process");
 const u = require('ak-tools');
 const { Readable } = require('stream');
 
 
-/** @typedef {import('./index').BatchRequestConfig} Config */
+/** @typedef {import('../index').BatchRequestConfig} Config */
 
 // Mock fetch
 const REQUEST_BIN = `https://enp5ly7ky8t0c.x.pipedream.net/`;

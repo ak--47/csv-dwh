@@ -30,10 +30,15 @@
     "nodemon": "^3.1.0"
   },
   "dependencies": {
+    "@google-cloud/bigquery": "^7.7.0",
     "ak-fetch": "^1.0.15",
     "ak-tools": "^1.0.55",
+    "chance": "^1.1.11",
+    "date-fns": "^3.6.0",
+    "dayjs": "^1.11.11",
     "dotenv": "^16.4.5",
-    "make-mp-data": "^1.1.14",
+    "make-mp-data": "^1.1.15",
+    "papaparse": "^5.4.1",
     "yargs": "^17.7.2"
   }
 }

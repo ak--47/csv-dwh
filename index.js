@@ -2,14 +2,20 @@
 const u = require("ak-tools");
 const fetch = require("ak-fetch");
 const { version } = require('./package.json');
-const cli = require('./cli');
+
 const path = require('path');
 require('dotenv').config({ debug: false, override: false });
 const dataMaker = require('make-mp-data');
-const  loadToBigQuery  = require('./middleware/bigquery');
+const Papa = require("papaparse");
+
+const cli = require('./components/cli');
+const { inferType, getUniqueKeys, generateSchema } = require('./components/inference.js');
+
+
+const loadToBigQuery = require('./middleware/bigquery');
 
 /**
- * @typedef {Object} Config
+ * @typedef {import('./types').JobConfig} Config
  * 
  * 
  */
@@ -23,15 +29,26 @@ const  loadToBigQuery  = require('./middleware/bigquery');
 async function main(PARAMS) {
 	const startTime = Date.now();
 	const {
+		//general
 		warehouse = "bigquery",
 		batch_size = 100,
-		event_table_name = 'events',
-		user_table_name = 'users',
-		scd_table_name = 'scd',
+		
+		//generated data
+		demoDataConfig,
+		event_table_name = '',
+		user_table_name = '',
+		scd_table_name = '',
 		lookup_table_name = '',
 		group_table_name = '',
 
+		//byo data
+		table_name = "foo",
+		csv_file = '',
+		
+		//bigquery
 		bigquery_dataset = 'hello-world',
+		
+		
 
 	} = PARAMS;
 
@@ -41,13 +58,25 @@ async function main(PARAMS) {
 			event_table_name,
 			batch_size: 100,
 			bigquery_dataset,
+			csv_file,
+			demoDataConfig,
+			table_name,
 		};
 	}
 
 	//todo: simulation OR CSV file...
-	const simulation = await generateSampleData();
-	const batched = u.objMap(simulation, (value) => batchData(value, batch_size));
-	const { eventData, userProfilesData, scdTableData, groupProfilesData, lookupTableData } = batched;
+	let data;
+	let schema;
+	if (csv_file) {
+		const fileData = await u.load(path.resolve(csv_file));
+		const { data: parsed, errors } = Papa.parse(fileData, { header: true });
+		schema = generateSchema(parsed, 'csv');
+		data = { csvData: parsed };
+	}
+	if (demoDataConfig) data = await dataMaker(demoDataConfig);
+
+	const batched = u.objMap(data, (value) => batchData(value, batch_size));
+	const { eventData, userProfilesData, scdTableData, groupProfilesData, lookupTableData, csvData } = batched;
 
 
 	const results = [];
@@ -56,6 +85,8 @@ async function main(PARAMS) {
 	if (scd_table_name) results.push(await loadCSVtoDataWarehouse(scdTableData, warehouse, PARAMS));
 	if (lookup_table_name) results.push(await loadCSVtoDataWarehouse(lookupTableData, warehouse, PARAMS));
 	if (group_table_name) results.push(await loadCSVtoDataWarehouse(groupProfilesData, warehouse, PARAMS));
+	//this is the only one that matters
+	if (table_name) results.push(await loadCSVtoDataWarehouse(csvData, warehouse, PARAMS));
 
 	debugger;
 
@@ -82,30 +113,6 @@ async function loadCSVtoDataWarehouse(batches, warehouse, PARAMS) {
 	return result;
 }
 
-async function generateSampleData() {
-	/** @type {import('make-mp-data').Config} */
-	const simulationConfig = {
-		anonIds: true,
-		sessionIds: true,
-		numEvents: 100,
-		numUsers: 10,
-		seed: "off you pop",
-		writeToDisk: false,
-		verbose: true,
-	};
-	const data = await dataMaker(simulationConfig);
-
-	const { eventData, groupProfilesData, lookupTableData, scdTableData, userProfilesData } = data;
-
-	return {
-		eventData,
-		groupProfilesData,
-		lookupTableData,
-		scdTableData,
-		userProfilesData,
-	};
-
-}
 
 function batchData(data, batchSize) {
 	const batches = [];
@@ -114,6 +121,7 @@ function batchData(data, batchSize) {
 	}
 	return batches;
 }
+
 
 // this is for CLI
 if (require.main === module) {
@@ -133,6 +141,16 @@ if (require.main === module) {
 			});
 	});
 }
+
+
+const values = ['123', '45.67', 'true', 'False', '2022-01-01', 'hello', '2022-01-01T00:00:00Z'];
+
+values.forEach(value => {
+	console.log(`${value}: ${inferType(value)}`);
+});
+
+
+
 
 
 
