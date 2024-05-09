@@ -11,8 +11,8 @@ describe('INFER', () => {
 
     test('DATE', () => {
         expect(inferType("2021-04-01")).toBe('DATE');
-        expect(inferType("2021-02-28T01:02:03Z")).toBe('DATE'); // ISO format
-        expect(inferType("2021-04-01T00:00:00")).toBe('DATE'); // Date with time
+        expect(inferType("2021-02-28T01:02:03Z")).toBe('TIMESTAMP'); // ISO format
+        expect(inferType("2021-04-01T00:00:00")).toBe('TIMESTAMP'); // Date with time
     });
 
     test('BOOLEAN', () => {

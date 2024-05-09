@@ -16,7 +16,7 @@ const loadToBigQuery = require('./middleware/bigquery');
 
 /**
  * @typedef {import('./types').JobConfig} Config
- * 
+ * @typedef {import('./types').Result} Result
  * 
  */
 
@@ -65,7 +65,12 @@ async function main(PARAMS) {
 		...PARAMS
 	};
 
-
+	// clean PARAMS
+	for (const key in PARAMS) {
+		if (PARAMS[key] === undefined) delete PARAMS[key];
+		if (PARAMS[key] === '') delete PARAMS[key];
+		if (PARAMS[key] === null) delete PARAMS[key];
+	}
 
 	let data;
 	let schema;
@@ -81,7 +86,7 @@ async function main(PARAMS) {
 	// generated data
 	if (demoDataConfig) {
 		data = await dataMaker(demoDataConfig);
-		//todo: multiple schemas
+		//todo: multiple schemas YIKES
 	}
 
 	const batched = u.objMap(data, (value) => batchData(value, batch_size));
@@ -98,7 +103,26 @@ async function main(PARAMS) {
 	//this is the only one that matters
 	if (table_name) results.push(await loadCSVtoDataWarehouse(schema, csvData, warehouse, PARAMS));
 
-	debugger;
+	const endTime = Date.now();
+	const e2eDuration = endTime - startTime;
+	const clockTime = u.prettyTime(e2eDuration);
+	const totalRows = results.reduce((acc, result) => acc + result.insert.success + result.insert.failed, 0);
+	const recordsPerSec = Math.floor(totalRows / (e2eDuration / 1000));
+
+	const jobSummary = {
+		version,
+		PARAMS,
+		results,
+		e2eDuration,
+		clockTime,
+		recordsPerSec,
+		totalRows
+	};
+
+	console.log('JOB SUMMARY:\n\n', jobSummary);
+
+
+	return jobSummary;
 
 }
 
@@ -121,13 +145,15 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 			default:
 				result = Promise.resolve(null);
 		}
-		return result;
 	}
 	catch (e) {
 		console.log('WAREHOUSE ERROR', warehouse);
 		console.error(e);
 		debugger;
 	}
+
+	const summary = summarize(result);
+	return summary;
 }
 
 
@@ -139,6 +165,31 @@ function batchData(data, batchSize = 0) {
 	}
 	return batches;
 }
+
+/**
+ * @param  {Result} results
+ */
+function summarize(results) {
+	const { upload, dataset, schema, table } = results;
+	const uploadSummary = upload.reduce((acc, batch) => {
+		acc.success += batch.insertedRows;
+		acc.failed += batch.failedRows;
+		acc.duration += batch.duration;
+		return acc;
+
+	}, { success: 0, failed: 0, duration: 0, errors: [] });
+
+	const summary = {
+		insert: uploadSummary,
+		dataset,
+		schema,
+		table
+	};
+
+	return summary;
+}
+
+
 
 
 // this is for CLI
@@ -159,9 +210,6 @@ if (require.main === module) {
 			});
 	});
 }
-
-
-
 
 
 

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "jest",
+    "test": "jest --runInBand",
     "deps": "./scripts/deps.sh",
     "post": "npm publish",
     "prune": "rm -rf logs/*",
@@ -32,12 +32,12 @@
   "dependencies": {
     "@google-cloud/bigquery": "^7.7.0",
     "ak-fetch": "^1.0.15",
-    "ak-tools": "^1.0.55",
+    "ak-tools": "^1.0.56",
     "chance": "^1.1.11",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "dotenv": "^16.4.5",
-    "make-mp-data": "^1.1.15",
+    "make-mp-data": "^1.2.2",
     "papaparse": "^5.4.1",
     "yargs": "^17.7.2"
   }

@@ -26,13 +26,12 @@ async function main(schema, batches, PARAMS) {
 	batches = batches.map(batch => batch.map(row => u.rnKeys(row, headerMap)));
 
 
-	const bigQuerySchema = schemaToBQS(schema);
+	schema = schemaToBQS(schema);
 
 	const dataset = await createDataset();
 	const table = await createTable(schema);
-	debugger;
 	const upload = await insertData(schema, batches);
-	return { dataset, table, upload };
+	return { dataset, table, schema, upload };
 }
 
 
@@ -42,10 +41,10 @@ async function createDataset() {
 
 	if (!datasetExists) {
 		const [dataset] = await client.createDataset(datasetId);
-		console.log(`Dataset ${dataset.id} created.`);
-		return dataset;
+		console.log(`Dataset ${dataset.id} created.\n`);
+		return datasetId;
 	} else {
-		console.log(`Dataset ${datasetId} already exists.`);
+		console.log(`Dataset ${datasetId} already exists.\n`);
 		return datasetId;
 	}
 }
@@ -53,38 +52,36 @@ async function createDataset() {
 
 async function createTable(schema) {
 	const dataset = client.dataset(datasetId);
-	const [tables] = await dataset.getTables();
-	const tableExists = tables.some(table => table.id === tableId);
-	const options = { schema: schemaToBQS(schema) };
+	const table = dataset.table(tableId);
+	const [tableExists] = await table.exists();
 
-	if (!tableExists) {
-		const [table] = await dataset.createTable(tableId, options);
-		console.log(`Table ${table.id} created.`);
-		return table;
-	} else {
-		console.log(`Table ${tableId} already exists. Overwriting schema.`);
-		// @ts-ignore
-		const table = await dataset.table(tableId);
-		const [metaData] = await table.setMetadata(options);
-		console.log(`Table ${table.id} schema updated.`);
-		return metaData;
+	if (tableExists) {
+		console.log(`Table ${tableId} already exists. Deleting existing table.`);
+		await table.delete();
+		console.log(`Table ${tableId} has been deleted.`);
 	}
+
+	// Proceed to create a new table with the new schema
+	const options = { schema: schemaToBQS(schema) };
+	const [newTable] = await dataset.createTable(tableId, options);
+	console.log(`New table ${newTable.id} created with the updated schema.\n`);
+	const newTableExists = await newTable.exists();
+	return newTable.id;
 }
 
 
-
 function schemaToBQS(schema) {
-	return schema.map(field => {
+	const transformedSchema = schema.map(field => {
 		let bqType;
 
 		// Determine BigQuery type
 		// ? https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
 		switch (field.type.toUpperCase()) {
 			case 'OBJECT': // Treat objects as RECORD
-				bqType = 'JSON';
+				bqType = 'STRING';
 				break;
 			case 'ARRAY': // Arrays require a type specification of the elements
-				bqType = 'REPEATED';
+				bqType = 'STRING';
 				break;
 			case 'JSON': // Store JSON as a string if not decomposed into a schema
 				bqType = 'STRING';
@@ -95,8 +92,6 @@ function schemaToBQS(schema) {
 			case 'FLOAT':
 				bqType = 'FLOAT64';
 				break;
-
-
 			default:
 				bqType = field.type.toUpperCase();
 				break;
@@ -110,12 +105,10 @@ function schemaToBQS(schema) {
 		};
 
 		// arrays require an item type
-		if (field.type.toUpperCase() === 'ARRAY') {
-			// fieldSchema.itemType = "foos"
-			// fieldSchema.type = field.itemType.toUpperCase();
-			fieldSchema.type = 'JSON';
-			fieldSchema.mode = 'REPEATED';
-		}
+		// if (field.type.toUpperCase() === 'ARRAY') {
+		// 	fieldSchema.type = 'JSON';
+		// 	fieldSchema.mode = 'REPEATED';
+		// }
 
 		// // For RECORD types, handle subfields if any
 		// if (field.type.toUpperCase() === 'OBJECT' && field.fields) {
@@ -124,12 +117,13 @@ function schemaToBQS(schema) {
 
 		return fieldSchema;
 	});
+
+	return transformedSchema;
 }
 
-// BQ restriction on column names
-// 
+
 /**
- * Prepares and cleans header names according to BigQuery's naming restrictions. Optionally returns
+ * Prepares and cleans header names according to BigQuery's naming restrictions. can return hashmap or array
  * ? see: https://cloud.google.com/bigquery/docs/schemas#column_names
  * @param {string[]} headers - The array of header names to be cleaned.
  * @param {boolean} [asArray=false] - Whether to return the result as an array of arrays.
@@ -180,132 +174,140 @@ function prepHeaders(headers, asArray = false) {
 	return headerMap;
 }
 
+async function waitForTableToBeReady(table, retries = 20, maxInsertAttempts = 20) {
+	console.log('Checking if table exits...');
 
+	tableExists: for (let i = 0; i < retries; i++) {
+		const [exists] = await table.exists();
+		if (exists) {
+			console.log(`\tTable is confirmed to exist on attempt ${i + 1}.`);
+			break tableExists;
+		}
+		const sleepTime = u.rand(1000, 5000);
+		console.log(`sleeping for ${u.prettyTime(sleepTime)}; waiting for table exist; attempt ${i + 1}`);
+		await u.sleep(sleepTime);
+
+		if (i === retries - 1) {
+			console.log(`Table does not exist after ${retries} attempts.`);
+			return false;
+		}
+	}
+
+	console.log('\nChecking if table is ready for operations...');
+	let insertAttempt = 0;
+	while (insertAttempt < maxInsertAttempts) {
+		try {
+			// Attempt a dummy insert that SHOULD fail, but not because 404
+			const dummyRecord = { [u.uid()]: u.uid() };
+			await table.insert([dummyRecord]);
+			console.log('...should never get here...');
+			return true; // If successful, return true immediately
+		} catch (error) {
+			if (error.code === 404) {
+				const sleepTime = u.rand(1000, 5000);
+				console.log(`\tTable not ready for operations, sleeping ${u.prettyTime(sleepTime)} retrying... attempt #${insertAttempt + 1}`);
+				await u.sleep(sleepTime);
+				insertAttempt++;
+			}
+
+			else if (error.name === 'PartialFailureError') {
+				console.log('\tTable is ready for operations\n');
+				return true;
+			}
+
+			else {
+				console.log('should never get here either');
+				debugger;
+			}
+
+
+
+		}
+	}
+	return false; // Return false if all attempts fail
+}
 
 async function insertData(schema, batches) {
-	// Inserts data of various BigQuery-supported types into a table.
+	const table = client.dataset(datasetId).table(tableId);
 
-	/**
-	 * TODO(developer): Uncomment the following lines before running the sample.
-	 */
-	// const datasetId = 'my_dataset';
-	// const tableId = 'my_table';
+	// Check if table is ready
+	const tableReady = await waitForTableToBeReady(table);
+	if (!tableReady) {
+		console.log('\nTable is NOT ready after all attempts. Aborting data insertion.');
+		process.exit(1);
+	}
+	console.log('Starting data insertion...\n');
+	const results = [];
 
-	// Describe the schema of the table
-	// For more information on supported data types, see
-	// https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
-	const schemaEx = [
-		{
-			name: 'name',
-			type: 'STRING',
-		},
-		{
-			name: 'age',
-			type: 'INTEGER',
-		},
-		{
-			name: 'school',
-			type: 'BYTES',
-		},
-		{
-			name: 'metadata',
-			type: 'JSON',
-		},
-		{
-			name: 'location',
-			type: 'GEOGRAPHY',
-		},
-		{
-			name: 'measurements',
-			mode: 'REPEATED',
-			type: 'FLOAT',
-		},
-		{
-			name: 'datesTimes',
-			type: 'RECORD',
-			fields: [
-				{
-					name: 'day',
-					type: 'DATE',
-				},
-				{
-					name: 'firstTime',
-					type: 'DATETIME',
-				},
-				{
-					name: 'secondTime',
-					type: 'TIME',
-				},
-				{
-					name: 'thirdTime',
-					type: 'TIMESTAMP',
-				},
-			],
-		},
-	];
-
-	// For all options, see https://cloud.google.com/bigquery/docs/reference/v2/tables#resource
+	/** @type {import('@google-cloud/bigquery').InsertRowsOptions} */
 	const options = {
+		skipInvalidRows: false,
+		ignoreUnknownValues: false,
+		raw: false,
+		partialRetries: 3,
 		schema: schema,
 	};
+	// Continue with data insertion if the table is ready
+	let currentBatch = 0;
+	for (const batch of batches) {
+		currentBatch++;
+		const start = Date.now();
+		try {
+			const rows = prepareRowsForInsertion(batch, schema);
+			const [job] = await table.insert(rows, options);
+			const duration = Date.now() - start;
+			results.push({ status: 'success', insertedRows: rows.length, failedRows: 0, duration });
+			u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
 
-	// Create a new table in the dataset
-	const [table] = await bigquery
-		.dataset(datasetId)
-		.createTable(tableId, options);
-
-	console.log(`Table ${table.id} created.`);
-
-	// The DATE type represents a logical calendar date, independent of time zone.
-	// A DATE value does not represent a specific 24-hour time period.
-	// Rather, a given DATE value represents a different 24-hour period when
-	// interpreted in different time zones, and may represent a shorter or longer
-	// day during Daylight Savings Time transitions.
-	const bqDate = bigquery.date('2019-1-12');
-	// A DATETIME object represents a date and time, as they might be
-	// displayed on a calendar or clock, independent of time zone.
-	const bqDatetime = bigquery.datetime('2019-02-17 11:24:00.000');
-	// A TIME object represents a time, as might be displayed on a watch,
-	// independent of a specific date and timezone.
-	const bqTime = bigquery.time('14:00:00');
-	// A TIMESTAMP object represents an absolute point in time,
-	// independent of any time zone or convention such as Daylight
-	// Savings Time with microsecond precision.
-	const bqTimestamp = bigquery.timestamp('2020-04-27T18:07:25.356Z');
-	const bqGeography = bigquery.geography('POINT(1 2)');
-	const schoolBuffer = Buffer.from('Test University');
-	// a JSON field needs to be converted to a string
-	const metadata = JSON.stringify({
-		owner: 'John Doe',
-		contact: 'johndoe@example.com',
-	});
-	// Rows to be inserted into table
-	const rows = [
-		{
-			name: 'Tom',
-			age: '30',
-			location: bqGeography,
-			school: schoolBuffer,
-			metadata: metadata,
-			measurements: [50.05, 100.5],
-			datesTimes: {
-				day: bqDate,
-				firstTime: bqDatetime,
-				secondTime: bqTime,
-				thirdTime: bqTimestamp,
-			},
-		},
-		{
-			name: 'Ada',
-			age: '35',
-			measurements: [30.08, 121.7],
-		},
-	];
-
-	// Insert data into table
-	await client.dataset(datasetId).table(tableId).insert(rows);
-
-	console.log(`Inserted ${rows.length} rows`);
+		} catch (error) {
+			const duration = Date.now() - start;
+			results.push({ status: 'error', errorMessage: error.message, errors: error, duration });
+			console.error(`\n\nError inserting batch ${currentBatch}; ${error.message}\n\n`);
+			debugger;
+		}
+	}
+	console.log('\n\tData insertion complete.\n');
+	return results;
 }
+
+function prepareRowsForInsertion(batch, schema) {
+	return batch.map(row => {
+		const newRow = {};
+		schema.forEach(field => {
+			//sparse CSVs will have missing fields
+			if (row[field.name] !== '') {
+				newRow[field.name] = convertField(row[field.name], field.type.toUpperCase());
+			}
+			if (row[field.name] === '') delete newRow[field.name];
+		});
+		return newRow;
+	});
+}
+
+function convertField(value, type) {
+	switch (type) {
+		case 'STRING':
+			return value.toString();
+		case 'TIMESTAMP':
+			return value;
+		case 'DATE':
+			return value;
+		case 'INT64':
+			return parseInt(value);
+		case 'FLOAT64':
+			return parseFloat(value);
+		case 'BOOLEAN':
+			return value.toLowerCase() === 'true';
+		case 'RECORD':
+			return JSON.parse(value);
+		case 'JSON':
+			return JSON.parse(value);
+		case 'REPEATED':
+			return JSON.parse(value);
+		default:
+			return value;
+	}
+}
+
 
 module.exports = main;

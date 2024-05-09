@@ -20,3 +20,20 @@ export type JobConfig = {
 	// BIGQUERY
 	bigquery_dataset? : string
 }
+
+
+export type Result = { 
+	dataset: string; 
+	table: string; 
+	schema: any; 
+	upload: InsertResult[];
+}
+
+type InsertResult = {
+	status: string;
+	insertedRows: number;
+	failedRows: number;
+	duration: number;
+	errors?: any;
+	errorMessage?: string;
+}

@@ -3,10 +3,11 @@ const { parseISO, isValid } = require('date-fns');
 
 function inferType(value) {
 	//complex objects
-	if (isJSONStr(value)) return inferJSONType(value);	
 	if (isBoolean(value)) return 'BOOLEAN';
+	if (isJSONStr(value)) return inferJSONType(value);
 	if (isNumber(value)) return inferNumberType(value);
-	if (isValidDate(value)) return 'DATE';
+	if (isValidDate(value)) return inferDateType(value);
+
 	return 'STRING';
 }
 
@@ -21,6 +22,18 @@ function isNumber(value) {
 
 function inferNumberType(value) {
 	return value.includes('.') ? 'FLOAT' : 'INT';
+}
+
+function inferDateType(value) {
+
+	if (value.includes('T')) {
+		return 'TIMESTAMP';
+	}
+	if (value.includes('Z')) {
+		return 'TIMESTAMP';
+	}
+
+	return 'DATE';
 }
 
 function inferJSONType(value) {
