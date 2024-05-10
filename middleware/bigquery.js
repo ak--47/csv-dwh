@@ -1,10 +1,18 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 const u = require('ak-tools');
-//todo: authentication
-const client = new BigQuery();
+
+const client = new BigQuery(); // use application default credentials; todo: override with service account
 let datasetId = '';
 let tableId = '';
 
+
+/**
+ * BigQuery middleware
+ * implements this contract
+ * @param  {import('../types').Schema} schema
+ * @param  {import('../types').csvBatch[]} batches
+ * @param  {import('../types').JobConfig} PARAMS
+ */
 async function main(schema, batches, PARAMS) {
 	const {
 		bigquery_dataset = '',
@@ -19,18 +27,22 @@ async function main(schema, batches, PARAMS) {
 
 	datasetId = bigquery_dataset;
 	tableId = table_name;
+	// ensure column headers are clean in schema and batches
 	const columnHeaders = schema.map(field => field.name);
 	const headerMap = prepHeaders(columnHeaders);
 	const headerReplacePairs = prepHeaders(columnHeaders, true);
+	// @ts-ignore
 	schema = schema.map(field => u.rnVals(field, headerReplacePairs));
 	batches = batches.map(batch => batch.map(row => u.rnKeys(row, headerMap)));
 
-
+	// build a specific schema for BigQuery
 	schema = schemaToBQS(schema);
 
+	// do work
 	const dataset = await createDataset();
 	const table = await createTable(schema);
 	const upload = await insertData(schema, batches);
+	
 	return { dataset, table, schema, upload };
 }
 

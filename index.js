@@ -28,12 +28,12 @@ const loadToBigQuery = require('./middleware/bigquery');
  */
 async function main(PARAMS) {
 	const startTime = Date.now();
-	const {
-		//general
-		warehouse = "bigquery",
-		batch_size = 0,
+	let {
+		//everything requires:
+		warehouse = "",
+		batch_size = 1000,
 
-		//generated data
+		//generated data requires:
 		demoDataConfig,
 		event_table_name = '',
 		user_table_name = '',
@@ -41,29 +41,27 @@ async function main(PARAMS) {
 		lookup_table_name = '',
 		group_table_name = '',
 
-		//byo data
-		table_name = "foo",
+		//byo data requires:
+		table_name = "",
 		csv_file = '',
 
-		//bigquery
-		bigquery_dataset = 'hello-world',
-
-
+		//bigquery requires:
+		bigquery_dataset = '',
 
 	} = PARAMS;
 
-	PARAMS = {
-		// @ts-ignore
-		warehouse,
-		event_table_name,
-		batch_size: 0,
-		bigquery_dataset,
-		// @ts-ignore
-		csv_file,
-		demoDataConfig,
-		table_name,
-		...PARAMS
-	};
+	if (!warehouse) throw new Error('warehouse is required');
+	if (!csv_file && !demoDataConfig) throw new Error('csv_file or demoDataConfig is required');
+	if (!table_name && csv_file) console.warn('no table name specified; i will make one up'); table_name = u.makeName(2, '_');
+	if (demoDataConfig && !event_table_name) {
+		console.warn('no table name specified; i will make one up');
+		const prefix = u.makeName(2, '_');
+		event_table_name = prefix + '_events';
+		user_table_name = prefix + '_users'; 
+		scd_table_name = prefix + '_scd';
+		lookup_table_name = prefix + '_lookup';
+		group_table_name = prefix + '_groups';		
+	} 
 
 	// clean PARAMS
 	for (const key in PARAMS) {
@@ -107,7 +105,7 @@ async function main(PARAMS) {
 	const e2eDuration = endTime - startTime;
 	const clockTime = u.prettyTime(e2eDuration);
 	const totalRows = results.reduce((acc, result) => acc + result.insert.success + result.insert.failed, 0);
-	const recordsPerSec = Math.floor(totalRows / (e2eDuration / 1000));
+	const recordsPerSec = Math.floor(Number(totalRows) / (e2eDuration / 1000));
 
 	const jobSummary = {
 		version,
@@ -134,16 +132,16 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 			case 'bigquery':
 				result = await loadToBigQuery(schema, batches, PARAMS);
 				break;
-			case 'snowflake':
-				// todo
-				// result = await loadToSnowflake(records, schema, PARAMS);
-				break;
-			case 'databricks':
-				// todo
-				// result = await loadToDatabricks(records, schema, PARAMS);
-				break;
+			// case 'snowflake':
+			// 	// todo
+			// 	// result = await loadToSnowflake(records, schema, PARAMS);
+			// 	break;
+			// case 'databricks':
+			// 	// todo
+			// 	// result = await loadToDatabricks(records, schema, PARAMS);
+			// 	break;
 			default:
-				result = Promise.resolve(null);
+				throw new Error(`Unknown warehouse: ${warehouse}`);
 		}
 	}
 	catch (e) {
@@ -167,9 +165,10 @@ function batchData(data, batchSize = 0) {
 }
 
 /**
- * @param  {Result} results
+ * @param  {Result | undefined} results
  */
 function summarize(results) {
+	if (!results) return {};
 	const { upload, dataset, schema, table } = results;
 	const uploadSummary = upload.reduce((acc, batch) => {
 		acc.success += batch.insertedRows;
@@ -195,7 +194,7 @@ function summarize(results) {
 // this is for CLI
 if (require.main === module) {
 	const params = cli().then((params) => {
-		// @ts-ignore
+
 		main(params)
 			.then((results) => {
 				if (params.verbose) console.log('\n\nRESULTS:\n\n', u.json(results));

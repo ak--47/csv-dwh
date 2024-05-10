@@ -21,6 +21,18 @@ export type JobConfig = {
 	bigquery_dataset? : string
 }
 
+// TypeScript types for inferred schema
+type JSONType = 'ARRAY' | 'OBJECT' | 'JSON';
+type NumberType = 'FLOAT' | 'INT';
+type DateType = 'DATE' | 'TIMESTAMP';
+type BasicType = 'STRING' | 'BOOLEAN' | JSONType | NumberType | DateType;
+
+export interface SchemaField {
+  name: string;
+  type: BasicType;
+}
+
+export type Schema = SchemaField[];
 
 export type Result = { 
 	dataset: string; 
@@ -28,6 +40,15 @@ export type Result = {
 	schema: any; 
 	upload: InsertResult[];
 }
+
+
+export type csvRecord = {
+	[key: string]: string 
+}
+
+export type csvBatch = csvRecord[]
+
+
 
 type InsertResult = {
 	status: string;
