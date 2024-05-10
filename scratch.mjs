@@ -21,10 +21,10 @@ const PARAMS = {
 	// demoDataConfig: ecommerce
 	// csv_file: "./testData/events-restive-grotto-unfolding.csv",
 	// csv_file: "./testData/events-shimmering-skyline-pulsating.csv",
-	csv_file: "./testData/simple-EVENTS.csv",
+	csv_file: "./testData/simpleForReal-EVENTS.csv",
 	warehouse: "snowflake",
 	table_name: "baby_first_table",
-	batch_size: 10,
+	batch_size: 2500,
 	snowflake_account,
 	snowflake_user,
 	snowflake_password,

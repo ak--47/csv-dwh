@@ -85,8 +85,10 @@ async function main(PARAMS) {
 
 	// user supplied csv file
 	if (csv_file) {
-		const fileData = await u.load(path.resolve(csv_file));
-		const { data: parsed, errors } = Papa.parse(fileData, { header: true });
+		const filePath = path.resolve(csv_file);
+		const fileData = await u.load(filePath);		
+		const parseJob = Papa.parse(fileData, { header: true, skipEmptyLines: false, fastMode: false });
+		const { data: parsed } = parseJob;
 		schema = generateSchema(parsed, 'csv');
 		data = { csvData: parsed };
 	}
@@ -159,7 +161,7 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 		debugger;
 	}
 
-	const summary = summarize(result);
+	const summary = summarize(result, PARAMS);
 	return summary;
 }
 
@@ -175,10 +177,12 @@ function batchData(data, batchSize = 0) {
 
 /**
  * @param  {Result | undefined} results
+ * @param  {Config} PARAMS
  */
-function summarize(results) {
+function summarize(results, PARAMS) {
 	if (!results) return {};
-	const { upload, dataset, schema, table } = results;
+	let { upload, dataset = "", schema, table } = results;
+	if (!dataset) dataset = PARAMS.bigquery_dataset || PARAMS.snowflake_database || 'unknown';
 	const uploadSummary = upload.reduce((acc, batch) => {
 		acc.success += batch.insertedRows || 0;
 		acc.failed += batch.failedRows || 0;

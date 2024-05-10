@@ -17,6 +17,8 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	const { snowflake_database, table_name } = PARAMS;
 	if (!snowflake_database) throw new Error('snowflake_database is required');
 	if (!table_name) throw new Error('table_name is required');
+	// @ts-ignore
+	schema = schema.map(prepareSnowflakeSchema);
 	const columnHeaders = schema.map(field => field.name);
 	const headerMap = prepHeaders(columnHeaders);
 	const headerReplacePairs = prepHeaders(columnHeaders, true);
@@ -28,41 +30,53 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	/** @type {import('../types').InsertResult[]} */
 	const upload = [];
 
+	let createTableSQL
 	try {
 		// Create or replace table
-		const createTableSQL = `CREATE OR REPLACE TABLE ${table_name} (${snowflake_table_schema})`;
+		createTableSQL = `CREATE OR REPLACE TABLE ${table_name} (${snowflake_table_schema})`;
 		const tableCreation = await executeSQL(conn, createTableSQL);
+		console.log(`Table ${table_name} created (or replaced) successfully`);
 	}
 	catch (error) {
 		console.error(`Error creating table; ${error.message}`);
 		debugger;
 	}
 
+	// Prepare insert statement
+	const columnNames = schema.map(f => f.name).join(", ");
+	const placeholders = schema.map(() => '?').join(", ");
+	const insertSQL = `INSERT INTO ${table_name} (${columnNames}) VALUES (${placeholders})`;
+	console.log('\n\n')
 
+	let currentBatch = 0;
 	// Insert data
 	for (const batch of batches) {
-		const statements = [];
-		for (const row of batch) {
-			const columnNames = schema.map(f => f.name).join(", ");
-			const values = schema.map(f => formatSQLValue(row[f.name])).join(", ");
-			statements.push(`INSERT INTO ${PARAMS.table_name} (${columnNames}) VALUES (${values});`);
-		}
-		const combinedSQL = `BEGIN;\n${statements.join("\n")}\nCOMMIT;`;
+		currentBatch++;
+		const bindArray = batch.map(row => schema.map(f => formatBindValue(row[f.name])));
+		const start = Date.now();
 		try {
-			const start = Date.now();
-			const task = await executeSQL(conn, combinedSQL);
+			const task = await executeSQL(conn, insertSQL, bindArray);
 			const duration = Date.now() - start;
-			upload.push({ duration, status: 'success', insertedRows: batch.length, failedRows: 0 });
+			const numRows = task?.[0]?.['number of rows inserted'] || batch.length;
+			upload.push({ duration, status: 'success', insertedRows: numRows, failedRows: 0 });
+			u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
 		} catch (error) {
-			upload.push({ status: 'error', errorMessage: error.message, errors: error, duration: Date.now() - start });
-			console.error(`\n\nError during batch insert; ${error.message}\n\n`);
+			const duration = Date.now() - start;
+			upload.push({ status: 'error', errorMessage: error.message, errors: error, duration });
+			console.error(`\n\nError inserting batch ${currentBatch}; ${error.message}\n\n`);
 		}
 	}
 
+	/** @type {import('../types').WarehouseUploadResult} */
+	const uploadJob = { schema, database: snowflake_database, table: table_name, upload };
+	
+	console.log('\n\nData insertion complete; Terminating Connection...\n');
+	
+	//conn.destroy(terminationHandler);
 	// @ts-ignore
 	conn.destroy();
 
-	const uploadJob = { schema, database: snowflake_database, table: table_name, upload };
+	
 	return uploadJob;
 
 }
@@ -88,6 +102,58 @@ function formatSQLValue(value) {
 		return `'${value.replace(/'/g, "''")}'`;
 	} else {
 		return value;
+	}
+}
+/**
+ * @param  {import('../types').SchemaField} field
+ */
+function prepareSnowflakeSchema(field) {
+	const { name, type } = field;
+	let snowflakeType = type.toUpperCase();
+	switch (type) {
+		case 'INT': snowflakeType = 'NUMBER'; break;
+		case 'FLOAT': snowflakeType = 'FLOAT'; break;
+		case 'STRING': snowflakeType = 'VARCHAR'; break;
+		case 'BOOLEAN': snowflakeType = 'BOOLEAN'; break;
+		case 'DATE': snowflakeType = 'DATE'; break;
+		case 'TIMESTAMP': snowflakeType = 'TIMESTAMP'; break;
+		case 'JSON': snowflakeType = 'VARIANT'; break;
+		case 'ARRAY': snowflakeType = 'VARIANT'; break;
+		case 'OBJECT': snowflakeType = 'VARIANT'; break;
+		// Add other type mappings as necessary
+	}
+	return { name, type: snowflakeType };
+}
+
+function formatBindValue(value) {
+	if (value === null || value === undefined || value === "null" || value.trim() === "") {
+		return null; // Convert null-like strings to actual null
+	} else if (typeof value === 'string' && u.isJSONStr(value)) {
+		// Check if the string is JSON, parse it to actual JSON
+		try {
+			const parsed = JSON.parse(value);
+			if (Array.isArray(parsed)) {
+				// If it's an array, return it as-is so Snowflake interprets it as an array
+				return parsed;
+			} else {
+				// If it's any other kind of JSON, return the parsed JSON
+				return parsed;
+			}
+		} catch (e) {
+			// If JSON parsing fails, return the original string (should not happen since you check with isJSONStr)
+			return value;
+		}
+	} else {
+		return value; // Return the value directly if not a JSON string
+	}
+}
+
+
+function terminationHandler(err, conn) {
+	if (err) {
+		console.error('Unable to disconnect: ' + err.message);
+	} else {
+		console.log('\tDisconnected connection with id: ' + conn.getId());
 	}
 }
 
@@ -120,40 +186,28 @@ function schemaToSnowflakeSQL(schema) {
  * @param {snowflake.Connection} conn 
  * @param {string} sql 
  * @param {any[]} [binds] pass binds to bulk insert
- * @returns {Promise<void>}
+ * @returns {Promise<snowflake.StatementStatus | any[] | undefined>}
  */
 function executeSQL(conn, sql, binds) {
-	if (binds) {
-		return new Promise((resolve, reject) => {
-			conn.execute({
-				sqlText: sql,
-				binds: binds, //todo 
-				complete: (err, stmt, rows) => {
-					if (err) {
-						console.error('Failed executing SQL:', err);
-						reject(err);
-					} else {
-						console.log('SQL executed successfully');
-						resolve(rows);
-					}
-				}
-			});
-		});
-	}
 	return new Promise((resolve, reject) => {
+
+		const options = { sqlText: sql };
+		if (binds) options.binds = binds;
 		conn.execute({
-			sqlText: sql,
+			...options,
 			complete: (err, stmt, rows) => {
 				if (err) {
 					console.error('Failed executing SQL:', err);
 					reject(err);
 				} else {
-					console.log('SQL executed successfully');
+					// console.log('SQL executed successfully');
 					resolve(rows);
 				}
 			}
 		});
 	});
+
+
 }
 
 
@@ -182,7 +236,7 @@ async function createSnowflakeConnection(PARAMS) {
 	if (!snowflake_warehouse) throw new Error('snowflake_warehouse is required');
 	if (!snowflake_role) throw new Error('snowflake_role is required');
 
-	snowflake.configure({ keepAlive: true });
+	snowflake.configure({ keepAlive: true, logLevel: 'WARN' });
 
 	return new Promise((resolve, reject) => {
 		const connection = snowflake.createConnection({
@@ -193,7 +247,9 @@ async function createSnowflakeConnection(PARAMS) {
 			schema: snowflake_schema,
 			warehouse: snowflake_warehouse,
 			role: snowflake_role,
-			accessUrl: 'https://xjcqygf-pj72746.snowflakecomputing.com'
+			accessUrl: 'https://xjcqygf-pj72746.snowflakecomputing.com',
+			// jsonColumnVariantParser: rawColumnValue => JSON.parse(rawColumnValue),
+
 
 		});
 

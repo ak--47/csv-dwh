@@ -1,4 +1,4 @@
-const { isJSONStr } = require('ak-tools');
+const { isJSONStr, clone } = require('ak-tools');
 const { parseISO, isValid } = require('date-fns');
 
 function inferType(value) {
@@ -71,7 +71,8 @@ function getUniqueKeys(data) {
 
 
 function generateSchema(data, type) {
-	const keys = getUniqueKeys(data);
+	const copyData = clone(data);
+	const keys = getUniqueKeys(copyData);
 	//assume everything is a string
 	let schema = keys.map(key => {
 		const template = {
@@ -80,10 +81,10 @@ function generateSchema(data, type) {
 		};
 
 		try {
-			while (!data[0][key] && data.length) {
-				data.shift();
+			while (!copyData[0][key] && copyData.length) {
+				copyData.shift();
 			}
-			template.type = inferType(data[0][key]);
+			template.type = inferType(copyData[0][key]);
 
 		}
 		catch (e) {
