@@ -108,7 +108,11 @@ function prepHeaders(headers, asArray = false) {
 	const headerMap = {};
 	const usedNames = new Set();
 
-	headers.forEach(originalName => {
+	headers.forEach((originalName, index) => {
+		if (originalName === null) originalName = 'null';
+		if (originalName === undefined) originalName = 'undefined';
+		if (originalName === '') originalName = 'empty_index_' + index;
+
 		let cleanName = originalName.trim();
 
 		// Replace invalid characters
@@ -146,6 +150,7 @@ function prepHeaders(headers, asArray = false) {
 
 	return headerMap;
 }
+
 
 module.exports = {
 	inferType,
