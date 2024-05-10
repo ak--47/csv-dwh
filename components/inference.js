@@ -94,6 +94,57 @@ function generateSchema(data, type) {
 	return schema;
 }
 
+/**
+ * Prepares and cleans header names according to BigQuery's naming restrictions. can return hashmap or array
+ * ? see: https://cloud.google.com/bigquery/docs/schemas#column_names
+ * @param {string[]} headers - The array of header names to be cleaned.
+ * @param {boolean} [asArray=false] - Whether to return the result as an array of arrays.
+ * @returns {(Object|string[][])|{}} If asArray is true, returns an array of arrays, each containing
+ * the original header name and the cleaned header name. If false, returns an object mapping
+ * original header names to cleaned header names.
+ */
+function prepHeaders(headers, asArray = false) {
+	const headerMap = {};
+	const usedNames = new Set();
+
+	headers.forEach(originalName => {
+		let cleanName = originalName.trim();
+
+		// Replace invalid characters
+		cleanName = cleanName.replace(/[^a-zA-Z0-9_]/g, '_');
+
+		// Ensure it starts with a letter or underscore
+		if (!/^[a-zA-Z_]/.test(cleanName)) {
+			cleanName = '_' + cleanName;
+		}
+
+		// Trim to maximum length
+		cleanName = cleanName.substring(0, 300);
+
+		// Ensure uniqueness
+		let uniqueName = cleanName;
+		let suffix = 1;
+		while (usedNames.has(uniqueName)) {
+			uniqueName = cleanName + '_' + suffix++;
+		}
+		cleanName = uniqueName;
+
+		// Add to used names set
+		usedNames.add(cleanName);
+
+		// Map original name to clean name
+		headerMap[originalName] = cleanName;
+	});
+
+	if (asArray) {
+		const oldNames = Object.keys(headerMap);
+		const newNames = Object.values(headerMap);
+		const result = oldNames.map((key, i) => [key, newNames[i]]);
+		return result;
+	}
+
+	return headerMap;
+}
 
 module.exports = {
 	inferType,
@@ -104,5 +155,6 @@ module.exports = {
 	isNumber,
 	isBoolean,
 	isJSONStr,
-	generateSchema
+	generateSchema,
+	prepHeaders
 };

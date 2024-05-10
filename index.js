@@ -13,10 +13,11 @@ const { inferType, getUniqueKeys, generateSchema } = require('./components/infer
 
 
 const loadToBigQuery = require('./middleware/bigquery');
+const loadToSnowflake = require('./middleware/snowflake');
 
 /**
  * @typedef {import('./types').JobConfig} Config
- * @typedef {import('./types').Result} Result
+ * @typedef {import('./types').WarehouseUploadResult} Result
  * 
  */
 
@@ -48,6 +49,15 @@ async function main(PARAMS) {
 		//bigquery requires:
 		bigquery_dataset = '',
 
+		//snowflake requires:
+		snowflake_account = '',
+		snowflake_user = '',
+		snowflake_password = '',
+		snowflake_database = '',
+		snowflake_schema = '',
+		snowflake_warehouse = '',
+		snowflake_role = '',
+
 	} = PARAMS;
 
 	if (!warehouse) throw new Error('warehouse is required');
@@ -57,11 +67,11 @@ async function main(PARAMS) {
 		console.warn('no table name specified; i will make one up');
 		const prefix = u.makeName(2, '_');
 		event_table_name = prefix + '_events';
-		user_table_name = prefix + '_users'; 
+		user_table_name = prefix + '_users';
 		scd_table_name = prefix + '_scd';
 		lookup_table_name = prefix + '_lookup';
-		group_table_name = prefix + '_groups';		
-	} 
+		group_table_name = prefix + '_groups';
+	}
 
 	// clean PARAMS
 	for (const key in PARAMS) {
@@ -132,10 +142,9 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 			case 'bigquery':
 				result = await loadToBigQuery(schema, batches, PARAMS);
 				break;
-			// case 'snowflake':
-			// 	// todo
-			// 	// result = await loadToSnowflake(records, schema, PARAMS);
-			// 	break;
+			case 'snowflake':
+				result = await loadToSnowflake(schema, batches, PARAMS);
+				break;
 			// case 'databricks':
 			// 	// todo
 			// 	// result = await loadToDatabricks(records, schema, PARAMS);
@@ -171,9 +180,9 @@ function summarize(results) {
 	if (!results) return {};
 	const { upload, dataset, schema, table } = results;
 	const uploadSummary = upload.reduce((acc, batch) => {
-		acc.success += batch.insertedRows;
-		acc.failed += batch.failedRows;
-		acc.duration += batch.duration;
+		acc.success += batch.insertedRows || 0;
+		acc.failed += batch.failedRows || 0;
+		acc.duration += batch.duration || 0;
 		return acc;
 
 	}, { success: 0, failed: 0, duration: 0, errors: [] });

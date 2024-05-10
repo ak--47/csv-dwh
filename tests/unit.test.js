@@ -1,5 +1,5 @@
 // @ts-nocheck
-const { generateSchema, getUniqueKeys, inferType, } = require('../components/inference.js');
+const { generateSchema, getUniqueKeys, inferType, prepHeaders } = require('../components/inference.js');
 
 describe('INFER', () => {
     test('STRING', () => {
@@ -81,5 +81,218 @@ describe("GENERATE", () => {
         const uniqueKeys = getUniqueKeys(data);
         expect(uniqueKeys).toEqual(expect.arrayContaining(['a', 'b', 'c', 'd']));
         expect(uniqueKeys.length).toBe(4);
+    });
+});
+
+
+describe('RENAMING', () => {
+    test('cleans headers', () => {
+        const headers = ['first name', 'last-name', 'email@address.com', '123Start', '!@#$%^&*()'];
+        const expected = {
+            'first name': 'first_name',
+            'last-name': 'last_name',
+            'email@address.com': 'email_address_com',
+            '123Start': '_123Start',
+            '!@#$%^&*()': '__________'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('unique names', () => {
+        const headers = ['name', 'name', 'name'];
+        const expected = {
+            'name': 'name',
+            'name_1': 'name_1',
+            'name_2': 'name_2'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('whitespace + empty', () => {
+        const headers = [' ', '   ', '', '  a  '];
+        const expected = {
+            ' ': '_',
+            '   ': '_',
+            '': '_',
+            '  a  ': 'a'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('arrays', () => {
+        const headers = ['first name', 'last-name'];
+        const expectedArray = [
+            ['first name', 'first_name'],
+            ['last-name', 'last_name']
+        ];
+        expect(prepHeaders(headers, true)).toEqual(expectedArray);
+    });
+
+	test('numerics', () => {
+        const headers = ['123', '4567', '890'];
+        const expected = {
+            '123': '_123',
+            '4567': '_4567',
+            '890': '_890'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('trimmed + unique', () => {
+        const headers = ['data', ' data', 'data ', 'data', '  data  '];
+        const expected = {
+            'data': 'data',
+            ' data': 'data_1',
+            'data ': 'data_2',
+            'data_3': 'data_3',
+            '  data  ': 'data_4'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('max length', () => {
+        const headers = ['a'.repeat(301), 'b'.repeat(302), 'c'.repeat(303)];
+        const expected = {
+            ['a'.repeat(301)]: 'a'.repeat(300),
+            ['b'.repeat(302)]: 'b'.repeat(300),
+            ['c'.repeat(303)]: 'c'.repeat(300)
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('special chars', () => {
+        const headers = ['name@domain', 'user!profile', 'location#home'];
+        const expected = {
+            'name@domain': 'name_domain',
+            'user!profile': 'user_profile',
+            'location#home': 'location_home'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('case sensitivity', () => {
+        const headers = ['Name', 'NAME', 'name'];
+        const expected = {
+            'Name': 'Name',
+            'NAME': 'NAME',
+            'name': 'name'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('mixed types', () => {
+        const headers = ['age', '123Age', 'age123'];
+        const expected = {
+            'age': 'age',
+            '123Age': '_123Age',
+            'age123': 'age123'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('no input', () => {
+        const headers = [];
+        const expected = {};
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('detailed array', () => {
+        const headers = ['name', 'NAME', 'name_1'];
+        const expectedArray = [
+            ['name', 'name'],
+            ['NAME', 'NAME'],
+            ['name_1', 'name_1']
+        ];
+        expect(prepHeaders(headers, true)).toEqual(expectedArray);
+    });
+
+	test('SQL characters', () => {
+        const headers = ['select*', 'from?', 'where!', 'group@', 'order#'];
+        const expected = {
+            'select*': 'select_',
+            'from?': 'from_',
+            'where!': 'where_',
+            'group@': 'group_',
+            'order#': 'order_'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('moar specials', () => {
+        const headers = ['user%name', 'e-mail', 'full/name', 'role+level', 'date-time'];
+        const expected = {
+            'user%name': 'user_name',
+            'e-mail': 'e_mail',
+            'full/name': 'full_name',
+            'role+level': 'role_level',
+            'date-time': 'date_time'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('unicode', () => {
+        const headers = ['naïve', 'façade', 'résumé', 'coöperate', 'exposé'];
+        const expected = {
+            'naïve': 'na_ve',
+            'façade': 'fa_ade',
+            'résumé': 'r_sum_',
+            'coöperate': 'co_operate',
+            'exposé': 'expos_'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('emoji', () => {
+        const headers = ['🚀Launch', 'Profit💰', '✈️Travel'];
+        const expected = {
+            '🚀Launch': '_Launch',
+            'Profit💰': 'Profit_',
+            '✈️Travel': '_Travel'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('leading numbers', () => {
+        const headers = ['1stPlace', '2ndBase', '3rdWheel'];
+        const expected = {
+            '1stPlace': '_1stPlace',
+            '2ndBase': '_2ndBase',
+            '3rdWheel': '_3rdWheel'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('complex scenarios', () => {
+        const headers = ['name@domain.com', 'user-profile', '100%Guaranteed', 'hello_world', 'XMLHttpRequest'];
+        const expected = {
+            'name@domain.com': 'name_domain_com',
+            'user-profile': 'user_profile',
+            '100%Guaranteed': '_100_Guaranteed',
+            'hello_world': 'hello_world',
+            'XMLHttpRequest': 'XMLHttpRequest'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('duplicates + specials', () => {
+        const headers = ['name', 'name', 'name!', 'name@', 'name#'];
+        const expected = {
+            'name': 'name',
+            'name_1': 'name_1',
+            'name!': 'name_2',
+            'name@': 'name_3',
+            'name#': 'name_4'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
+    });
+
+    test('null + undefined', () => {
+        const headers = [null, undefined, ''];
+        const expected = {
+            '': '_',
+            'undefined': '_1',
+            'null': '_2'
+        };
+        expect(prepHeaders(headers)).toEqual(expected);
     });
 });

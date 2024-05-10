@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "dev": "nodemon scratch.mjs",
     "test": "jest --runInBand",
     "deps": "./scripts/deps.sh",
     "post": "npm publish",
@@ -39,6 +40,7 @@
     "dotenv": "^16.4.5",
     "make-mp-data": "^1.2.2",
     "papaparse": "^5.4.1",
+    "snowflake-sdk": "^1.10.1",
     "yargs": "^17.7.2"
   }
 }

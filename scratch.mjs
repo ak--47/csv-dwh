@@ -1,6 +1,16 @@
 /* cSpell:disable */
 import main from "./index.js";
 import u from "ak-tools";
+import dotenv from "dotenv";
+dotenv.config();
+
+const { snowflake_account,
+	snowflake_user,
+	snowflake_password,
+	snowflake_database,
+	snowflake_schema,
+	snowflake_warehouse,
+	snowflake_role } = process.env;
 
 console.log('\n------------------------------\n');
 
@@ -12,10 +22,16 @@ const PARAMS = {
 	// csv_file: "./testData/events-restive-grotto-unfolding.csv",
 	// csv_file: "./testData/events-shimmering-skyline-pulsating.csv",
 	csv_file: "./testData/simple-EVENTS.csv",
-	warehouse: "bigquery",	
-	bigquery_dataset: "csv_dwh",
-	table_name: "babys-first-table",
-	batch_size: 2500
+	warehouse: "snowflake",
+	table_name: "baby_first_table",
+	batch_size: 10,
+	snowflake_account,
+	snowflake_user,
+	snowflake_password,
+	snowflake_database,
+	snowflake_schema,
+	snowflake_warehouse,
+	snowflake_role
 };
 const data = await main(PARAMS);
 

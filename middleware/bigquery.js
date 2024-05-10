@@ -1,5 +1,6 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 const u = require('ak-tools');
+const { prepHeaders } = require('../components/inference');
 
 const client = new BigQuery(); // use application default credentials; todo: override with service account
 let datasetId = '';
@@ -12,8 +13,9 @@ let tableId = '';
  * @param  {import('../types').Schema} schema
  * @param  {import('../types').csvBatch[]} batches
  * @param  {import('../types').JobConfig} PARAMS
+ * @returns {Promise<import('../types').WarehouseUploadResult>}
  */
-async function main(schema, batches, PARAMS) {
+async function loadToBigQuery(schema, batches, PARAMS) {
 	const {
 		bigquery_dataset = '',
 		table_name = '',
@@ -42,8 +44,11 @@ async function main(schema, batches, PARAMS) {
 	const dataset = await createDataset();
 	const table = await createTable(schema);
 	const upload = await insertData(schema, batches);
-	
-	return { dataset, table, schema, upload };
+
+	const uploadJob = { schema, dataset, table, upload };
+
+	// @ts-ignore
+	return uploadJob;
 }
 
 
@@ -121,7 +126,6 @@ function schemaToBQS(schema) {
 		// 	fieldSchema.type = 'JSON';
 		// 	fieldSchema.mode = 'REPEATED';
 		// }
-
 		// // For RECORD types, handle subfields if any
 		// if (field.type.toUpperCase() === 'OBJECT' && field.fields) {
 		//     fieldSchema.fields = schemaToBQS(field.fields);
@@ -133,58 +137,6 @@ function schemaToBQS(schema) {
 	return transformedSchema;
 }
 
-
-/**
- * Prepares and cleans header names according to BigQuery's naming restrictions. can return hashmap or array
- * ? see: https://cloud.google.com/bigquery/docs/schemas#column_names
- * @param {string[]} headers - The array of header names to be cleaned.
- * @param {boolean} [asArray=false] - Whether to return the result as an array of arrays.
- * @returns {(Object|string[][])|{}} If asArray is true, returns an array of arrays, each containing
- * the original header name and the cleaned header name. If false, returns an object mapping
- * original header names to cleaned header names.
- */
-function prepHeaders(headers, asArray = false) {
-	const headerMap = {};
-	const usedNames = new Set();
-
-	headers.forEach(originalName => {
-		let cleanName = originalName.trim();
-
-		// Replace invalid characters
-		cleanName = cleanName.replace(/[^a-zA-Z0-9_]/g, '_');
-
-		// Ensure it starts with a letter or underscore
-		if (!/^[a-zA-Z_]/.test(cleanName)) {
-			cleanName = '_' + cleanName;
-		}
-
-		// Trim to maximum length
-		cleanName = cleanName.substring(0, 300);
-
-		// Ensure uniqueness
-		let uniqueName = cleanName;
-		let suffix = 1;
-		while (usedNames.has(uniqueName)) {
-			uniqueName = cleanName + '_' + suffix++;
-		}
-		cleanName = uniqueName;
-
-		// Add to used names set
-		usedNames.add(cleanName);
-
-		// Map original name to clean name
-		headerMap[originalName] = cleanName;
-	});
-
-	if (asArray) {
-		const oldNames = Object.keys(headerMap);
-		const newNames = Object.values(headerMap);
-		const result = oldNames.map((key, i) => [key, newNames[i]]);
-		return result;
-	}
-
-	return headerMap;
-}
 
 async function waitForTableToBeReady(table, retries = 20, maxInsertAttempts = 20) {
 	console.log('Checking if table exits...');
@@ -322,4 +274,4 @@ function convertField(value, type) {
 }
 
 
-module.exports = main;
+module.exports = loadToBigQuery;
