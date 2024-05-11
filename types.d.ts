@@ -34,7 +34,8 @@ export interface JobConfig {
 type JSONType = "ARRAY" | "OBJECT" | "JSON";
 type NumberType = "FLOAT" | "INT";
 type DateType = "DATE" | "TIMESTAMP";
-type BasicType = "STRING" | "BOOLEAN" | JSONType | NumberType | DateType;
+type SpecialType = "PRIMARY_KEY" | "FOREIGN_KEY" | "LOOKUP_KEY";
+type BasicType = "STRING" | "BOOLEAN" | JSONType | NumberType | DateType | SpecialType;
 
 export interface SchemaField {
   name: string;

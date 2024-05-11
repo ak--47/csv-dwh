@@ -6,15 +6,16 @@ const client = new BigQuery(); // use application default credentials; todo: ove
 let datasetId = '';
 let tableId = '';
 
+/** @typedef { "INT64" | "FLOAT64" | "DATE" | "TIMESTAMP" | "BOOLEAN" | "STRING" | "ARRAY" | "STRUCT" | "JSON" | "RECORD"} BQTypes */
 
 /**
- * BigQuery middleware
- * implements this contract
- * @param  {import('../types').Schema} schema
- * @param  {import('../types').csvBatch[]} batches
- * @param  {import('../types').JobConfig} PARAMS
- * @returns {Promise<import('../types').WarehouseUploadResult>}
- */
+* BigQuery middleware
+* implements this contract
+* @param  {import('../types').Schema} schema
+* @param  {import('../types').csvBatch[]} batches
+* @param  {import('../types').JobConfig} PARAMS
+* @returns {Promise<import('../types').WarehouseUploadResult>}
+*/
 async function loadToBigQuery(schema, batches, PARAMS) {
 	const {
 		bigquery_dataset = '',
@@ -67,48 +68,54 @@ async function createDataset() {
 }
 
 
-async function createTable(schema) {
-	const dataset = client.dataset(datasetId);
-	const table = dataset.table(tableId);
-	const [tableExists] = await table.exists();
 
-	if (tableExists) {
-		console.log(`Table ${tableId} already exists. Deleting existing table.`);
-		await table.delete();
-		console.log(`Table ${tableId} has been deleted.`);
-	}
-
-	// Proceed to create a new table with the new schema
-	const options = { schema: schemaToBQS(schema) };
-	const [newTable] = await dataset.createTable(tableId, options);
-	console.log(`New table ${newTable.id} created with the updated schema.\n`);
-	const newTableExists = await newTable.exists();
-	return newTable.id;
-}
-
-
+/**
+ * @param  {import('../types').Schema} schema
+ */
 function schemaToBQS(schema) {
 	const transformedSchema = schema.map(field => {
 		let bqType;
+		let mode = 'NULLABLE';
 
 		// Determine BigQuery type
 		// ? https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types
 		switch (field.type.toUpperCase()) {
-			case 'OBJECT': // Treat objects as RECORD
-				bqType = 'STRING';
+			// JSON TYPES
+			case 'OBJECT':
+				bqType = 'JSON';
+
 				break;
-			case 'ARRAY': // Arrays require a type specification of the elements
-				bqType = 'STRING';
+			case 'ARRAY':
+				bqType = 'JSON';
+				
 				break;
-			case 'JSON': // Store JSON as a string if not decomposed into a schema
-				bqType = 'STRING';
+			case 'JSON': 
+				bqType = 'JSON';
+
 				break;
+
+			// NUMERIC TYPES
 			case 'INT':
 				bqType = 'INT64';
 				break;
 			case 'FLOAT':
 				bqType = 'FLOAT64';
 				break;
+
+			// DATE TYPES
+			case 'DATE':
+				bqType = 'DATE';
+				break;
+			case 'TIMESTAMP':
+				bqType = 'TIMESTAMP';
+				break;
+
+			// PRIMITIVE TYPES
+			case 'BOOLEAN':
+				bqType = 'BOOLEAN';
+				break;
+			case 'STRING':
+				bqType = 'STRING';
 			default:
 				bqType = field.type.toUpperCase();
 				break;
@@ -118,8 +125,9 @@ function schemaToBQS(schema) {
 		const fieldSchema = {
 			name: field.name,
 			type: bqType,
-			mode: field.mode || 'NULLABLE'
+			mode
 		};
+
 
 		// arrays require an item type
 		// if (field.type.toUpperCase() === 'ARRAY') {
@@ -135,6 +143,46 @@ function schemaToBQS(schema) {
 	});
 
 	return transformedSchema;
+}
+/**
+ * @param  {any} value
+ * @param  {BQTypes} type
+ */
+function convertField(value, type) {
+	switch (type) {
+		case 'STRING':
+			return value.toString();
+		case 'TIMESTAMP':
+			return value;
+		case 'DATE':
+			return value;
+		case 'INT64':
+			return parseInt(value);
+		case 'FLOAT64':
+			return parseFloat(value);
+		case 'BOOLEAN':
+			return value.toLowerCase() === 'true';
+		case 'RECORD':
+			return JSON.parse(value);
+		case 'STRUCT':
+			return JSON.parse(value);;
+		default:
+			return value;
+	}
+}
+
+function prepareRowsForInsertion(batch, schema) {
+	return batch.map(row => {
+		const newRow = {};
+		schema.forEach(field => {
+			//sparse CSVs will have missing fields
+			if (row[field.name] !== '') {
+				newRow[field.name] = convertField(row[field.name], field.type.toUpperCase());
+			}
+			if (row[field.name] === '') delete newRow[field.name];
+		});
+		return newRow;
+	});
 }
 
 
@@ -234,44 +282,27 @@ async function insertData(schema, batches) {
 	return results;
 }
 
-function prepareRowsForInsertion(batch, schema) {
-	return batch.map(row => {
-		const newRow = {};
-		schema.forEach(field => {
-			//sparse CSVs will have missing fields
-			if (row[field.name] !== '') {
-				newRow[field.name] = convertField(row[field.name], field.type.toUpperCase());
-			}
-			if (row[field.name] === '') delete newRow[field.name];
-		});
-		return newRow;
-	});
+async function createTable(schema) {
+	const dataset = client.dataset(datasetId);
+	const table = dataset.table(tableId);
+	const [tableExists] = await table.exists();
+
+	if (tableExists) {
+		console.log(`Table ${tableId} already exists. Deleting existing table.`);
+		await table.delete();
+		console.log(`Table ${tableId} has been deleted.`);
+	}
+
+	// Proceed to create a new table with the new schema
+	const options = { schema: schemaToBQS(schema) };
+	const [newTable] = await dataset.createTable(tableId, options);
+	console.log(`New table ${newTable.id} created with the updated schema.\n`);
+	const newTableExists = await newTable.exists();
+	return newTable.id;
 }
 
-function convertField(value, type) {
-	switch (type) {
-		case 'STRING':
-			return value.toString();
-		case 'TIMESTAMP':
-			return value;
-		case 'DATE':
-			return value;
-		case 'INT64':
-			return parseInt(value);
-		case 'FLOAT64':
-			return parseFloat(value);
-		case 'BOOLEAN':
-			return value.toLowerCase() === 'true';
-		case 'RECORD':
-			return JSON.parse(value);
-		case 'JSON':
-			return JSON.parse(value);
-		case 'REPEATED':
-			return JSON.parse(value);
-		default:
-			return value;
-	}
-}
+
+
 
 
 module.exports = loadToBigQuery;
