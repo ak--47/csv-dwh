@@ -1,0 +1,42 @@
+[
+    {
+        "name": "product_id",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "category",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "demand",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "supply",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "manufacturer",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "price",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "rating",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "reviews",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    }
+]

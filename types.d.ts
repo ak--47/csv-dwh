@@ -6,6 +6,8 @@ export interface JobConfig {
 
   warehouse: "bigquery" | "snowflake";
   batch_size?: number;
+  dry_run?: boolean;
+  verbose?: boolean;
 
   // for csv imports
   table_name?: string;

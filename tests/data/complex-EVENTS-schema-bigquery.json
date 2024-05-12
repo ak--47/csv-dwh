@@ -1,0 +1,147 @@
+[
+    {
+        "name": "event",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_source",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "time",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_device_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_session_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "plan",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "dateOfRenewal",
+        "type": "DATE",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "codewords",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "device",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "company_id",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_insert_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "product_id",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "colors",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "category",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "hashTags",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "watchTimeSec",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "quality",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "format",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "uploader_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_user_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "amount",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "qty",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "description",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "severity",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "ticket_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "page",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "utm_source",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "currency",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "cart",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    }
+]

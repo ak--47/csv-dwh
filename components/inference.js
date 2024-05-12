@@ -151,6 +151,34 @@ function prepHeaders(headers, asArray = false) {
 	return headerMap;
 }
 
+/**
+ * Cleans a string to ensure it is safe to use as a table name or column header in all major DWH platforms.
+ * - Replaces any non-alphanumeric characters with underscores.
+ * - Ensures the name doesn't start with a digit or reserved keyword.
+ * - Removes trailing underscores.
+ * - Collapses multiple underscores to a single one.
+ * - Converts to lower case for consistency.
+ * - Ensures a minimum length by adding a default prefix if too short.
+ * - Limits the length to 300 characters.
+ */
+function cleanName(name) {
+    const reservedKeywords = new Set(['SELECT', 'TABLE', 'DELETE', 'INSERT', 'UPDATE']); // Example reserved keywords
+    name = name
+        .replace(/[^a-zA-Z0-9_]+/g, '_') // Replace sequences of non-alphanumeric characters with underscore
+        .replace(/^[\d_]+/, '_') // Replace leading digits or underscores
+        .replace(/_+$/, '') // Remove trailing underscores
+        .replace(/_+/g, '_') // Collapse multiple underscores into one
+        .toLowerCase() // Convert to lower case for consistency
+        .substring(0, 300); // Limit the length to 300 characters
+
+    // Handle reserved keywords and ensure minimum length
+    if (reservedKeywords.has(name.toUpperCase()) || name.length < 3) {
+        name = `db_${name}`; // Add a prefix if the name is a reserved keyword or too short
+    }
+
+    return name;
+}
+
 
 module.exports = {
 	inferType,
@@ -162,5 +190,6 @@ module.exports = {
 	isBoolean,
 	isJSONStr,
 	generateSchema,
-	prepHeaders
+	prepHeaders, 
+	cleanName
 };

@@ -1,0 +1,147 @@
+[
+    {
+        "name": "event",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_source",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "time",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_user_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "variants",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "flows",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "flags",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "experiment_ids",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "multiVariate",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "platform",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "currentTheme",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_insert_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "videoCategory",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "isFeaturedItem",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "watchTimeSec",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "quality",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "format",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "uploader_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "amount",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "currency",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "coupon",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "numItems",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "itemCategory",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "dateItemListed",
+        "type": "DATE",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "itemId",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "page",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "utm_source",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "rating",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "reviews",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    }
+]

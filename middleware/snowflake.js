@@ -1,6 +1,7 @@
 const snowflake = require('snowflake-sdk');
 const u = require('ak-tools');
-const { prepHeaders } = require('../components/inference');
+const { prepHeaders, cleanName } = require('../components/inference');
+require('dotenv').config();
 
 
 /**
@@ -11,12 +12,22 @@ const { prepHeaders } = require('../components/inference');
  * @returns {Promise<import('../types').WarehouseUploadResult>}
  */
 async function loadToSnowflake(schema, batches, PARAMS) {
+	PARAMS.snowflake_account = PARAMS.snowflake_account || process.env.snowflake_account;
+	PARAMS.snowflake_user = PARAMS.snowflake_user || process.env.snowflake_user;
+	PARAMS.snowflake_password = PARAMS.snowflake_password || process.env.snowflake_password;
+	PARAMS.snowflake_database = PARAMS.snowflake_database || process.env.snowflake_database;
+	PARAMS.snowflake_schema = PARAMS.snowflake_schema || process.env.snowflake_schema;
+	PARAMS.snowflake_warehouse = PARAMS.snowflake_warehouse || process.env.snowflake_warehouse;
+	PARAMS.snowflake_role = PARAMS.snowflake_role || process.env.snowflake_role;
+
 	const conn = await createSnowflakeConnection(PARAMS);
 	const isConnectionValid = await conn.isValidAsync();
 
-	const { snowflake_database, table_name } = PARAMS;
+	let { snowflake_database, table_name, dry_run } = PARAMS;
 	if (!snowflake_database) throw new Error('snowflake_database is required');
 	if (!table_name) throw new Error('table_name is required');
+
+	table_name = cleanName(table_name);
 	// @ts-ignore
 	schema = schema.map(prepareSnowflakeSchema);
 	const columnHeaders = schema.map(field => field.name);
@@ -30,7 +41,7 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	/** @type {import('../types').InsertResult[]} */
 	const upload = [];
 
-	let createTableSQL
+	let createTableSQL;
 	try {
 		// Create or replace table
 		createTableSQL = `CREATE OR REPLACE TABLE ${table_name} (${snowflake_table_schema})`;
@@ -46,9 +57,13 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	const columnNames = schema.map(f => f.name).join(", ");
 	const placeholders = schema.map(() => '?').join(", ");
 	const insertSQL = `INSERT INTO ${table_name} (${columnNames}) VALUES (${placeholders})`;
-	console.log('\n\n')
+	console.log('\n\n');
 
 	let currentBatch = 0;
+	if (dry_run) {
+		console.log('Dry run requested. Skipping Snowflake upload.');
+		return { schema, database: snowflake_database, table: table_name, upload: [] };
+	}
 	// Insert data
 	for (const batch of batches) {
 		currentBatch++;
@@ -69,14 +84,14 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 
 	/** @type {import('../types').WarehouseUploadResult} */
 	const uploadJob = { schema, database: snowflake_database, table: table_name, upload };
-	
+
 	console.log('\n\nData insertion complete; Terminating Connection...\n');
-	
+
 	//conn.destroy(terminationHandler);
 	// @ts-ignore
 	conn.destroy();
 
-	
+
 	return uploadJob;
 
 }
@@ -266,5 +281,7 @@ async function createSnowflakeConnection(PARAMS) {
 		});
 	});
 }
+
+
 
 module.exports = loadToSnowflake;

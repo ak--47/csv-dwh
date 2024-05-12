@@ -58,6 +58,11 @@ async function main(PARAMS) {
 		snowflake_warehouse = '',
 		snowflake_role = '',
 
+		//options
+		verbose = true,
+		dry_run = false,
+		...rest
+
 	} = PARAMS;
 
 	if (!warehouse) throw new Error('warehouse is required');
@@ -116,7 +121,7 @@ async function main(PARAMS) {
 	const endTime = Date.now();
 	const e2eDuration = endTime - startTime;
 	const clockTime = u.prettyTime(e2eDuration);
-	const totalRows = results.reduce((acc, result) => acc + result.insert.success + result.insert.failed, 0);
+	const totalRows = results.reduce((acc, result) => acc + result?.insert?.success || 0 + result?.insert?.failed || 0, 0);
 	const recordsPerSec = Math.floor(Number(totalRows) / (e2eDuration / 1000));
 
 	const jobSummary = {

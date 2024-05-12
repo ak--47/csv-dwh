@@ -1,0 +1,118 @@
+[
+    {
+        "name": "event",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_source",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "time",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "_user_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "variants",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "flows",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "flags",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "experiment_ids",
+        "type": "NUMBER"
+    },
+    {
+        "name": "multiVariate",
+        "type": "BOOLEAN"
+    },
+    {
+        "name": "platform",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "currentTheme",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_insert_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "videoCategory",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "isFeaturedItem",
+        "type": "BOOLEAN"
+    },
+    {
+        "name": "watchTimeSec",
+        "type": "NUMBER"
+    },
+    {
+        "name": "quality",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "format",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "uploader_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "amount",
+        "type": "NUMBER"
+    },
+    {
+        "name": "currency",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "coupon",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "numItems",
+        "type": "NUMBER"
+    },
+    {
+        "name": "itemCategory",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "dateItemListed",
+        "type": "DATE"
+    },
+    {
+        "name": "itemId",
+        "type": "NUMBER"
+    },
+    {
+        "name": "page",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "utm_source",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "rating",
+        "type": "NUMBER"
+    },
+    {
+        "name": "reviews",
+        "type": "NUMBER"
+    }
+]

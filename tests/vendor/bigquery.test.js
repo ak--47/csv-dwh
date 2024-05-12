@@ -20,11 +20,11 @@ const commonParams = {
 test("simple: events", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
-		csv_file: "./testData/simple-EVENTS.csv",
+		csv_file: "./tests/data/simple-EVENTS.csv",
 		table_name: "test-simpleEvents",
 		...commonParams
 	};
-	const expectedRows = 1080;
+	const expectedRows = 1111;
 	const job = await main(PARAMS);
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
@@ -37,14 +37,14 @@ test("simple: events", async () => {
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./testData/simple-EVENTS-bigquery.json', true);
+	const expectedSchema = await u.load('./tests/data/simple-EVENTS-schema-bigquery.json', true);
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
 
 test("simple: users", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
-		csv_file: "./testData/simple-USERS.csv",
+		csv_file: "./tests/data/simple-USERS.csv",
 		table_name: "test-simple-USERS",
 		...commonParams
 	};
@@ -61,7 +61,7 @@ test("simple: users", async () => {
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./testData/simple-USERS-bigquery.json', true);
+	const expectedSchema = await u.load('./tests/data/simple-USERS-schema-bigquery.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -70,11 +70,11 @@ test("simple: users", async () => {
 test("complex: events", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
-		csv_file: "./testData/complex-EVENTS.csv",
+		csv_file: "./tests/data/complex-EVENTS.csv",
 		table_name: "test-complex-EVENTS",
 		...commonParams
 	};
-	const expectedRows = 1082;
+	const expectedRows = 1111;
 	const job = await main(PARAMS);
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
@@ -87,7 +87,7 @@ test("complex: events", async () => {
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./testData/complex-EVENTS-bigquery.json', true);
+	const expectedSchema = await u.load('./tests/data/complex-EVENTS-schema-bigquery.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -95,7 +95,7 @@ test("complex: events", async () => {
 test("complex: users", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
-		csv_file: "./testData/complex-USERS.csv",
+		csv_file: "./tests/data/complex-USERS.csv",
 		table_name: "test-complex-USERS",
 		...commonParams
 	};
@@ -112,7 +112,7 @@ test("complex: users", async () => {
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./testData/complex-USERS-bigquery.json', true);
+	const expectedSchema = await u.load('./tests/data/complex-USERS-schema-bigquery.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -120,7 +120,7 @@ test("complex: users", async () => {
 test("complex: groups", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
-		csv_file: "./testData/complex-GROUP.csv",
+		csv_file: "./tests/data/complex-GROUP.csv",
 		table_name: "test-complex-GROUP",
 		...commonParams
 	};
@@ -137,7 +137,7 @@ test("complex: groups", async () => {
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./testData/complex-GROUP-bigquery.json', true);
+	const expectedSchema = await u.load('./tests/data/complex-GROUP-schema-bigquery.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -146,7 +146,7 @@ test("complex: groups", async () => {
 test("complex: lookups", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
-		csv_file: "./testData/complex-LOOKUP.csv",
+		csv_file: "./tests/data/complex-LOOKUP.csv",
 		table_name: "test-complex-LOOKUP",
 		...commonParams
 	};
@@ -163,7 +163,7 @@ test("complex: lookups", async () => {
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./testData/complex-LOOKUP-bigquery.json', true);
+	const expectedSchema = await u.load('./tests/data/complex-LOOKUP-schema-bigquery.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -172,11 +172,11 @@ test("complex: lookups", async () => {
 test("complex: scd", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
-		csv_file: "./testData/complex-SCD.csv",
+		csv_file: "./tests/data/complex-SCD.csv",
 		table_name: "test-complex-SCD",
 		...commonParams
 	};
-	const expectedRows = 267;
+	const expectedRows = 293;
 	const job = await main(PARAMS);
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
@@ -189,7 +189,7 @@ test("complex: scd", async () => {
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./testData/complex-SCD-bigquery.json', true);
+	const expectedSchema = await u.load('./tests/data/complex-SCD-schema-bigquery.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);

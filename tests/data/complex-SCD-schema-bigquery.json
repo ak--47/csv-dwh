@@ -1,0 +1,42 @@
+[
+    {
+        "name": "distinct_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "plan",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "MRR",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "NPS",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "marketingOptIn",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "dateOfRenewal",
+        "type": "DATE",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "startTime",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "insertTime",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    }
+]

@@ -1,5 +1,4 @@
-testData/*
-!testData/.gitkeep
+
 # Logs
 logs/*
 !logs/.gitkeep

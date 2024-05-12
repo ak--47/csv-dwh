@@ -1,0 +1,1001 @@
+product_id,category,demand,supply,manufacturer,price,rating,reviews
+1,Music,medium,high,Constellation Brands Inc.,358,2,12
+2,Outdoors,medium,high,Eastman Kodak Company,330,3,18
+3,Beauty,low,high,Pepsi Bottling Group Inc.,346,2,17
+4,Home,medium,low,Darden Restaurants Inc.,326,3,11
+5,Electronics,medium,high,AK Steel Holding Corporation,129,4,23
+6,Handmade,high,medium,"Albertson's, Inc.",379,3,15
+7,Baby,low,medium,Gillette Company,347,2,14
+8,Automotive,medium,medium,H.B. Fuller Company,138,3,1
+9,Beauty,high,high,Champion Enterprises Inc.,381,2,10
+10,Computers,medium,medium,MGIC Investment Corporation,373,4,2
+11,Garden & Tools,high,medium,JDS Uniphase Corp.,368,3,15
+12,Games,medium,low,Teradyne Inc,334,4,30
+13,Electronics,low,low,Marsh Supermarkets Inc.,153,1,29
+14,Entertainment,medium,medium,Comerica Inc.,313,3,11
+15,Industrial,low,low,Harman International Industries Inc.,388,4,31
+16,Art,medium,medium,Linens 'n Things Inc.,377,4,14
+17,Kids,low,medium,Sonoco Products Co.,134,2,6
+18,Handmade,low,medium,ConAgra Foods Inc.,396,3,4
+19,Movies,medium,medium,Comerica Inc.,313,4,21
+20,Handmade,low,high,Emerson Electric Co.,117,4,15
+21,Handmade,high,medium,Crown Cork & Seal Co. Inc.,151,2,25
+22,Entertainment,low,high,The Men's Wearhouse Inc.,332,3,23
+23,Outdoors,medium,medium,Equity Office Properties Trust,381,3,13
+24,Outdoors,medium,medium,Service Corp. International,101,3,18
+25,Entertainment,high,high,TravelCenters of America Inc.,211,2,24
+26,Sports,high,low,PolyOne Corp,356,3,32
+27,Smart Home,medium,medium,Lennar Corporation,117,4,8
+28,Baby,low,medium,Northern Trust Corporation,327,3,9
+29,Sports,high,medium,The May Department Stores Company,357,3,3
+30,Games,medium,low,Ryland Group Inc.,302,5,21
+31,Automotive,low,high,The Goodyear Tire & Rubber Company,371,3,24
+32,Kids,medium,medium,Healthsouth Corp,129,2,10
+33,Movies,high,medium,TMP Worldwide Inc,141,2,23
+34,Garden & Tools,low,low,Landstar System Inc.,98,5,21
+35,Smart Home,low,medium,Burlington Coat Factory Warehouse Corporation,123,5,24
+36,Sports,high,medium,Synovus Financial Corp.,154,3,13
+37,Music,medium,high,Wyeth,143,4,18
+38,Handmade,low,medium,Marshall & Ilsley Corporation,360,2,17
+39,Sports,medium,high,"Dominion Resources, Inc.",349,3,21
+40,Pet Supplies,medium,medium,PepsiAmericas Inc.,105,4,28
+41,Handmade,medium,medium,Maxxam Inc.,388,4,14
+42,Home,medium,medium,Pactiv Corp,372,3,1
+43,Music,medium,low,Caremark Rx Inc.,379,2,26
+44,Home,low,medium,Fairchild Semiconductor International Inc.,331,4,30
+45,Computers,medium,medium,"Brown Shoe Company, Inc.",178,4,9
+46,Home,high,medium,M.D.C. Holdings Inc.,364,2,29
+47,Entertainment,low,high,Perini Corp,324,3,1
+48,Food & Grocery,medium,high,Hillenbrand Industries Inc.,305,3,18
+49,Movies,medium,low,Calpine Corp.,137,2,17
+50,Baby,medium,medium,Mariner Health Care Inc.,129,3,29
+51,Games,high,low,Toll Brothers Inc,361,3,23
+52,Automotive,medium,medium,Vishay Intertechnology Inc,112,3,22
+53,Electronics,high,low,Molex Incorporated,181,3,9
+54,Beauty,high,medium,Yellow Corporation,339,3,18
+55,Smart Home,low,low,Oglethorpe Power Corp.,399,3,15
+56,Smart Home,medium,medium,Western Gas Resources Inc,361,3,15
+57,Games,medium,medium,Comerica Inc.,116,5,26
+58,Games,medium,medium,L-3 Communications Holdings Inc.,353,3,32
+59,Pet Supplies,medium,low,Lehman Brothers Holdings Inc.,209,3,14
+60,Automotive,medium,medium,Eastman Kodak Company,121,3,6
+61,Toys,high,medium,KeyCorp,155,3,9
+62,Beauty,medium,medium,Ingram Micro Inc.,326,4,11
+63,Automotive,medium,medium,Williams Sonoma Inc,361,2,1
+64,Games,medium,high,XO Communications Inc,414,2,17
+65,Home,low,medium,Sonic Automotive Inc.,161,4,22
+66,Computers,medium,low,Silgan Holdings Inc.,390,4,32
+67,Smart Home,medium,high,Kelly Services Inc.,405,5,2
+68,Sports,medium,medium,Unified Western Grocers Inc,117,2,32
+69,Music,medium,medium,Sports Authority Inc,149,2,10
+70,Smart Home,high,medium,"Peter Kiewit Sons', Inc.",149,4,18
+71,Home,medium,high,Burlington Northern Santa Fe Corporation,148,2,25
+72,Books,high,low,CNF Inc.,397,2,4
+73,Pet Supplies,medium,high,ConAgra Foods Inc.,396,2,22
+74,Pet Supplies,high,low,The McGraw-Hill Companies Inc.,139,4,33
+75,Toys,low,medium,GenCorp Inc.,334,3,33
+76,Games,low,low,Safeway Inc,156,3,28
+77,Industrial,low,medium,Outback Steakhouse Inc.,145,2,14
+78,Pet Supplies,medium,medium,John Hancock Financial Services Inc.,354,4,4
+79,Music,low,low,"ADC Telecommunications, Inc.",161,3,4
+80,Kids,low,medium,"Burlington Industries, Inc.",375,2,21
+81,Food & Grocery,high,medium,Nortek Inc,149,4,21
+82,Entertainment,medium,medium,"Borders Group, Inc.",362,4,15
+83,Music,low,medium,Black Hills Corporation,366,4,24
+84,Food & Grocery,high,low,USG Corporation,331,2,29
+85,Movies,medium,high,The Men's Wearhouse Inc.,299,5,33
+86,Games,high,high,United Stationers Inc,382,2,14
+87,Sports,medium,medium,The Men's Wearhouse Inc.,388,3,23
+88,Games,medium,medium,Dun & Bradstreet Inc.,144,2,20
+89,Food & Grocery,medium,medium,Plains All American Pipeline LP,367,3,23
+90,Handmade,high,low,United Parcel Service Inc,348,3,20
+91,Sports,medium,high,Flowers Foods Inc.,338,3,16
+92,Toys,low,high,Delta Air Lines Inc.,203,2,14
+93,Toys,high,low,Puget Energy Inc.,181,3,19
+94,Movies,high,high,CBRL Group Inc.,364,3,3
+95,Handmade,low,medium,Crown Cork & Seal Co. Inc.,145,3,4
+96,Food & Grocery,low,low,PolyOne Corp,174,2,14
+97,Computers,medium,medium,American Express Company,164,4,13
+98,Art,medium,low,Capital One Financial Corp.,125,3,22
+99,Food & Grocery,high,low,"Budget Group, Inc.",366,3,17
+100,Electronics,low,medium,Nike Inc,136,5,15
+101,Computers,low,low,FirstEnergy Corp.,150,4,28
+102,Electronics,low,high,Oracle Corp,380,2,4
+103,Pet Supplies,low,medium,"Beckman Coulter, Inc.",344,4,3
+104,Garden & Tools,medium,low,Consolidated Edison Inc.,160,3,28
+105,Music,medium,high,Yum Brands Inc.,375,3,9
+106,Toys,high,medium,Varco International Inc,179,2,6
+107,Smart Home,high,high,Gentek Inc.,171,3,11
+108,Automotive,medium,medium,CDW Computer Centers Inc.,369,2,9
+109,Books,medium,high,Enterprise Products Partners L.P.,368,3,29
+110,Automotive,medium,high,Omnicom Group,160,3,19
+111,Music,high,medium,Enron Corp.,154,3,28
+112,Home,high,high,Plains All American Pipeline LP,381,2,24
+113,Kids,low,medium,Alliant Energy Corporation,187,2,19
+114,Movies,high,medium,Hughes Supply Inc.,365,4,30
+115,Kids,high,medium,Dana Corporation,348,2,20
+116,Computers,medium,low,Exelon Corporation,108,4,11
+117,Food & Grocery,medium,medium,KPMG Consulting Inc.,376,4,23
+118,Health,medium,high,Snap-On Inc,349,4,33
+119,Toys,medium,high,Terex Corp,358,4,18
+120,Beauty,medium,high,"AutoNation, Inc.",351,3,18
+121,Art,medium,high,Cisco Systems Inc.,367,2,28
+122,Entertainment,medium,high,CMS Energy Corp.,372,2,28
+123,Food & Grocery,medium,medium,Sara Lee Corp,393,3,3
+124,Pet Supplies,high,low,Bausch & Lomb Incorporated,318,2,21
+125,Handmade,medium,low,Newell Rubbermaid Inc,157,2,30
+126,Kids,high,medium,Precision Castparts Corp,351,2,20
+127,Kids,medium,medium,Cooper Tire & Rubber Co.,377,3,32
+128,Toys,high,medium,Tesoro Petroleum Corp.,359,4,21
+129,Art,high,medium,Allegheny Technologies Incorporated,153,5,22
+130,Books,medium,medium,U.S. Bancorp,149,4,5
+131,Automotive,medium,medium,Comerica Inc.,389,3,14
+132,Computers,low,medium,Cintas Corp.,369,3,8
+133,Beauty,low,low,Spartan Stores Inc,161,5,32
+134,Computers,medium,medium,PPG Industries Inc,137,1,3
+135,Books,medium,high,Performance Food Group Co.,326,1,21
+136,Beauty,medium,low,Gap Inc.,98,4,28
+137,Industrial,medium,high,Leggett & Platt Inc.,95,2,14
+138,Smart Home,high,low,Caremark Rx Inc.,131,3,14
+139,Computers,medium,high,Toll Brothers Inc,132,2,17
+140,Handmade,high,low,International Business Machines Corp.,329,4,23
+141,Beauty,high,high,NiSource Inc,149,1,29
+142,Baby,low,low,ALLTEL Corporation,139,2,14
+143,Computers,high,medium,Energizer Holdings Inc.,159,4,23
+144,Outdoors,high,medium,"Big Lots, Inc.",329,4,9
+145,Food & Grocery,high,high,Protective Life Corp,137,3,3
+146,Automotive,medium,medium,Northrop Grumman Corporation,352,5,18
+147,Automotive,medium,medium,DQE Inc.,147,1,11
+148,Smart Home,medium,medium,PETsMART Inc,373,2,4
+149,Handmade,medium,medium,Flowserv Corp,391,3,15
+150,Computers,low,high,Hershey Foods Corp.,113,4,33
+151,Garden & Tools,medium,high,Conseco Inc.,153,5,28
+152,Electronics,medium,high,Marathon Oil Corporation,350,2,21
+153,Art,medium,high,Jones Apparel Group Inc.,373,3,11
+154,Electronics,medium,low,Genzyme Corporation,171,3,5
+155,Sports,low,high,Tecumseh Products Company,178,2,14
+156,Baby,medium,medium,Farmland Industries Inc.,154,4,26
+157,Baby,high,low,Sovereign Bancorp Inc.,389,4,8
+158,Sports,medium,low,Pro-Fac Cooperative Inc.,180,3,14
+159,Books,high,high,Fleetwood Enterprises Inc.,302,3,4
+160,Toys,high,low,Walgreen Co,366,3,24
+161,Industrial,high,low,Smithfield Foods Inc,340,3,14
+162,Handmade,medium,medium,Reader's Digest Association Inc.,368,5,30
+163,Baby,high,high,Liz Claiborne Inc.,343,4,28
+164,Garden & Tools,medium,medium,Del Monte Foods Co,125,3,15
+165,Art,medium,high,Bristol-Myers Squibb Company,153,4,23
+166,Kids,medium,medium,Smith International Inc,116,3,22
+167,Beauty,low,high,GreenPoint Financial Corp.,147,2,14
+168,Books,high,low,Audiovox Corporation,134,3,22
+169,Automotive,medium,medium,Sports Authority Inc,367,2,13
+170,Automotive,high,low,Johnson Controls Inc.,336,1,19
+171,Smart Home,low,high,OM Group Inc,370,5,13
+172,Computers,high,low,Texas Instruments Incorporated,151,2,14
+173,Electronics,medium,high,AOL Time Warner Inc.,145,3,14
+174,Health,medium,medium,"Conectiv, Inc",149,2,29
+175,Games,medium,medium,Hawaiian Electric Industries Inc.,368,2,32
+176,Electronics,low,high,Premcor Inc.,137,3,14
+177,Handmade,low,high,Great Plains Energy Inc.,106,3,4
+178,Music,high,medium,Simon Property Group Inc,375,2,20
+179,Beauty,medium,high,Mercury General Corporation,370,4,9
+180,Health,high,high,Mattel Inc.,330,3,23
+181,Toys,high,high,Conseco Inc.,153,4,11
+182,Computers,medium,medium,Gentek Inc.,163,2,9
+183,Handmade,low,high,Mohawk Industries Inc.,341,3,20
+184,Handmade,high,medium,Community Health Systems Inc.,392,3,9
+185,Smart Home,low,high,Electronic Arts Inc.,395,3,11
+186,Electronics,medium,medium,Williams Sonoma Inc,119,5,9
+187,Health,high,high,"Broadwing, Inc.",379,3,29
+188,Automotive,low,high,Chubb Corp,366,3,29
+189,Computers,high,medium,Comerica Inc.,384,4,11
+190,Automotive,low,high,Procter & Gamble Co.,368,3,12
+191,Sports,medium,medium,Pier 1 Imports Inc.,153,2,18
+192,Art,medium,medium,Aetna Inc.,156,4,31
+193,Smart Home,medium,low,Ryerson Tull Inc,327,5,11
+194,Electronics,medium,high,PPL Corp,410,4,13
+195,Food & Grocery,low,high,Mariner Health Care Inc.,157,2,18
+196,Home,medium,high,Dynegy Inc.,161,4,15
+197,Toys,medium,high,Volt Information Sciences Inc,376,4,5
+198,Outdoors,high,medium,North Fork Bancorporation Inc,138,4,33
+199,Outdoors,medium,high,Federal Express Corp.,380,4,17
+200,Beauty,medium,low,Goldman Sachs Group Inc.,171,5,9
+201,Industrial,low,medium,Brunswick Corporation,124,4,2
+202,Industrial,high,high,Gillette Company,358,2,9
+203,Handmade,medium,low,Stater Bros. Holdings Inc.,153,3,32
+204,Home,medium,high,"Allied Waste Industries, Inc.",142,3,11
+205,Toys,low,high,DIMON Incorporated,381,3,30
+206,Toys,medium,medium,United Rentals Inc,125,3,3
+207,Industrial,medium,medium,Petco Animal Supplies Inc.,171,3,32
+208,Books,medium,medium,KPMG Consulting Inc.,147,1,15
+209,Art,high,medium,Granite Construction Incorporated,326,4,14
+210,Entertainment,low,high,Gentek Inc.,117,2,7
+211,Music,medium,low,Apache Corporation,345,4,9
+212,Kids,medium,high,Prudential Financial Inc.,345,2,8
+213,Pet Supplies,medium,medium,Di Giorgio Corporation,363,5,14
+214,Outdoors,high,medium,Dun & Bradstreet Inc.,337,2,20
+215,Games,medium,high,Conseco Inc.,388,1,20
+216,Health,medium,medium,St. Paul Cos.,133,4,24
+217,Health,high,medium,Goodrich Corporation,373,4,13
+218,Food & Grocery,medium,high,LandAmerica Financial Group Inc.,149,3,9
+219,Garden & Tools,medium,medium,Harman International Industries Inc.,162,3,23
+220,Automotive,medium,low,National Commerce Financial Corporation,420,2,22
+221,Pet Supplies,high,high,Federal Mogul Corp.,369,2,9
+222,Garden & Tools,medium,medium,Frontier Oil Corp,113,4,21
+223,Music,low,high,Radio Shack Corporation,141,4,29
+224,Health,medium,medium,Wells Fargo & Company,158,2,15
+225,Entertainment,medium,medium,ConAgra Foods Inc.,347,1,30
+226,Music,high,high,SunTrust Banks Inc,380,2,17
+227,Smart Home,low,medium,Deere & Company,373,2,28
+228,Pet Supplies,medium,high,Micron Technology Inc.,340,3,13
+229,Music,low,high,"Apple Computer, Inc.",406,3,21
+230,Health,medium,low,Universal Corporation,98,3,11
+231,Food & Grocery,medium,low,"AutoZone, Inc.",136,1,24
+232,Games,low,medium,Payless Shoesource Inc,104,4,23
+233,Beauty,low,low,Revlon Inc,382,3,28
+234,Entertainment,medium,high,Saks Inc,336,2,2
+235,Toys,low,low,Eli Lilly and Company,117,4,11
+236,Outdoors,medium,medium,Champion Enterprises Inc.,113,4,18
+237,Health,low,medium,Storage Technology Corporation,361,4,3
+238,Handmade,low,low,Dillard's Inc.,384,4,20
+239,Entertainment,medium,medium,Franklin Resources Inc.,362,4,1
+240,Smart Home,medium,low,Wyndham International Inc,151,2,15
+241,Pet Supplies,medium,high,Banta Corporation,372,4,14
+242,Beauty,high,low,Campbell Soup Co.,126,2,31
+243,Games,medium,high,J.B. Hunt Transport Services Inc.,137,3,15
+244,Industrial,high,medium,Delta Air Lines Inc.,177,2,29
+245,Smart Home,low,medium,Trinity Industries Inc,385,2,21
+246,Smart Home,medium,low,Service Corp. International,131,2,21
+247,Movies,high,medium,"American Financial Group, Inc.",115,4,10
+248,Beauty,high,medium,A.G. Edwards Inc.,389,2,8
+249,Outdoors,medium,low,"Dominion Resources, Inc.",129,3,23
+250,Automotive,medium,low,"Burlington Industries, Inc.",164,4,6
+251,Sports,medium,high,Ryder System Inc,163,4,14
+252,Food & Grocery,high,medium,Viad Corp,133,2,4
+253,Automotive,medium,medium,GreenPoint Financial Corp.,129,2,7
+254,Entertainment,high,high,Xerox Corp,113,2,14
+255,Industrial,medium,medium,EGL Inc.,359,5,15
+256,Baby,high,low,Bank of America Corporation,384,3,15
+257,Baby,low,low,Concord EFS Inc.,145,2,14
+258,Food & Grocery,low,low,Lear Corporation,136,2,18
+259,Automotive,medium,high,Union Pacific Corporation,133,3,21
+260,Industrial,low,low,Tecumseh Products Company,144,3,13
+261,Smart Home,high,low,Omnicare Inc,387,2,17
+262,Books,low,medium,Avaya Inc.,382,3,9
+263,Home,medium,high,Citizens Communications Co.,143,4,18
+264,Garden & Tools,low,high,Sun Microsystems Inc.,359,2,35
+265,Sports,medium,medium,Level 3 Communications Inc.,321,3,33
+266,Health,medium,medium,Viasystems Group Inc,212,2,14
+267,Pet Supplies,medium,low,Performance Food Group Co.,370,2,1
+268,Baby,low,medium,Great Lakes Chemical Corporation,414,1,9
+269,Pet Supplies,medium,medium,The Bear Stearns Companies Inc.,366,3,23
+270,Automotive,low,high,Polo Ralph Lauren Corp,145,2,19
+271,Garden & Tools,high,low,Deluxe Corporation,378,2,2
+272,Industrial,medium,low,Stater Bros. Holdings Inc.,168,2,33
+273,Garden & Tools,high,high,Constellation Brands Inc.,390,3,14
+274,Handmade,medium,low,Consolidated Edison Inc.,137,2,31
+275,Health,medium,medium,WPS Resources Corporation,163,3,21
+276,Pet Supplies,medium,high,KPMG Consulting Inc.,389,1,23
+277,Industrial,low,medium,NiSource Inc,206,4,1
+278,Art,low,high,Starwood Hotels & Resorts Worldwide Inc,140,2,2
+279,Music,medium,high,The Lubrizol Corporation,404,1,19
+280,Smart Home,low,high,Adelphia Communications Corporation,111,2,17
+281,Electronics,medium,high,AMC Entertainment Inc.,151,1,11
+282,Food & Grocery,low,low,Mail-Well Inc.,364,2,10
+283,Outdoors,high,high,Wendy's International Inc,141,3,12
+284,Electronics,low,medium,Temple-Inland Inc,197,4,28
+285,Entertainment,high,high,Footstar Inc.,143,3,23
+286,Books,medium,medium,MDU Resources Group Inc.,342,3,23
+287,Movies,medium,medium,Premcor Inc.,366,3,2
+288,Beauty,high,high,Bethlehem Steel Corporation,172,2,24
+289,Industrial,low,low,Crompton Corp.,116,4,11
+290,Books,medium,low,Burlington Resources Inc.,379,2,23
+291,Toys,low,low,Reader's Digest Association Inc.,379,4,11
+292,Kids,medium,medium,CMGI Inc.,363,3,14
+293,Computers,medium,low,W.R. Berkley Corporation,144,3,11
+294,Pet Supplies,medium,high,Concord EFS Inc.,201,2,17
+295,Sports,low,low,Pentair Inc,377,4,32
+296,Baby,high,medium,The May Department Stores Company,401,2,11
+297,Industrial,low,medium,Textron Inc,365,4,10
+298,Home,low,medium,"Adams Resources & Energy, Inc.",404,4,11
+299,Toys,high,medium,"BJ's Wholesale Club, Inc.",105,2,7
+300,Music,low,high,Pioneer-Standard Electronics Inc.,396,3,30
+301,Games,high,medium,Liz Claiborne Inc.,343,5,14
+302,Beauty,medium,low,Noble Energy Inc,156,2,23
+303,Smart Home,low,medium,Toys 'R' Us Inc,180,1,29
+304,Smart Home,medium,medium,"Swift Transportation, Co., Inc",377,2,11
+305,Toys,high,medium,"Allied Waste Industries, Inc.",104,2,4
+306,Movies,high,high,Sierra Health Services Inc,98,3,32
+307,Games,low,medium,The LTV Corporation,140,3,23
+308,Health,medium,medium,Metris Companies Inc,376,3,28
+309,Toys,medium,medium,Plains All American Pipeline LP,370,1,10
+310,Food & Grocery,medium,high,Pharmacia Corp,98,3,17
+311,Outdoors,high,low,AMERCO,389,2,21
+312,Automotive,low,high,Dillard's Inc.,221,3,32
+313,Health,high,high,The Boeing Company,366,4,11
+314,Food & Grocery,low,low,Seaboard Corp,171,3,21
+315,Beauty,medium,high,Smurfit-Stone Container Corp,371,3,24
+316,Baby,medium,high,Honeywell International Inc.,396,3,17
+317,Outdoors,low,high,L-3 Communications Holdings Inc.,340,3,24
+318,Entertainment,medium,high,Felcor Lodging Trust Inc.,146,4,16
+319,Computers,low,medium,ITT Industries Inc.,388,4,13
+320,Garden & Tools,low,medium,Gold Kist Inc.,386,3,3
+321,Games,medium,high,Owens Corning,119,3,9
+322,Music,medium,medium,Zale Corporation,389,1,23
+323,Entertainment,low,medium,Unova Inc,136,2,20
+324,Health,medium,medium,WorldCom Inc,130,2,4
+325,Entertainment,high,high,American Power Conversion Corporation,326,4,15
+326,Sports,low,low,NorthWestern Corporation,312,2,29
+327,Beauty,medium,medium,Bank One Corporation,140,2,32
+328,Games,low,high,The Bear Stearns Companies Inc.,128,2,17
+329,Baby,medium,low,Honeywell International Inc.,305,1,6
+330,Garden & Tools,medium,low,Teradyne Inc,117,3,17
+331,Games,low,medium,Golden West Financial Corporation,398,2,15
+332,Electronics,medium,high,Unisys Corporation,111,4,13
+333,Smart Home,low,low,First American Financial Corp.,336,3,22
+334,Pet Supplies,medium,high,Abercrombie & Fitch Co.,359,1,25
+335,Games,medium,low,Tenet Healthcare Corporation,130,3,17
+336,Electronics,medium,low,Knight-Ridder Inc.,200,5,22
+337,Electronics,low,low,Parker Hannifin Corp.,356,1,30
+338,Outdoors,medium,high,Parker Hannifin Corp.,126,3,6
+339,Games,medium,medium,Equity Office Properties Trust,113,3,23
+340,Art,low,medium,Supervalu Inc,380,3,14
+341,Beauty,medium,low,Pitney Bowes Inc.,124,2,21
+342,Beauty,medium,medium,Fluor Corp,175,2,10
+343,Electronics,low,medium,E.W. Scripps Company,156,4,17
+344,Kids,medium,low,Archer Daniels Midland Company,157,4,29
+345,Kids,low,high,Amgen Inc.,125,4,14
+346,Music,low,medium,NCR Corporation,139,3,23
+347,Garden & Tools,medium,high,W.R. Berkley Corporation,326,4,6
+348,Health,medium,low,Michaels Stores Inc.,388,3,13
+349,Automotive,high,high,Standard Pacific Corp.,384,2,17
+350,Books,high,low,Tiffany & Co,153,2,4
+351,Games,medium,low,CBRL Group Inc.,340,2,33
+352,Entertainment,low,low,Electronic Arts Inc.,398,4,18
+353,Food & Grocery,medium,medium,"Allergan, Inc.",365,3,11
+354,Games,medium,high,Kerr-McGee Corporation,370,3,15
+355,Handmade,low,medium,Xilinx Inc,366,2,11
+356,Handmade,low,medium,Regis Corporation,128,3,14
+357,Movies,low,low,Sonoco Products Co.,338,3,5
+358,Food & Grocery,low,medium,"The Alpine Group, Inc.",302,3,16
+359,Garden & Tools,low,medium,Wallace Computer Services Inc,149,3,32
+360,Computers,low,medium,Del Monte Foods Co,340,1,14
+361,Industrial,high,low,Vulcan Materials Company,161,5,32
+362,Health,medium,high,National Semiconductor Corporation,149,3,18
+363,Art,low,high,The Men's Wearhouse Inc.,363,4,17
+364,Art,medium,low,Viasystems Group Inc,153,2,29
+365,Electronics,medium,medium,Zale Corporation,388,1,21
+366,Automotive,medium,high,AMR Corporation,139,2,11
+367,Electronics,medium,medium,Estee Lauder Companies Inc.,349,3,3
+368,Movies,low,medium,Omnicom Group,198,3,9
+369,Computers,medium,high,Del Monte Foods Co,161,3,30
+370,Baby,low,high,Fortune Brands Inc.,156,1,29
+371,Industrial,medium,medium,The Allstate Corporation,155,4,14
+372,Toys,low,medium,Ashland Inc.,166,4,30
+373,Industrial,medium,medium,Dell Computer Corporation,127,2,19
+374,Kids,high,low,Pitney Bowes Inc.,138,3,28
+375,Books,high,low,Pilgrim's Pride Corporation,368,3,29
+376,Smart Home,medium,low,TMP Worldwide Inc,411,5,11
+377,Home,high,medium,Quintiles Transnational,354,5,28
+378,Books,low,high,EGL Inc.,344,3,2
+379,Art,medium,high,"Allergan, Inc.",371,3,26
+380,Baby,high,medium,Timken Company,138,2,21
+381,Entertainment,medium,low,Unocal Corporation,353,3,3
+382,Games,low,low,Scholastic Corp,132,3,9
+383,Books,medium,medium,OfficeMax Inc,336,2,11
+384,Health,medium,medium,Dun & Bradstreet Inc.,116,3,13
+385,Toys,medium,low,Unified Western Grocers Inc,332,2,28
+386,Computers,high,low,Metris Companies Inc,197,3,29
+387,Toys,medium,high,"American Axle & Manufacturing Holdings, Inc.",317,3,30
+388,Baby,medium,low,American Greetings Corporation,322,2,7
+389,Sports,medium,high,"Belk, Inc.",363,3,32
+390,Garden & Tools,medium,medium,Wyndham International Inc,132,3,30
+391,Garden & Tools,medium,medium,Foamex International Inc,349,4,14
+392,Health,low,high,Marsh & McLennan Companies Inc.,152,4,5
+393,Food & Grocery,medium,medium,Chiquita Brands International Inc.,373,3,11
+394,Home,medium,medium,John Hancock Financial Services Inc.,152,4,32
+395,Industrial,high,low,Smurfit-Stone Container Corp,370,5,17
+396,Kids,medium,medium,Harrah's Entertainment Inc.,381,2,23
+397,Home,medium,medium,Unocal Corporation,140,4,24
+398,Garden & Tools,medium,medium,Sunoco Inc.,106,3,30
+399,Toys,high,low,Loews Corporation,117,2,21
+400,Health,medium,medium,Foamex International Inc,164,2,11
+401,Books,high,medium,Sierra Health Services Inc,378,2,3
+402,Home,medium,medium,Quanta Services Inc.,367,3,16
+403,Industrial,high,medium,KLA-Tencor Corporation,348,3,35
+404,Automotive,medium,medium,CDI Corp.,389,3,11
+405,Electronics,medium,medium,Emerson Electric Co.,167,2,10
+406,Computers,high,medium,Progressive Corporation,169,2,2
+407,Toys,medium,medium,Jacobs Engineering Group Inc.,161,3,22
+408,Games,medium,low,Target Corp.,145,2,24
+409,Garden & Tools,medium,medium,Southern Union Company,347,3,13
+410,Home,medium,medium,Fisher Scientific International Inc.,359,2,21
+411,Games,medium,medium,Rockwell Collins Inc,127,3,21
+412,Health,medium,low,York International Corp,134,3,30
+413,Food & Grocery,low,high,K-Mart Corp.,126,4,4
+414,Baby,medium,high,Ingles Market Inc,370,1,30
+415,Health,medium,high,The May Department Stores Company,374,4,11
+416,Food & Grocery,high,low,Wendy's International Inc,107,3,19
+417,Food & Grocery,low,medium,Delta Air Lines Inc.,392,4,28
+418,Industrial,high,high,"Belk, Inc.",133,3,14
+419,Games,low,low,Federal Mogul Corp.,387,1,14
+420,Baby,medium,medium,"Burlington Industries, Inc.",359,3,21
+421,Handmade,high,medium,DaVita Inc.,139,5,3
+422,Kids,medium,medium,Baxter International Inc.,363,2,13
+423,Pet Supplies,high,medium,"Amkor Technology, Inc.",361,2,15
+424,Games,low,low,Echostar Communications Corporation,142,3,9
+425,Kids,medium,low,Unisource Energy Corp,140,3,18
+426,Health,medium,medium,Tower Automotive Inc.,192,4,2
+427,Electronics,medium,low,PNC Financial Services Group Inc.,142,1,19
+428,Electronics,medium,high,Collins & Aikman Corp.,111,4,23
+429,Toys,medium,medium,Metaldyne Corporation,200,4,14
+430,Garden & Tools,medium,medium,Hovnanian Enterprises Inc.,90,2,11
+431,Sports,high,medium,Adolph Coors Company,392,2,20
+432,Home,medium,low,National Rural Utilities Cooperative Finance Corporation,144,4,17
+433,Health,medium,low,Pepsi Bottling Group Inc.,339,5,31
+434,Handmade,medium,low,America West Holdings Corporation,342,4,25
+435,Food & Grocery,high,medium,WPS Resources Corporation,122,3,3
+436,Toys,medium,high,Novellus Systems Inc,370,2,18
+437,Pet Supplies,medium,medium,International Multifoods Corporation,384,2,3
+438,Automotive,high,medium,Morgan Stanley Dean Witter & Co.,337,2,21
+439,Industrial,medium,high,Frontier Oil Corp,368,2,17
+440,Art,low,low,"Adams Resources & Energy, Inc.",120,5,21
+441,Industrial,low,high,Capital One Financial Corp.,137,2,8
+442,Electronics,high,low,"American International Group, Inc.",168,2,10
+443,Health,low,medium,Nextel Communications Inc,117,4,23
+444,Movies,high,medium,H.B. Fuller Company,396,1,17
+445,Movies,medium,medium,Carpenter Technology Corp.,320,1,11
+446,Automotive,medium,medium,Ryland Group Inc.,98,3,10
+447,Toys,medium,low,Ciena Corp.,368,2,14
+448,Beauty,medium,medium,NorthWestern Corporation,372,2,19
+449,Industrial,high,low,Hormel Foods Corp.,129,2,16
+450,Home,low,medium,J.B. Hunt Transport Services Inc.,376,2,28
+451,Music,medium,high,Countrywide Credit Industries Inc.,326,2,30
+452,Pet Supplies,medium,low,H&R Block Inc.,353,2,17
+453,Automotive,low,medium,AK Steel Holding Corporation,144,3,4
+454,Pet Supplies,high,high,Triad Hospitals Inc,387,4,24
+455,Smart Home,medium,medium,MeadWestvaco Corporation,111,4,5
+456,Art,high,low,United Parcel Service Inc,360,2,6
+457,Smart Home,high,low,KeyCorp,154,2,1
+458,Computers,high,low,McLeodUSA Incorporated,402,2,18
+459,Handmade,medium,medium,Domino's Pizza LLC,119,3,28
+460,Handmade,medium,low,IT Group Inc.,325,4,23
+461,Health,high,medium,"Amtran, Inc.",133,1,17
+462,Music,medium,medium,Wakenhut Corporation,180,4,23
+463,Smart Home,medium,medium,Energy East Corporation,113,2,15
+464,Food & Grocery,high,high,Weis Markets Inc.,336,4,18
+465,Home,medium,low,"Arch Coal, Inc.",160,2,5
+466,Toys,medium,low,Murphy Oil Corporation,362,3,23
+467,Food & Grocery,high,medium,Storage Technology Corporation,378,2,11
+468,Pet Supplies,high,medium,Hewlett-Packard Company,153,3,4
+469,Industrial,medium,low,FirstEnergy Corp.,127,5,12
+470,Health,low,medium,Jabil Circuit Inc.,131,4,23
+471,Garden & Tools,low,medium,First National of Nebraska Inc.,107,1,14
+472,Electronics,medium,medium,Walter Industries Inc,136,4,9
+473,Food & Grocery,low,medium,"ADC Telecommunications, Inc.",173,5,22
+474,Sports,low,low,"Avnet, Inc.",322,2,24
+475,Music,medium,medium,"Advanced Micro Devices, Inc.",362,3,21
+476,Food & Grocery,medium,medium,Host Marriott Corp.,376,4,30
+477,Computers,high,medium,NCR Corporation,388,2,21
+478,Baby,high,medium,J.P. Morgan Chase & Co.,326,3,11
+479,Beauty,medium,high,XO Communications Inc,326,4,9
+480,Pet Supplies,medium,medium,Flowers Foods Inc.,348,4,18
+481,Outdoors,high,low,Ryder System Inc,363,2,30
+482,Books,low,medium,Wellpoint Health Networks Inc,389,2,29
+483,Electronics,medium,medium,Freeport McMoran Copper & Gold Inc.,147,4,28
+484,Outdoors,low,high,Health Management Associates Inc.,349,3,20
+485,Industrial,medium,high,York International Corp,363,3,11
+486,Electronics,medium,medium,Charter One Financial Inc.,168,1,30
+487,Outdoors,medium,low,"Brightpoint, Inc.",339,3,30
+488,Toys,low,high,American Standard Companies Inc.,387,3,33
+489,Beauty,low,high,Hughes Supply Inc.,348,2,28
+490,Home,high,medium,Protective Life Corp,403,3,30
+491,Beauty,medium,low,Newmont Mining Corporation,385,3,3
+492,Music,medium,low,America West Holdings Corporation,178,2,15
+493,Books,high,medium,Masco Corporation,370,4,18
+494,Baby,medium,high,Clear Channel Communications Inc.,327,3,11
+495,Beauty,medium,medium,United Technologies Corporation,159,3,28
+496,Computers,low,medium,Medtronic Inc.,333,4,23
+497,Pet Supplies,high,medium,Republic Services Inc,328,3,29
+498,Garden & Tools,medium,medium,AK Steel Holding Corporation,127,3,17
+499,Music,high,medium,Scholastic Corp,159,3,18
+500,Art,low,high,Regions Financial Corp.,379,1,21
+501,Computers,medium,high,FMC Corp,168,3,5
+502,Pet Supplies,medium,high,Lexmark International Inc.,315,3,17
+503,Computers,medium,medium,C. H. Robinson Worldwide Inc.,365,4,11
+504,Handmade,high,high,"Autoliv, Inc.",115,3,14
+505,Garden & Tools,medium,medium,H.B. Fuller Company,315,2,29
+506,Garden & Tools,low,medium,Coventry Health Care Inc.,155,2,28
+507,Music,medium,medium,Boston Scientific Corporation,104,3,20
+508,Books,medium,high,Symbol Technologies Inc,349,3,20
+509,Automotive,medium,high,PepsiCo Inc.,389,2,20
+510,Baby,medium,low,Hubbell Inc.,125,2,17
+511,Pet Supplies,medium,low,Raymond James Financial Inc.,392,3,20
+512,Music,medium,medium,Sonic Automotive Inc.,168,5,15
+513,Games,low,medium,Idacorp Inc.,388,3,4
+514,Food & Grocery,low,medium,Scotts Company,341,3,6
+515,Beauty,medium,medium,Hughes Supply Inc.,118,2,18
+516,Games,low,medium,Wells Fargo & Company,147,2,28
+517,Industrial,medium,medium,Tenneco Automotive Inc.,127,2,10
+518,Movies,low,medium,Merrill Lynch & Co. Inc.,181,2,26
+519,Books,high,high,Ruddick Corp,367,3,8
+520,Home,low,medium,Diebold Incorporated,362,2,24
+521,Movies,low,low,Torchmark Corporation,287,2,19
+522,Beauty,medium,low,Shaw Group Inc,119,2,14
+523,Movies,medium,medium,Genuine Parts Company,129,3,28
+524,Beauty,high,high,McCormick & Company Incorporated,157,5,8
+525,Sports,medium,low,Puget Energy Inc.,178,3,15
+526,Computers,high,medium,"E*Trade Group, Inc.",373,3,4
+527,Kids,medium,high,"American Water Works Company, Inc.",212,2,20
+528,Books,low,medium,Seaboard Corp,341,3,17
+529,Books,low,medium,U.S. Industries Inc.,198,2,16
+530,Outdoors,medium,medium,DTE Energy Co.,366,5,14
+531,Baby,medium,medium,Wisconsin Energy Corporation,393,2,29
+532,Industrial,high,medium,R.J. Reynolds Tobacco Company,387,3,28
+533,Entertainment,high,high,Burlington Resources Inc.,363,3,19
+534,Outdoors,low,medium,Western Digital Inc,343,3,23
+535,Entertainment,low,medium,RPM Inc.,358,4,14
+536,Electronics,low,low,Tech Data Corporation,370,3,14
+537,Baby,high,low,Abercrombie & Fitch Co.,372,3,4
+538,Electronics,low,medium,Providian Financial Corp.,119,3,5
+539,Food & Grocery,high,high,Collins & Aikman Corp.,159,3,33
+540,Electronics,high,medium,Sovereign Bancorp Inc.,338,4,4
+541,Sports,medium,low,Costco Wholesale Corp.,160,3,21
+542,Baby,medium,high,Unisys Corporation,126,4,24
+543,Sports,medium,medium,Fidelity National Financial Inc.,159,3,11
+544,Industrial,low,medium,Crane Co.,331,3,9
+545,Garden & Tools,medium,high,Systemax Inc.,350,4,20
+546,Health,high,high,Mail-Well Inc.,185,2,14
+547,Food & Grocery,medium,low,AOL Time Warner Inc.,350,2,21
+548,Electronics,medium,medium,ABM Industries Incorporated,391,2,11
+549,Pet Supplies,high,low,Costco Wholesale Corp.,123,3,30
+550,Garden & Tools,high,medium,Amerada Hess Corporation,151,4,17
+551,Entertainment,low,high,Staff Leasing Inc.,134,4,2
+552,Electronics,high,medium,Sonic Automotive Inc.,101,2,16
+553,Food & Grocery,medium,high,Nash Finch Company,129,3,14
+554,Computers,medium,low,Equity Residential Properties Trust,389,2,13
+555,Garden & Tools,medium,medium,US Oncology Inc,332,2,14
+556,Entertainment,low,medium,Lennox International Inc.,193,2,23
+557,Art,low,medium,"American Financial Group, Inc.",201,3,20
+558,Kids,low,medium,WestPoint Stevens Inc,355,2,17
+559,Kids,high,medium,E.I. Du Pont de Nemours and Company,197,3,14
+560,Computers,low,medium,Audiovox Corporation,349,4,14
+561,Pet Supplies,low,medium,Pro-Fac Cooperative Inc.,165,4,21
+562,Smart Home,high,low,Prudential Financial Inc.,171,4,6
+563,Music,high,medium,U.S. Industries Inc.,166,3,11
+564,Industrial,high,medium,Imperial Sugar Company,362,4,9
+565,Automotive,low,medium,American Power Conversion Corporation,133,2,3
+566,Kids,medium,medium,Stilwell Financial Inc,157,1,10
+567,Pet Supplies,high,medium,United Auto Group Inc,343,2,1
+568,Health,high,medium,Intuit Inc.,200,2,3
+569,Automotive,low,medium,Bowater Incorporated,312,3,23
+570,Movies,low,medium,PepsiCo Inc.,366,4,14
+571,Home,high,medium,"Airgas, Inc.",349,2,24
+572,Sports,low,high,Foster Wheeler Ltd.,156,4,23
+573,Music,medium,high,AmerisourceBergen Corporation,164,4,7
+574,Music,low,high,Owens Corning,171,1,28
+575,Baby,medium,high,The Allstate Corporation,210,4,4
+576,Music,low,low,"Amkor Technology, Inc.",159,2,10
+577,Home,medium,low,"ADC Telecommunications, Inc.",158,4,13
+578,Beauty,low,medium,Hubbell Inc.,137,2,10
+579,Music,medium,low,Kohl's Corp.,173,2,18
+580,Kids,medium,low,KPMG Consulting Inc.,155,3,14
+581,Food & Grocery,high,medium,Zions Bancorporation,151,3,13
+582,Smart Home,medium,high,Cincinnati Financial Corp.,365,2,20
+583,Toys,medium,high,Smithfield Foods Inc,191,5,20
+584,Toys,low,low,FMC Corp,365,2,19
+585,Baby,high,medium,Parker Hannifin Corp.,162,4,29
+586,Books,high,high,PepsiAmericas Inc.,359,4,11
+587,Baby,medium,medium,Rite Aid Corp,131,3,4
+588,Home,medium,medium,Flowers Foods Inc.,137,3,23
+589,Beauty,medium,medium,Footstar Inc.,135,4,18
+590,Sports,medium,high,Avery Dennison Corporation,111,3,21
+591,Baby,high,high,Williams Companies Inc,169,3,18
+592,Music,high,high,Spherion Corp,164,3,21
+593,Kids,high,medium,Sierra Health Services Inc,144,2,20
+594,Pet Supplies,medium,low,Western Digital Inc,349,3,31
+595,Food & Grocery,low,medium,Lithia Motors Inc.,165,2,23
+596,Electronics,medium,medium,TruServ Corporation,363,1,29
+597,Food & Grocery,low,high,Metals USA Inc.,392,3,3
+598,Movies,medium,medium,PPG Industries Inc,122,2,28
+599,Computers,medium,low,NSTAR,363,2,29
+600,Art,high,high,Energy East Corporation,388,2,20
+601,Food & Grocery,low,high,Eaton Corporation,134,3,19
+602,Food & Grocery,low,low,Astoria Financial Corporation,364,3,5
+603,Games,high,high,Southern Company,164,5,32
+604,Entertainment,medium,low,Burlington Coat Factory Warehouse Corporation,341,2,15
+605,Pet Supplies,low,medium,Cummins Inc.,302,2,15
+606,Movies,high,low,Kohl's Corp.,112,2,18
+607,Books,medium,medium,Pennzoil-Quaker State Company,123,3,11
+608,Music,medium,medium,Revlon Inc,115,4,11
+609,Smart Home,high,low,Vulcan Materials Company,134,1,7
+610,Kids,low,low,Hawaiian Electric Industries Inc.,376,3,17
+611,Electronics,medium,medium,Bank One Corporation,149,3,33
+612,Books,medium,high,J.P. Morgan Chase & Co.,165,2,32
+613,Movies,high,low,Omnicom Group,352,2,21
+614,Food & Grocery,high,high,UnumProvident Corporation,143,3,15
+615,Entertainment,medium,medium,Danaher Corporation,348,3,21
+616,Entertainment,high,medium,Astoria Financial Corporation,119,3,4
+617,Health,medium,high,Commercial Metals Co.,354,1,11
+618,Art,high,medium,Pier 1 Imports Inc.,390,3,33
+619,Pet Supplies,high,high,OM Group Inc,128,3,30
+620,Outdoors,medium,medium,Washington Post Co.,104,2,14
+621,Computers,high,medium,"Big Lots, Inc.",397,3,14
+622,Garden & Tools,high,medium,Darden Restaurants Inc.,113,2,24
+623,Electronics,medium,low,Enron Corp.,380,3,22
+624,Baby,low,high,Ball Corporation,347,3,21
+625,Health,high,low,Humana Inc.,158,3,28
+626,Pet Supplies,high,medium,Anadarko Petroleum Corporation,341,3,17
+627,Movies,high,high,"Barnes & Noble, Inc.",392,3,8
+628,Industrial,high,medium,Owens & Minor Inc.,117,2,20
+629,Kids,medium,medium,Kindred Healthcare Inc.,353,1,28
+630,Industrial,medium,medium,J.P. Morgan Chase & Co.,364,3,4
+631,Books,medium,medium,Hon Industries Inc.,309,3,20
+632,Toys,low,low,North Fork Bancorporation Inc,396,2,23
+633,Handmade,medium,medium,Lennox International Inc.,381,3,23
+634,Pet Supplies,medium,medium,IMS Health Inc.,140,3,10
+635,Home,low,medium,Di Giorgio Corporation,319,4,18
+636,Music,medium,high,Weatherford International Inc,117,3,29
+637,Toys,medium,medium,UnumProvident Corporation,347,2,21
+638,Pet Supplies,high,medium,Baxter International Inc.,104,3,11
+639,Industrial,medium,medium,Smithfield Foods Inc,315,3,20
+640,Art,medium,low,Trigon Healthcare Inc.,363,3,20
+641,Industrial,high,high,Estee Lauder Companies Inc.,317,3,5
+642,Electronics,low,medium,Hilton Hotels Corp.,359,3,14
+643,Sports,low,medium,Coventry Health Care Inc.,154,3,14
+644,Outdoors,high,medium,Raytheon Company,360,3,23
+645,Sports,medium,medium,Phar Mor Inc.,133,3,31
+646,Electronics,high,high,NTL Incorporated,368,4,20
+647,Outdoors,high,high,Bowater Incorporated,98,2,15
+648,Movies,low,medium,Milacron Inc.,346,2,21
+649,Baby,medium,medium,Household International Corp.,139,3,23
+650,Games,medium,high,W.R. Grace & Co,181,3,20
+651,Home,medium,medium,Performance Food Group Co.,144,3,29
+652,Outdoors,low,high,Franklin Resources Inc.,181,3,11
+653,Smart Home,low,low,Volt Information Sciences Inc,340,2,10
+654,Beauty,medium,medium,SunTrust Banks Inc,360,3,14
+655,Kids,medium,medium,Texas Industries Inc.,180,3,14
+656,Computers,high,low,Genzyme Corporation,163,2,14
+657,Home,low,medium,US Oncology Inc,129,4,32
+658,Outdoors,medium,low,American Greetings Corporation,161,2,9
+659,Automotive,medium,low,Trinity Industries Inc,137,1,21
+660,Industrial,high,high,NSTAR,137,4,15
+661,Movies,medium,low,Computer Associates International Inc.,132,3,23
+662,Beauty,high,medium,Sara Lee Corp,338,4,26
+663,Automotive,low,high,NorthWestern Corporation,153,2,15
+664,Art,medium,high,Varco International Inc,334,3,19
+665,Toys,high,high,Paychex Inc,368,3,8
+666,Smart Home,high,medium,Noble Energy Inc,358,2,11
+667,Toys,low,medium,Performance Food Group Co.,158,2,22
+668,Music,medium,medium,Audiovox Corporation,331,4,19
+669,Entertainment,medium,medium,KeySpan Corp.,386,2,28
+670,Baby,high,medium,Gentiva Health Services Inc.,387,3,3
+671,Smart Home,medium,high,Sprint Corp.,164,3,10
+672,Music,medium,medium,Avery Dennison Corporation,350,5,15
+673,Automotive,medium,low,Fleming Companies Inc.,109,4,11
+674,Music,medium,high,Reebok International Ltd.,142,3,30
+675,Pet Supplies,low,medium,Compuware Corp.,336,2,10
+676,Toys,medium,medium,ChevronTexaco Corp.,166,3,33
+677,Outdoors,high,low,Valero Energy Corporation,335,2,28
+678,Industrial,medium,high,Bethlehem Steel Corporation,133,3,15
+679,Home,low,medium,Unisource Energy Corp,180,2,30
+680,Garden & Tools,medium,low,Stein Mart Inc,381,2,4
+681,Toys,medium,medium,Southwest Gas Corp,163,4,9
+682,Handmade,low,medium,Perini Corp,344,3,22
+683,Computers,medium,medium,"Apple Computer, Inc.",404,2,14
+684,Books,medium,medium,Compuware Corp.,381,3,29
+685,Electronics,medium,medium,NTL Incorporated,164,3,26
+686,Automotive,high,medium,Pathmark Stores Inc.,348,2,18
+687,Music,low,high,Martin Marietta Materials Inc.,116,3,32
+688,Garden & Tools,medium,low,"Allegheny Energy, Inc.",172,3,30
+689,Outdoors,medium,high,Wellpoint Health Networks Inc,327,4,14
+690,Art,medium,medium,Revlon Inc,339,3,13
+691,Automotive,low,high,Ryland Group Inc.,376,2,21
+692,Games,medium,medium,Landstar System Inc.,199,2,30
+693,Food & Grocery,high,high,"Cadence Design Systems, Inc.",375,3,30
+694,Health,low,medium,CellStar Corp.,160,4,15
+695,Smart Home,medium,low,SunTrust Banks Inc,193,3,1
+696,Food & Grocery,high,medium,Eli Lilly and Company,384,3,3
+697,Garden & Tools,medium,medium,Prudential Financial Inc.,367,4,9
+698,Movies,medium,low,Goodrich Corporation,174,3,32
+699,Books,medium,low,Sovereign Bancorp Inc.,379,2,29
+700,Games,high,low,Unisys Corporation,367,3,15
+701,Health,high,medium,Hercules Inc.,145,2,11
+702,Smart Home,low,low,Varco International Inc,136,3,13
+703,Industrial,low,medium,The McGraw-Hill Companies Inc.,212,2,14
+704,Pet Supplies,low,high,Household International Corp.,156,3,17
+705,Automotive,high,low,"Brightpoint, Inc.",379,3,18
+706,Beauty,high,high,Unocal Corporation,128,4,24
+707,Toys,low,medium,Protective Life Corp,119,3,33
+708,Industrial,low,medium,Bethlehem Steel Corporation,153,4,12
+709,Home,medium,high,Sovereign Bancorp Inc.,350,3,13
+710,Automotive,medium,medium,Expeditors International of Washington Inc.,171,3,20
+711,Health,medium,medium,Bristol-Myers Squibb Company,322,3,30
+712,Handmade,low,medium,Bristol-Myers Squibb Company,406,3,20
+713,Electronics,medium,medium,UST Inc,170,2,10
+714,Pet Supplies,medium,medium,General Electric Company,339,4,32
+715,Home,medium,low,Foster Wheeler Ltd.,405,3,5
+716,Movies,medium,low,Kellogg Company,113,4,11
+717,Kids,medium,medium,W.R. Grace & Co,377,2,28
+718,Health,high,low,"Allergan, Inc.",117,3,3
+719,Movies,high,medium,BellSouth Corporation,168,3,21
+720,Sports,medium,medium,Stewart & Stevenson Services Inc,364,2,14
+721,Kids,low,low,Ferro Corp.,348,3,12
+722,Pet Supplies,low,medium,Standard Pacific Corp.,187,3,1
+723,Computers,low,low,Wakenhut Corporation,379,4,20
+724,Industrial,medium,medium,Huntington Bancshares Inc.,380,2,5
+725,Outdoors,high,medium,Vulcan Materials Company,168,3,28
+726,Pet Supplies,medium,high,Marriott International Inc.,144,2,6
+727,Industrial,low,high,Marshall & Ilsley Corporation,114,3,9
+728,Computers,low,medium,Omnicom Group,352,2,23
+729,Food & Grocery,medium,medium,Acterna Corp.,187,3,23
+730,Automotive,high,low,Manor Care Inc.,382,2,23
+731,Home,low,medium,SunGard Data Systems Inc.,356,2,13
+732,Garden & Tools,medium,medium,Spartan Stores Inc,335,3,13
+733,Automotive,low,low,Stryker Corp,155,3,32
+734,Entertainment,medium,low,"Allergan, Inc.",163,2,9
+735,Pet Supplies,medium,medium,"Applied Materials, Inc.",115,3,31
+736,Pet Supplies,low,low,Texas Industries Inc.,160,2,15
+737,Computers,medium,high,National Service Industries Inc,153,3,9
+738,Pet Supplies,medium,high,W.W. Grainger Inc,309,5,2
+739,Games,medium,low,Pinnacle West Capital Corp,402,5,17
+740,Kids,medium,medium,Park Place Entertainment Corp,170,2,20
+741,Home,low,high,Forest Laboratories Inc.,156,1,25
+742,Computers,medium,medium,Plains All American Pipeline LP,119,2,12
+743,Handmade,high,low,Boise Cascade Corporation,362,4,25
+744,Health,low,medium,Hughes Supply Inc.,144,1,21
+745,Beauty,medium,high,ExxonMobil Corporation,355,3,11
+746,Sports,low,high,New York Times Company,389,3,30
+747,Health,low,high,Bowater Incorporated,333,4,17
+748,Electronics,high,medium,Silgan Holdings Inc.,368,2,5
+749,Electronics,high,medium,"Agilent Technologies, Inc.",141,2,28
+750,Games,low,low,Quintiles Transnational,360,2,9
+751,Home,high,medium,Constellation Brands Inc.,348,4,10
+752,Music,medium,low,Navistar International Corporation,169,4,20
+753,Entertainment,high,high,Lennar Corporation,374,2,23
+754,Movies,high,medium,Chubb Corp,336,4,26
+755,Garden & Tools,medium,medium,Gentiva Health Services Inc.,334,2,18
+756,Handmade,high,low,Stryker Corp,133,1,25
+757,Music,medium,high,Sanmina-SCI Inc,111,3,11
+758,Electronics,high,medium,"Airgas, Inc.",127,4,35
+759,Health,high,high,"Aquila, Inc.",149,2,20
+760,Entertainment,high,medium,CNF Inc.,380,3,10
+761,Industrial,high,low,Watsco Inc,370,2,33
+762,Art,medium,low,Harsco Corp.,389,2,13
+763,Music,medium,high,Equitable Resources Inc.,366,4,14
+764,Computers,medium,high,Genuity Inc.,369,2,11
+765,Handmade,high,medium,Raytheon Company,156,2,20
+766,Sports,medium,medium,D.R. Horton Inc.,366,2,32
+767,Art,low,medium,UnumProvident Corporation,368,5,6
+768,Pet Supplies,medium,medium,Coca-Cola Enterprises Inc.,350,2,23
+769,Art,low,high,Healthsouth Corp,358,3,15
+770,Entertainment,medium,high,Cabot Corp,403,2,21
+771,Music,medium,low,National Rural Utilities Cooperative Finance Corporation,107,3,32
+772,Industrial,low,medium,Spartan Stores Inc,166,2,14
+773,Baby,low,medium,Metaldyne Corporation,104,3,12
+774,Handmade,low,low,Grey Global Group Inc.,117,2,31
+775,Garden & Tools,high,medium,SBC Communications Inc,129,3,21
+776,Garden & Tools,medium,high,Colgate-Palmolive Co.,163,2,22
+777,Health,low,medium,Amgen Inc.,158,4,24
+778,Art,high,medium,American Standard Companies Inc.,370,2,13
+779,Automotive,low,high,FMC Corp,151,3,21
+780,Automotive,low,medium,Costco Wholesale Corp.,367,5,21
+781,Sports,medium,medium,Allmerica Financial Corporation,173,2,11
+782,Music,medium,high,Ameren Corporation,149,4,18
+783,Food & Grocery,high,medium,Deere & Company,386,2,14
+784,Outdoors,medium,low,Stilwell Financial Inc,132,2,14
+785,Movies,medium,high,The Goodyear Tire & Rubber Company,119,3,21
+786,Automotive,high,medium,International Multifoods Corporation,399,2,14
+787,Handmade,medium,high,Noble Energy Inc,161,2,30
+788,Baby,low,low,Perot Systems Corp,388,2,10
+789,Home,medium,high,Metals USA Inc.,372,3,15
+790,Entertainment,low,medium,Bowater Incorporated,191,4,30
+791,Art,medium,medium,TravelCenters of America Inc.,160,4,28
+792,Outdoors,medium,medium,Vulcan Materials Company,392,4,17
+793,Home,high,medium,ChevronTexaco Corp.,127,3,3
+794,Music,low,high,Oxford Health Plans Inc,348,2,9
+795,Food & Grocery,low,medium,Sherwin-Williams Company,326,2,16
+796,Industrial,high,medium,Park Place Entertainment Corp,183,3,15
+797,Music,high,high,Fleetwood Enterprises Inc.,171,2,4
+798,Garden & Tools,low,high,Teradyne Inc,404,3,17
+799,Music,high,medium,Ingles Market Inc,170,3,23
+800,Baby,high,low,Eli Lilly and Company,149,2,13
+801,Kids,medium,low,RPM Inc.,353,4,28
+802,Kids,medium,medium,Household International Corp.,396,2,10
+803,Pet Supplies,medium,low,CDW Computer Centers Inc.,127,3,18
+804,Food & Grocery,high,high,"Applied Materials, Inc.",370,2,15
+805,Smart Home,high,high,"Apple Computer, Inc.",358,4,1
+806,Movies,medium,low,GATX Corporation,363,2,14
+807,Automotive,high,high,Newell Rubbermaid Inc,311,2,17
+808,Music,medium,medium,TRW Inc,407,2,3
+809,Baby,high,medium,Quintiles Transnational,387,2,4
+810,Baby,medium,high,Federated Department Stores Inc.,126,3,14
+811,Automotive,medium,medium,GenCorp Inc.,172,2,20
+812,Smart Home,medium,medium,Reebok International Ltd.,159,1,23
+813,Smart Home,low,low,Imperial Sugar Company,133,4,14
+814,Toys,medium,medium,Tektronix Inc,359,2,15
+815,Pet Supplies,low,high,Bed Bath & Beyond Inc.,372,2,14
+816,Garden & Tools,high,medium,Fortune Brands Inc.,348,4,28
+817,Outdoors,high,medium,H&R Block Inc.,340,3,31
+818,Baby,high,high,Comcast Corp.,123,4,1
+819,Toys,high,medium,Lear Corporation,368,2,29
+820,Art,medium,medium,Kerr-McGee Corporation,166,3,30
+821,Pet Supplies,low,medium,TECO Energy Inc,403,2,23
+822,Movies,high,medium,Sherwin-Williams Company,199,4,20
+823,Electronics,low,medium,WPS Resources Corporation,331,2,4
+824,Music,low,low,CVS Corp.,144,4,30
+825,Electronics,high,low,Colgate-Palmolive Co.,372,2,18
+826,Computers,medium,medium,Omnicom Group,372,2,10
+827,Health,low,high,ServiceMaster Co,388,3,28
+828,Garden & Tools,high,medium,AOL Time Warner Inc.,116,5,11
+829,Smart Home,low,high,Packaging Corp. of America,323,5,10
+830,Handmade,medium,medium,Norfolk Southern Corporation,322,4,15
+831,Electronics,medium,medium,Danaher Corporation,368,2,33
+832,Music,medium,high,Solutia Inc,185,3,23
+833,Sports,medium,medium,Burlington Coat Factory Warehouse Corporation,142,3,11
+834,Home,medium,medium,Jabil Circuit Inc.,393,3,11
+835,Entertainment,medium,low,Sports Authority Inc,176,2,26
+836,Art,medium,low,Encompass Services Corporation,332,4,8
+837,Food & Grocery,low,low,Clear Channel Communications Inc.,340,2,35
+838,Health,high,medium,CDI Corp.,304,3,13
+839,Movies,medium,medium,Comerica Inc.,178,2,23
+840,Art,low,low,EGL Inc.,111,4,19
+841,Food & Grocery,low,medium,Revlon Inc,365,3,30
+842,Baby,low,high,Praxair Inc,172,2,32
+843,Industrial,medium,low,Computer Sciences Corp.,171,3,28
+844,Art,high,low,Metaldyne Corporation,379,3,20
+845,Music,medium,high,General Motors Corporation,157,5,14
+846,Computers,high,medium,"Adams Resources & Energy, Inc.",379,3,35
+847,Kids,low,medium,Yum Brands Inc.,170,1,21
+848,Industrial,medium,high,Wells Fargo & Company,152,3,17
+849,Movies,high,high,Chubb Corp,117,3,21
+850,Pet Supplies,medium,medium,E.W. Scripps Company,363,2,31
+851,Toys,high,high,Caremark Rx Inc.,368,3,15
+852,Sports,low,high,EGL Inc.,206,3,21
+853,Games,high,medium,"Advantica Restaurant Group, Inc.",358,1,15
+854,Smart Home,high,low,Markel Corporation,181,4,18
+855,Sports,high,high,Compass Bancshares Inc,341,4,18
+856,Industrial,medium,low,Merrill Lynch & Co. Inc.,355,1,10
+857,Health,medium,low,"Earthlink, Inc.",125,4,20
+858,Music,high,high,Georgia Gulf Corporation,384,4,28
+859,Art,medium,low,Laboratory Corporation of America Holdings,341,4,15
+860,Toys,medium,medium,Bowater Incorporated,172,3,20
+861,Kids,medium,high,Acterna Corp.,148,2,14
+862,Garden & Tools,low,medium,"Anheuser-Busch Companies, Inc.",350,2,21
+863,Movies,medium,medium,Fifth Third Bancorp,137,2,20
+864,Kids,low,low,Nordstrom Inc,125,2,14
+865,Industrial,medium,medium,Continental Airlines Inc.,370,1,14
+866,Industrial,low,low,Herman Miller Inc.,109,4,29
+867,Baby,medium,high,Reader's Digest Association Inc.,330,4,32
+868,Pet Supplies,medium,high,Stanley Works,368,3,28
+869,Outdoors,low,medium,The Boeing Company,397,4,33
+870,Games,medium,medium,Ford Motor Co,131,5,2
+871,Beauty,low,medium,Hasbro Inc.,139,1,28
+872,Computers,medium,medium,Aetna Inc.,321,3,13
+873,Industrial,medium,medium,Pactiv Corp,156,3,14
+874,Health,low,medium,Timken Company,333,5,23
+875,Computers,high,low,EMC Corporation,356,3,23
+876,Pet Supplies,low,low,IMS Health Inc.,354,4,10
+877,Industrial,medium,medium,WestPoint Stevens Inc,151,4,13
+878,Sports,medium,high,Goldman Sachs Group Inc.,332,3,23
+879,Beauty,low,medium,Wisconsin Energy Corporation,180,3,21
+880,Movies,high,medium,Entergy Corporation,381,5,23
+881,Food & Grocery,medium,medium,KPMG Consulting Inc.,393,1,32
+882,Outdoors,low,high,Exelon Corporation,90,2,8
+883,Outdoors,medium,medium,3Com Corp,173,1,11
+884,Books,high,medium,Motorola Inc.,129,2,14
+885,Automotive,high,medium,Walgreen Co,362,3,32
+886,Movies,high,medium,"Broadwing, Inc.",203,4,24
+887,Home,medium,medium,ARAMARK Corporation,149,4,28
+888,Beauty,medium,high,Micron Technology Inc.,152,3,29
+889,Outdoors,high,medium,Health Management Associates Inc.,349,2,29
+890,Art,high,high,Lucent Technologies Inc.,152,3,24
+891,Art,medium,medium,H&R Block Inc.,151,3,10
+892,Books,low,medium,Johnson Controls Inc.,172,2,9
+893,Industrial,medium,medium,Polaris Industries Inc.,348,3,11
+894,Smart Home,high,high,Lennox International Inc.,203,2,20
+895,Food & Grocery,low,medium,Hercules Inc.,361,4,17
+896,Sports,low,medium,TruServ Corporation,181,2,14
+897,Beauty,medium,medium,Frontier Oil Corp,120,5,11
+898,Beauty,high,medium,Campbell Soup Co.,376,3,11
+899,Smart Home,high,high,Hughes Supply Inc.,362,2,11
+900,Toys,low,low,Radio Shack Corporation,305,2,18
+901,Home,medium,low,Value City Department Stores Inc,368,4,5
+902,Sports,high,medium,Stein Mart Inc,370,3,30
+903,Industrial,medium,low,Stater Bros. Holdings Inc.,354,4,17
+904,Food & Grocery,medium,low,Terex Corp,344,4,14
+905,Music,low,high,CSX Corp.,113,4,33
+906,Games,high,medium,TransMontaigne Inc,115,2,35
+907,Health,high,medium,"Alaska Air Group, Inc.",158,3,29
+908,Garden & Tools,low,medium,Procter & Gamble Co.,321,3,24
+909,Kids,medium,medium,Home Depot Inc.,344,3,29
+910,Toys,low,low,Sabre Holdings Corp,162,3,18
+911,Outdoors,medium,low,"Affiliated Computer Services, Inc.",112,2,14
+912,Health,medium,high,Perot Systems Corp,345,3,14
+913,Books,low,medium,Johnson Controls Inc.,183,3,33
+914,Outdoors,high,medium,Silgan Holdings Inc.,420,2,14
+915,Movies,low,medium,Briggs & Stratton Corporation,146,3,17
+916,Industrial,medium,high,PNM Resources Inc,152,4,33
+917,Industrial,medium,low,McKesson Corporation,350,3,15
+918,Beauty,medium,medium,Jack In The Box Inc.,403,4,18
+919,Music,medium,medium,OfficeMax Inc,116,4,3
+920,Kids,low,low,The Lubrizol Corporation,351,3,1
+921,Baby,low,medium,Comfort Systems USA Inc.,145,3,23
+922,Entertainment,medium,low,National City Corp.,137,2,15
+923,Smart Home,medium,high,Northrop Grumman Corporation,377,3,10
+924,Pet Supplies,medium,medium,J.B. Hunt Transport Services Inc.,388,3,7
+925,Handmade,low,high,Cooper Industries Ltd.,161,2,20
+926,Home,low,medium,PNM Resources Inc,182,2,24
+927,Electronics,medium,high,CVS Corp.,158,3,32
+928,Food & Grocery,high,medium,El Paso Corporation,174,4,14
+929,Garden & Tools,medium,low,Aetna Inc.,181,3,14
+930,Art,high,low,Solectron Corp,334,2,18
+931,Pet Supplies,low,high,Sun Microsystems Inc.,152,3,21
+932,Beauty,medium,medium,Crane Co.,133,3,30
+933,Entertainment,medium,medium,Gillette Company,355,4,15
+934,Kids,high,low,Conoco Inc,163,1,32
+935,Pet Supplies,medium,low,Philip Morris Companies Inc.,311,2,11
+936,Baby,high,low,ABM Industries Incorporated,165,3,13
+937,Books,low,low,Washington Mutual Inc,344,2,15
+938,Baby,medium,medium,Shopko Stores Inc,155,3,1
+939,Movies,low,low,Pitney Bowes Inc.,124,4,35
+940,Automotive,high,low,Deere & Company,362,5,19
+941,Art,low,low,Payless Shoesource Inc,143,2,26
+942,Pet Supplies,medium,high,Granite Construction Incorporated,138,1,29
+943,Industrial,low,medium,Fleming Companies Inc.,158,3,1
+944,Entertainment,medium,medium,Seaboard Corp,120,3,16
+945,Games,low,high,First National of Nebraska Inc.,128,4,21
+946,Entertainment,medium,medium,SunTrust Banks Inc,149,2,18
+947,Health,high,medium,ITT Industries Inc.,393,2,22
+948,Outdoors,medium,medium,Cendant Corp,157,3,20
+949,Health,low,medium,Domino's Pizza LLC,392,4,15
+950,Garden & Tools,medium,medium,Johnson Controls Inc.,374,3,23
+951,Outdoors,medium,medium,Wm Wrigley Jr Company,324,2,19
+952,Outdoors,high,low,Scotts Company,392,2,13
+953,Automotive,low,medium,Quantum Corp,350,3,23
+954,Games,medium,high,"Airgas, Inc.",114,2,32
+955,Home,medium,high,Mattel Inc.,157,4,23
+956,Pet Supplies,low,medium,Transocean Inc,368,3,11
+957,Electronics,medium,low,Outback Steakhouse Inc.,352,1,21
+958,Outdoors,medium,medium,Pinnacle West Capital Corp,103,3,17
+959,Outdoors,high,high,Regis Corporation,370,2,9
+960,Kids,low,medium,Revlon Inc,146,5,23
+961,Beauty,medium,low,AOL Time Warner Inc.,146,3,6
+962,Entertainment,medium,medium,Dynegy Inc.,387,3,21
+963,Beauty,high,low,Compuware Corp.,167,3,20
+964,Home,medium,high,"Airborne, Inc.",130,3,29
+965,Movies,high,low,PolyOne Corp,375,1,26
+966,Art,medium,medium,Tiffany & Co,119,1,15
+967,Baby,high,medium,"Apple Computer, Inc.",343,4,23
+968,Music,high,medium,"AdvancePCS, Inc.",165,4,7
+969,Pet Supplies,medium,high,Foamex International Inc,98,2,23
+970,Games,high,low,USA Interactive,353,1,30
+971,Smart Home,medium,medium,KB Home,373,3,12
+972,Garden & Tools,medium,high,MPS Group Inc.,388,3,5
+973,Industrial,low,medium,Pilgrim's Pride Corporation,131,5,24
+974,Garden & Tools,medium,medium,Countrywide Credit Industries Inc.,152,3,32
+975,Baby,medium,low,"The Bank of New York Company, Inc.",340,1,28
+976,Food & Grocery,medium,medium,Pentair Inc,147,3,13
+977,Home,high,low,Sysco Corp,375,4,11
+978,Books,medium,medium,Texas Instruments Incorporated,305,5,12
+979,Pet Supplies,medium,medium,Equitable Resources Inc.,107,2,15
+980,Games,high,medium,H&R Block Inc.,125,2,29
+981,Smart Home,low,low,Enterprise Products Partners L.P.,341,3,30
+982,Pet Supplies,medium,high,Convergys Corp.,116,4,30
+983,Electronics,low,medium,Pittston Brinks Group,162,1,9
+984,Health,high,medium,United Auto Group Inc,374,3,11
+985,Sports,low,medium,Cigna Corp,114,3,15
+986,Baby,medium,medium,Fifth Third Bancorp,211,4,11
+987,Electronics,medium,medium,United Rentals Inc,368,3,15
+988,Music,medium,medium,Baxter International Inc.,373,2,11
+989,Entertainment,medium,low,Whirlpool Corporation,317,3,28
+990,Pet Supplies,medium,medium,Rockwell Collins Inc,106,4,10
+991,Baby,high,medium,Harsco Corp.,172,3,17
+992,Home,medium,high,Morgan Stanley Dean Witter & Co.,305,3,14
+993,Outdoors,medium,low,IMS Health Inc.,366,3,20
+994,Beauty,high,medium,Siebel Systems Inc,130,2,21
+995,Toys,high,high,Pier 1 Imports Inc.,141,2,4
+996,Sports,medium,medium,Kelly Services Inc.,138,4,14
+997,Food & Grocery,low,low,Dynegy Inc.,347,4,17
+998,Handmade,medium,medium,The LTV Corporation,206,4,3
+999,Sports,medium,high,Omnicom Group,368,3,3
+1000,Sports,low,medium,"Best Buy Co., Inc.",153,3,23

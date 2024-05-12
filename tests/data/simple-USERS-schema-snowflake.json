@@ -1,0 +1,34 @@
+[
+    {
+        "name": "distinct_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_name",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_email",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_avatar",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_created",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "title",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "luckyNumber",
+        "type": "NUMBER"
+    },
+    {
+        "name": "spiritAnimal",
+        "type": "VARCHAR"
+    }
+]

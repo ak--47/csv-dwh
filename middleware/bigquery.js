@@ -1,6 +1,6 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 const u = require('ak-tools');
-const { prepHeaders } = require('../components/inference');
+const { prepHeaders, cleanName } = require('../components/inference');
 
 const client = new BigQuery(); // use application default credentials; todo: override with service account
 let datasetId = '';
@@ -17,9 +17,10 @@ let tableId = '';
 * @returns {Promise<import('../types').WarehouseUploadResult>}
 */
 async function loadToBigQuery(schema, batches, PARAMS) {
-	const {
+	let {
 		bigquery_dataset = '',
 		table_name = '',
+		dry_run = false,
 	} = PARAMS;
 
 	if (!bigquery_dataset) throw new Error('bigquery_dataset is required');
@@ -27,7 +28,7 @@ async function loadToBigQuery(schema, batches, PARAMS) {
 	if (!schema) throw new Error('schema is required');
 	if (!batches) throw new Error('batches is required');
 	if (batches.length === 0) throw new Error('batches is empty');
-
+	table_name = cleanName(table_name);
 	datasetId = bigquery_dataset;
 	tableId = table_name;
 	// ensure column headers are clean in schema and batches
@@ -40,6 +41,12 @@ async function loadToBigQuery(schema, batches, PARAMS) {
 
 	// build a specific schema for BigQuery
 	schema = schemaToBQS(schema);
+
+	if (dry_run) {
+		console.log('Dry run requested. Skipping BigQuery upload.');
+		return { schema, dataset: datasetId, table: tableId, upload: [] };
+	
+	}
 
 	// do work
 	const dataset = await createDataset();

@@ -1,0 +1,118 @@
+[
+    {
+        "name": "event",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_source",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "time",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "_device_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_session_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "plan",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "dateOfRenewal",
+        "type": "DATE"
+    },
+    {
+        "name": "codewords",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "device",
+        "type": "VARIANT"
+    },
+    {
+        "name": "company_id",
+        "type": "NUMBER"
+    },
+    {
+        "name": "_insert_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "product_id",
+        "type": "NUMBER"
+    },
+    {
+        "name": "colors",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "category",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "hashTags",
+        "type": "VARIANT"
+    },
+    {
+        "name": "watchTimeSec",
+        "type": "NUMBER"
+    },
+    {
+        "name": "quality",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "format",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "uploader_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_user_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "amount",
+        "type": "NUMBER"
+    },
+    {
+        "name": "qty",
+        "type": "NUMBER"
+    },
+    {
+        "name": "description",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "severity",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "ticket_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "page",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "utm_source",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "currency",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "cart",
+        "type": "VARIANT"
+    }
+]

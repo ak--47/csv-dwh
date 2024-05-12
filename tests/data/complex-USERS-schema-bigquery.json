@@ -1,0 +1,72 @@
+[
+    {
+        "name": "distinct_id",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_name",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_email",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_avatar",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_created",
+        "type": "TIMESTAMP",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "anonymousIds",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "sessionIds",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "title",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "luckyNumber",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "experiment",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "spiritAnimal",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "timezone",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "ip",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "lastCart",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    }
+]

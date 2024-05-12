@@ -1,0 +1,37 @@
+[
+    {
+        "name": "company_id",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_name",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "_email",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "__of_employees",
+        "type": "INT64",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "industry",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "segment",
+        "type": "STRING",
+        "mode": "NULLABLE"
+    },
+    {
+        "name": "products",
+        "type": "JSON",
+        "mode": "NULLABLE"
+    }
+]
