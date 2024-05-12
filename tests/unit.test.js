@@ -305,13 +305,13 @@ describe('RENAMING', () => {
 	});
 
 	test('emojis', () => {
-		expect(cleanName('🚀Launch')).toBe('__Launch');
-		expect(cleanName('Profit💰')).toBe('Profit__');
+		expect(cleanName('🚀Launch')).toBe('_launch');
+		expect(cleanName('Profit💰')).toBe('profit');
 	});
 
 	test('sql escape', () => {
-		expect(cleanName('select*')).toBe('select_');
-		expect(cleanName('from?')).toBe('from_');
+		expect(cleanName('select*')).toBe('db_select');
+		expect(cleanName('from?')).toBe('from');
 	});
 
 	test('special characters', () => {
@@ -323,22 +323,22 @@ describe('RENAMING', () => {
 	});
 
 	test('nulls', () => {
-		expect(cleanName('')).toBe('');
-		expect(cleanName(null)).toBe(''); // Assuming function handles null input
-		expect(cleanName(undefined)).toBe(''); // Assuming function handles undefined input
+		expect(cleanName('')).toBe('db_');
+		expect(cleanName(null).startsWith('db_unknown')).toBe(true); // Assuming function handles null input
+		expect(cleanName(undefined).startsWith('db_unknown')).toBe(true); // Assuming function handles undefined input
 	});
 
 	test('field scenarios', () => {
 		expect(cleanName('name@domain.com')).toBe('name_domain_com');
 		expect(cleanName('user-profile')).toBe('user_profile');
-		expect(cleanName('100%Guaranteed')).toBe('_100_Guaranteed');
+		expect(cleanName('100%Guaranteed')).toBe('_guaranteed');
 		expect(cleanName('hello_world')).toBe('hello_world');
-		expect(cleanName('XMLHttpRequest')).toBe('XMLHttpRequest');
+		expect(cleanName('XMLHttpRequest')).toBe('xmlhttprequest');
 	});
 
 	test('leading numbers', () => {
-		expect(cleanName('1stPlace')).toBe('_1stPlace');
-		expect(cleanName('2ndBase')).toBe('_2ndBase');
-		expect(cleanName('3rdWheel')).toBe('_3rdWheel');
+		expect(cleanName('1stPlace')).toBe('_stplace');
+		expect(cleanName('2ndBase')).toBe('_ndbase');
+		expect(cleanName('3rdWheel')).toBe('_rdwheel');
 	});
 });

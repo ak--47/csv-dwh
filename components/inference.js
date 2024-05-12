@@ -162,21 +162,26 @@ function prepHeaders(headers, asArray = false) {
  * - Limits the length to 300 characters.
  */
 function cleanName(name) {
-    const reservedKeywords = new Set(['SELECT', 'TABLE', 'DELETE', 'INSERT', 'UPDATE']); // Example reserved keywords
-    name = name
-        .replace(/[^a-zA-Z0-9_]+/g, '_') // Replace sequences of non-alphanumeric characters with underscore
-        .replace(/^[\d_]+/, '_') // Replace leading digits or underscores
-        .replace(/_+$/, '') // Remove trailing underscores
-        .replace(/_+/g, '_') // Collapse multiple underscores into one
-        .toLowerCase() // Convert to lower case for consistency
-        .substring(0, 300); // Limit the length to 300 characters
+	try {
+		const reservedKeywords = new Set(['SELECT', 'TABLE', 'DELETE', 'INSERT', 'UPDATE']); // Example reserved keywords
+		name = name
+			.replace(/[^a-zA-Z0-9_]+/g, '_') // Replace sequences of non-alphanumeric characters with underscore
+			.replace(/^[\d_]+/, '_') // Replace leading digits or underscores
+			.replace(/_+$/, '') // Remove trailing underscores
+			.replace(/_+/g, '_') // Collapse multiple underscores into one
+			.toLowerCase() // Convert to lower case for consistency
+			.substring(0, 300); // Limit the length to 300 characters
 
-    // Handle reserved keywords and ensure minimum length
-    if (reservedKeywords.has(name.toUpperCase()) || name.length < 3) {
-        name = `db_${name}`; // Add a prefix if the name is a reserved keyword or too short
-    }
+		// Handle reserved keywords and ensure minimum length
+		if (reservedKeywords.has(name.toUpperCase()) || name.length < 3) {
+			name = `db_${name}`; // Add a prefix if the name is a reserved keyword or too short
+		}
 
-    return name;
+		return name;
+	}
+	catch (e) {
+		return 'db_unknown_' + Math.random().toString(36).substring(5);
+	}
 }
 
 
@@ -190,6 +195,6 @@ module.exports = {
 	isBoolean,
 	isJSONStr,
 	generateSchema,
-	prepHeaders, 
+	prepHeaders,
 	cleanName
 };

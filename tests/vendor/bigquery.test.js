@@ -2,6 +2,7 @@
 const u = require('ak-tools');
 const main = require("../../index.js");
 require('dotenv').config();
+const { cleanName } = require('../../components/inference.js');
 
 const TIMEOUT = process.env.TIMEOUT || 1000 * 60 * 5; // 5 minutes
 const BATCH_SIZE = process.env.BATCH_SIZE || 500;
@@ -31,7 +32,7 @@ test("simple: events", async () => {
 	const result = results[0];
 	const { schema, dataset, table, insert } = result;
 	expect(dataset).toBe(PARAMS.bigquery_dataset);
-	expect(table).toBe(PARAMS.table_name);
+	expect(table).toBe(cleanName(PARAMS.table_name));
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
@@ -55,7 +56,7 @@ test("simple: users", async () => {
 	const result = results[0];
 	const { schema, dataset, table, insert } = result;
 	expect(dataset).toBe(PARAMS.bigquery_dataset);
-	expect(table).toBe(PARAMS.table_name);
+	expect(table).toBe(cleanName(PARAMS.table_name));
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
@@ -81,7 +82,7 @@ test("complex: events", async () => {
 	const result = results[0];
 	const { schema, dataset, table, insert } = result;
 	expect(dataset).toBe(PARAMS.bigquery_dataset);
-	expect(table).toBe(PARAMS.table_name);
+	expect(table).toBe(cleanName(PARAMS.table_name));
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
@@ -106,7 +107,7 @@ test("complex: users", async () => {
 	const result = results[0];
 	const { schema, dataset, table, insert } = result;
 	expect(dataset).toBe(PARAMS.bigquery_dataset);
-	expect(table).toBe(PARAMS.table_name);
+	expect(table).toBe(cleanName(PARAMS.table_name));
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
@@ -131,7 +132,7 @@ test("complex: groups", async () => {
 	const result = results[0];
 	const { schema, dataset, table, insert } = result;
 	expect(dataset).toBe(PARAMS.bigquery_dataset);
-	expect(table).toBe(PARAMS.table_name);
+	expect(table).toBe(cleanName(PARAMS.table_name));
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
@@ -157,7 +158,7 @@ test("complex: lookups", async () => {
 	const result = results[0];
 	const { schema, dataset, table, insert } = result;
 	expect(dataset).toBe(PARAMS.bigquery_dataset);
-	expect(table).toBe(PARAMS.table_name);
+	expect(table).toBe(cleanName(PARAMS.table_name));
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
@@ -183,7 +184,7 @@ test("complex: scd", async () => {
 	const result = results[0];
 	const { schema, dataset, table, insert } = result;
 	expect(dataset).toBe(PARAMS.bigquery_dataset);
-	expect(table).toBe(PARAMS.table_name);
+	expect(table).toBe(cleanName(PARAMS.table_name));
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
