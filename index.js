@@ -14,6 +14,7 @@ const { inferType, getUniqueKeys, generateSchema } = require('./components/infer
 
 const loadToBigQuery = require('./middleware/bigquery');
 const loadToSnowflake = require('./middleware/snowflake');
+const loadToRedshift = require('./middleware/redshift');
 
 /**
  * @typedef {import('./types').JobConfig} Config
@@ -154,6 +155,9 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 				break;
 			case 'snowflake':
 				result = await loadToSnowflake(schema, batches, PARAMS);
+				break;
+			case 'redshift':
+				result = await loadToRedshift(schema, batches, PARAMS);
 				break;
 			// case 'databricks':
 			// 	// todo

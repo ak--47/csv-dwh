@@ -40,6 +40,7 @@ async function loadToBigQuery(schema, batches, PARAMS) {
 	batches = batches.map(batch => batch.map(row => u.rnKeys(row, headerMap)));
 
 	// build a specific schema for BigQuery
+	// @ts-ignore
 	schema = schemaToBQS(schema);
 
 	if (dry_run) {

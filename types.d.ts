@@ -4,7 +4,7 @@ export interface JobConfig {
   demoDataConfig?: SimulationConfig;
   csv_file: string;
 
-  warehouse: "bigquery" | "snowflake";
+  warehouse: "bigquery" | "snowflake" | "redshift";
   region: string;
   batch_size?: number;
   dry_run?: boolean;
@@ -35,10 +35,11 @@ export interface JobConfig {
   // redshift
   redshift_workgroup?: string;
   redshift_database?: string;
-  AWS_ACCESS_KEY_ID?: string;
-  AWS_SECRET_ACCESS_KEY?: string;
-  AWS_SESSION_TOKEN?: string;
-  AWS_REGION?: string;
+  redshift_access_key_id?: string;
+  redshift_secret_access_key?: string;
+  redshift_session_token?: string;
+  redshift_region?: string;
+  redshift_schema_name?: string;
 }
 
 // TypeScript types for inferred schema
@@ -86,6 +87,7 @@ export type InsertResult = {
   duration: number; // Duration of the insert operation in milliseconds
   errors?: any[]; // Any errors encountered during the operation
   errorMessage?: string; // Error message if the operation failed
+  meta?: any; // Additional metadata
 };
 
 type InsertResult = {
