@@ -87,21 +87,24 @@ async function main(PARAMS) {
 
 	let data;
 	let schema;
+	let intermediateSchema;
 
 	// user supplied csv file
 	if (csv_file) {
 		const filePath = path.resolve(csv_file);
-		const fileData = await u.load(filePath);		
+		const fileData = await u.load(filePath);
 		const parseJob = Papa.parse(fileData, { header: true, skipEmptyLines: false, fastMode: false });
 		const { data: parsed } = parseJob;
 		schema = generateSchema(parsed, 'csv');
+		intermediateSchema = u.clone(schema);
 		data = { csvData: parsed };
 	}
 
-	// generated data
+	// generated data essentially needs to treated as multiple csvs
 	if (demoDataConfig) {
 		data = await dataMaker(demoDataConfig);
 		//todo: multiple schemas YIKES
+		intermediateSchema = {};
 	}
 
 	const batched = u.objMap(data, (value) => batchData(value, batch_size));

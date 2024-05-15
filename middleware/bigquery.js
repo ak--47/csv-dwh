@@ -136,15 +136,6 @@ function schemaToBQS(schema) {
 		};
 
 
-		// arrays require an item type
-		// if (field.type.toUpperCase() === 'ARRAY') {
-		// 	fieldSchema.type = 'JSON';
-		// 	fieldSchema.mode = 'REPEATED';
-		// }
-		// // For RECORD types, handle subfields if any
-		// if (field.type.toUpperCase() === 'OBJECT' && field.fields) {
-		//     fieldSchema.fields = schemaToBQS(field.fields);
-		// }
 
 		return fieldSchema;
 	});

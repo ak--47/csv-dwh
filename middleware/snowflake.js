@@ -5,7 +5,7 @@ require('dotenv').config();
 
 
 /**
- * Inserts data into Snowflake
+ * Main Function: Inserts data into Snowflake
  * @param {import('../types').Schema} schema
  * @param {import('../types').csvBatch[]} batches
  * @param {import('../types').JobConfig} PARAMS
@@ -54,20 +54,22 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	}
 
 	// Prepare insert statement
+	// Prepare insert statement
 	const columnNames = schema.map(f => f.name).join(", ");
-	const placeholders = schema.map(() => '?').join(", ");
+	const placeholders = schema.map(f => f.type === 'VARIANT' ? `PARSE_JSON(?)` : '?').join(", ");
 	const insertSQL = `INSERT INTO ${table_name} (${columnNames}) VALUES (${placeholders})`;
+	
 	console.log('\n\n');
 
 	let currentBatch = 0;
 	if (dry_run) {
 		console.log('Dry run requested. Skipping Snowflake upload.');
-		return { schema, database: snowflake_database, table: table_name, upload: [] };
+		return { schema, database: snowflake_database, table: table_name || "no table", upload: [] };
 	}
 	// Insert data
 	for (const batch of batches) {
 		currentBatch++;
-		const bindArray = batch.map(row => schema.map(f => formatBindValue(row[f.name])));
+		const bindArray = batch.map(row => schema.map(f => formatBindValue(row[f.name], f.type)));
 		const start = Date.now();
 		try {
 			const task = await executeSQL(conn, insertSQL, bindArray);
@@ -83,7 +85,7 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	}
 
 	/** @type {import('../types').WarehouseUploadResult} */
-	const uploadJob = { schema, database: snowflake_database, table: table_name, upload };
+	const uploadJob = { schema, database: snowflake_database, table: table_name || "", upload };
 
 	console.log('\n\nData insertion complete; Terminating Connection...\n');
 
@@ -96,29 +98,7 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 
 }
 
-/**
- * Properly formats a value for SQL statement.
- * @param {any} value The value to be formatted.
- * @returns {string} The formatted value for SQL.
- */
-function formatSQLValue(value) {
-	if (value === null || value === "" || value === undefined || value === "null") {
-		return 'NULL';
-	} else if (u.isJSONStr(value)) {
-		const parsed = JSON.parse(value);
-		if (Array.isArray(parsed)) {
-			const formattedArray = parsed.map(item =>
-				item === null ? 'NULL' : (typeof item === 'string' ? `'${item.replace(/'/g, "''")}'` : item)
-			);
-			return `ARRAY_CONSTRUCT(${formattedArray.join(", ")})`;
-		}
-		return `PARSE_JSON('${value.replace(/'/g, "''")}')`;
-	} else if (typeof value === 'string') {
-		return `'${value.replace(/'/g, "''")}'`;
-	} else {
-		return value;
-	}
-}
+
 /**
  * @param  {import('../types').SchemaField} field
  */
@@ -140,10 +120,14 @@ function prepareSnowflakeSchema(field) {
 	return { name, type: snowflakeType };
 }
 
-function formatBindValue(value) {
+function formatBindValue(value, type) {
 	if (value === null || value === undefined || value === "null" || value.trim() === "") {
 		return null; // Convert null-like strings to actual null
-	} else if (typeof value === 'string' && u.isJSONStr(value)) {
+	}
+	else if (type === 'VARIANT') {
+		return value; // Return the value directly if it's a JSON object
+	}
+	else if (typeof value === 'string' && u.isJSONStr(value)) {
 		// Check if the string is JSON, parse it to actual JSON
 		try {
 			const parsed = JSON.parse(value);
@@ -160,15 +144,6 @@ function formatBindValue(value) {
 		}
 	} else {
 		return value; // Return the value directly if not a JSON string
-	}
-}
-
-
-function terminationHandler(err, conn) {
-	if (err) {
-		console.error('Unable to disconnect: ' + err.message);
-	} else {
-		console.log('\tDisconnected connection with id: ' + conn.getId());
 	}
 }
 
@@ -200,7 +175,7 @@ function schemaToSnowflakeSQL(schema) {
  * ? https://docs.snowflake.com/en/developer-guide/node-js/nodejs-driver-execute#binding-an-array-for-bulk-insertions
  * @param {snowflake.Connection} conn 
  * @param {string} sql 
- * @param {any[]} [binds] pass binds to bulk insert
+ * @param {snowflake.Binds} [binds] pass binds to bulk insert
  * @returns {Promise<snowflake.StatementStatus | any[] | undefined>}
  */
 function executeSQL(conn, sql, binds) {
@@ -208,6 +183,7 @@ function executeSQL(conn, sql, binds) {
 
 		const options = { sqlText: sql };
 		if (binds) options.binds = binds;
+		
 		conn.execute({
 			...options,
 			complete: (err, stmt, rows) => {
@@ -224,10 +200,6 @@ function executeSQL(conn, sql, binds) {
 
 
 }
-
-
-
-
 
 /**
  * Establishes a connection to Snowflake
@@ -283,5 +255,36 @@ async function createSnowflakeConnection(PARAMS) {
 }
 
 
+function terminationHandler(err, conn) {
+	if (err) {
+		console.error('Unable to disconnect: ' + err.message);
+	} else {
+		console.log('\tDisconnected connection with id: ' + conn.getId());
+	}
+}
+
+/**
+ * Properly formats a value for SQL statement.
+ * @param {any} value The value to be formatted.
+ * @returns {string} The formatted value for SQL.
+ */
+function formatSQLValue(value) {
+	if (value === null || value === "" || value === undefined || value === "null") {
+		return 'NULL';
+	} else if (u.isJSONStr(value)) {
+		const parsed = JSON.parse(value);
+		if (Array.isArray(parsed)) {
+			const formattedArray = parsed.map(item =>
+				item === null ? 'NULL' : (typeof item === 'string' ? `'${item.replace(/'/g, "''")}'` : item)
+			);
+			return `ARRAY_CONSTRUCT(${formattedArray.join(", ")})`;
+		}
+		return `PARSE_JSON('${value.replace(/'/g, "''")}')`;
+	} else if (typeof value === 'string') {
+		return `'${value.replace(/'/g, "''")}'`;
+	} else {
+		return value;
+	}
+}
 
 module.exports = loadToSnowflake;
