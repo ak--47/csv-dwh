@@ -131,11 +131,24 @@ function prepareSnowflakeSchema(field) {
 	return { name, type: snowflakeType };
 }
 
-function prepareComplexRows(row, schema) {	
+/**
+ * re-parse complex columns from JSON string to JSON object;
+ * needed because of https://github.com/snowflakedb/snowflake-connector-nodejs/issues/59#issuecomment-1677672298
+ * @param  {Object} row
+ * @param  {import('../types').Schema} schema
+ */
+function prepareComplexRows(row, schema) {
 	const variantCols = schema.filter(f => f.type === 'VARIANT');
 	for (const col of variantCols) {
 		if (row[col.name]) {
 			row[col.name] = JSON.parse(row[col.name]);
+		}
+	}
+
+	for (const key in row) {
+		const value = row[key];
+		if (value === null || value === undefined || value === "null" || value === "") {
+			row[key] = null; // Convert null-like strings to actual null
 		}
 	}
 
@@ -286,7 +299,9 @@ async function createSnowflakeConnection(PARAMS) {
 	if (!snowflake_warehouse) throw new Error('snowflake_warehouse is required');
 	if (!snowflake_role) throw new Error('snowflake_role is required');
 
-	snowflake.configure({ keepAlive: true, logLevel: 'DEBUG' });
+	//todo: dev logging configuration
+	snowflake.configure({ keepAlive: true, logLevel: 'WARN' });
+	
 
 	return new Promise((resolve, reject) => {
 		const connection = snowflake.createConnection({
