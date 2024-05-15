@@ -160,6 +160,8 @@ function prepHeaders(headers, asArray = false) {
  * - Converts to lower case for consistency.
  * - Ensures a minimum length by adding a default prefix if too short.
  * - Limits the length to 300 characters.
+ * @param {string} name - The name to clean.
+ * @return {string}
  */
 function cleanName(name) {
 	try {

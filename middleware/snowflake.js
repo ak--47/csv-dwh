@@ -53,12 +53,13 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 		debugger;
 	}
 
-	// Prepare insert statement
-	// Prepare insert statement
-	const columnNames = schema.map(f => f.name).join(", ");
-	const placeholders = schema.map(f => f.type === 'VARIANT' ? `PARSE_JSON(?)` : '?').join(", ");
-	const insertSQL = `INSERT INTO ${table_name} (${columnNames}) VALUES (${placeholders})`;
-	
+
+	// // Prepare insert statement
+	// const columnNames = schema.map(f => f.name).join(", ");
+	// // const placeholders = schema.map(f => f.type === 'VARIANT' ? `PARSE_JSON(?)` : '?').join(", ");
+	// const placeholders = schema.map(f => '?').join(", ");
+	// const insertSQLOLD = `INSERT INTO ${table_name} (${columnNames}) VALUES (${placeholders})`;
+
 	console.log('\n\n');
 
 	let currentBatch = 0;
@@ -69,10 +70,20 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	// Insert data
 	for (const batch of batches) {
 		currentBatch++;
-		const bindArray = batch.map(row => schema.map(f => formatBindValue(row[f.name], f.type)));
+		const [insertSQL, hasVariant] = prepareInsertSQL(schema, table_name);
+		let data;
+		if (hasVariant) {
+			//variant columns need to be stringified as an ENTIRE ROW
+			//this is weird
+			data = [batch.map(row => prepareComplexRows(row, schema))].map(rows => JSON.stringify(rows));
+		}
+		else {
+			//datasets without variant columns can be inserted as an array of arrays (flatMap)
+			data = batch.map(row => schema.map(f => formatBindValue(row[f.name], f.type))); //.map(row => JSON.stringify(row));
+		}
 		const start = Date.now();
 		try {
-			const task = await executeSQL(conn, insertSQL, bindArray);
+			const task = await executeSQL(conn, insertSQL, data);
 			const duration = Date.now() - start;
 			const numRows = task?.[0]?.['number of rows inserted'] || batch.length;
 			upload.push({ duration, status: 'success', insertedRows: numRows, failedRows: 0 });
@@ -120,17 +131,29 @@ function prepareSnowflakeSchema(field) {
 	return { name, type: snowflakeType };
 }
 
+function prepareComplexRows(row, schema) {	
+	const variantCols = schema.filter(f => f.type === 'VARIANT');
+	for (const col of variantCols) {
+		if (row[col.name]) {
+			row[col.name] = JSON.parse(row[col.name]);
+		}
+	}
+
+	return row;
+}
+
 function formatBindValue(value, type) {
 	if (value === null || value === undefined || value === "null" || value.trim() === "") {
 		return null; // Convert null-like strings to actual null
 	}
 	else if (type === 'VARIANT') {
-		return value; // Return the value directly if it's a JSON object
+		return value;
+		// return JSON.parse(value); // Return the value directly if it's a JSON object
 	}
 	else if (typeof value === 'string' && u.isJSONStr(value)) {
 		// Check if the string is JSON, parse it to actual JSON
 		try {
-			const parsed = JSON.parse(value);
+			const parsed = JSON.parse(value); //todo is this necessary?
 			if (Array.isArray(parsed)) {
 				// If it's an array, return it as-is so Snowflake interprets it as an array
 				return parsed;
@@ -147,6 +170,44 @@ function formatBindValue(value, type) {
 	}
 }
 
+
+/**
+ * Creates an appropriate SQL statement for inserting data into a Snowflake table
+ * VARIANT types are handled by parsing JSON and flattening the data, primitives use VALUES (?,?,?) 
+ * ? https://docs.snowflake.com/en/developer-guide/node-js/nodejs-driver-execute#binding-an-array-for-bulk-insertions
+ * ? https://github.com/snowflakedb/snowflake-connector-nodejs/issues/59
+ * @param  {import('../types').Schema} schema
+ * @param  {string} tableName
+ * @returns {[string, boolean]}
+ */
+function prepareInsertSQL(schema, tableName) {
+	const hasVariant = schema.some(field => field.type === 'VARIANT');
+	if (hasVariant) {
+		// Build an SQL statement that uses FLATTEN and PARSE_JSON for VARIANT types
+		// Adjust select part to correctly handle case sensitivity and data extraction
+		const selectParts = schema.map(field => {
+			if (field.type === 'VARIANT') {
+				// Assuming JSON keys exactly match the field names in case and spelling
+				return `value:${field.name.toLowerCase()} AS ${field.name}`;
+			} else {
+				// Directly use the field name for non-VARIANT columns
+				return `value:${field.name.toLowerCase()} AS ${field.name}`;
+			}
+		}).join(", ");
+
+		// The query assumes that the JSON object keys match the lowercase version of the column names
+		return [`
+            INSERT INTO ${tableName}
+            SELECT ${selectParts}
+            FROM TABLE(FLATTEN(PARSE_JSON(?)))
+        `, true];
+	} else {
+		// Regular insert without JSON parsing
+		const columnNames = schema.map(f => f.name).join(", ");
+		const placeholders = schema.map(() => '?').join(", ");
+		return [`INSERT INTO ${tableName} (${columnNames}) VALUES (${placeholders})`, false];
+	}
+}
 
 /**
  * Translates a schema definition to Snowflake SQL data types
@@ -181,9 +242,11 @@ function schemaToSnowflakeSQL(schema) {
 function executeSQL(conn, sql, binds) {
 	return new Promise((resolve, reject) => {
 
+
 		const options = { sqlText: sql };
 		if (binds) options.binds = binds;
-		
+		if (binds) options.parameters = { MULTI_STATEMENT_COUNT: 1 };
+
 		conn.execute({
 			...options,
 			complete: (err, stmt, rows) => {
@@ -223,7 +286,7 @@ async function createSnowflakeConnection(PARAMS) {
 	if (!snowflake_warehouse) throw new Error('snowflake_warehouse is required');
 	if (!snowflake_role) throw new Error('snowflake_role is required');
 
-	snowflake.configure({ keepAlive: true, logLevel: 'WARN' });
+	snowflake.configure({ keepAlive: true, logLevel: 'DEBUG' });
 
 	return new Promise((resolve, reject) => {
 		const connection = snowflake.createConnection({
