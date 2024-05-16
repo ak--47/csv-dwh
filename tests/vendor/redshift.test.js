@@ -170,7 +170,8 @@ test("complex: events", async () => {
 	const PARAMS = {
 		csv_file: "./tests/data/mp_types/complex-EVENTS.csv",
 		table_name: "test-complex-EVENTS",
-		...commonParams
+		...commonParams,
+		batch_size: 100
 	};
 	const expectedRows = 1111;
 	const job = await main(PARAMS);
@@ -193,7 +194,8 @@ test("complex: users", async () => {
 	const PARAMS = {
 		csv_file: "./tests/data/mp_types/complex-USERS.csv",
 		table_name: "test-complex-USERS",
-		...commonParams
+		...commonParams,
+		batch_size: 25
 	};
 	const expectedRows = 100;
 	const job = await main(PARAMS);

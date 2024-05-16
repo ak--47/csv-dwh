@@ -168,7 +168,7 @@ async function executeSQL(client, sql, isBatch = false) {
 			// Wait for a while before checking the status again
 			if (statementStatus !== 'FINISHED') {
 				const waitTime = u.rand(250, 420);
-				console.log(`Statement ${statementId} is ${statementStatus}. Waiting ${waitTime}ms before checking again...`);
+				// console.log(`Statement ${statementId} is ${statementStatus}. Waiting ${waitTime}ms before checking again...`);
 				await u.sleep(waitTime);
 			}
 		} while (statementStatus !== 'FINISHED');
@@ -187,20 +187,21 @@ function formatSQLValue(value, type) {
 	if (value === null || value === undefined || value === "") return 'NULL';
 	switch (type) {
 		case 'INTEGER':
-			return parseInt(value);			
-		case 'REAL':
-			return parseFloat(value);
-		case 'BOOLEAN':
-			return value ? 'TRUE' : 'FALSE';
+            return parseInt(value, 10);
+        case 'REAL':
+            return parseFloat(value);
+        case 'BOOLEAN':
+            return value.toString().toLowerCase() === 'true' ? 'TRUE' : 'FALSE'; // Ensure boolean conversion
 		case 'STRING':
-			return `'${value}'`;
+			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
 		case 'VARCHAR':
-			return `'${value}'`;
+			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
 		case 'DATE':
+			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
 		case 'TIMESTAMP':
 			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
 		case 'SUPER': // For JSON types
-			return `'${value}'`; // Escape and convert to JSON string
+			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
 		default:
 			return value;
 	}

@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 const u = require("ak-tools");
-const fetch = require("ak-fetch");
 const { version } = require('./package.json');
 
 const path = require('path');
@@ -9,7 +8,7 @@ const dataMaker = require('make-mp-data');
 const Papa = require("papaparse");
 
 const cli = require('./components/cli');
-const { inferType, getUniqueKeys, generateSchema } = require('./components/inference.js');
+const { generateSchema } = require('./components/inference.js');
 
 
 const loadToBigQuery = require('./middleware/bigquery');
@@ -18,7 +17,9 @@ const loadToRedshift = require('./middleware/redshift');
 
 /**
  * @typedef {import('./types').JobConfig} Config
- * @typedef {import('./types').WarehouseUploadResult} Result
+ * @typedef {import('./types').WarehouseUploadResult} WarehouseResult
+ * @typedef {import('./types').Schema} Schema
+ * @typedef {import('./types').JobResult} JobResult
  * 
  */
 
@@ -26,6 +27,7 @@ const loadToRedshift = require('./middleware/redshift');
 /**
  * main program
  * @param {Config} PARAMS
+ * @returns {Promise<JobResult>}
  * 
  */
 async function main(PARAMS) {
@@ -60,7 +62,7 @@ async function main(PARAMS) {
 		snowflake_role = '',
 
 		//options
-		verbose = true,
+		verbose = false,
 		dry_run = false,
 		...rest
 
@@ -135,12 +137,14 @@ async function main(PARAMS) {
 		e2eDuration,
 		clockTime,
 		recordsPerSec,
-		totalRows
+		totalRows,
+		intermediateSchema
 	};
 
 	console.log('JOB SUMMARY:\n\n', jobSummary);
 
 
+	// @ts-ignore
 	return jobSummary;
 
 }
@@ -188,7 +192,7 @@ function batchData(data, batchSize = 0) {
 }
 
 /**
- * @param  {Result | undefined} results
+ * @param  {WarehouseResult | undefined} results
  * @param  {Config} PARAMS
  */
 function summarize(results, PARAMS) {
@@ -219,10 +223,10 @@ function summarize(results, PARAMS) {
 // this is for CLI
 if (require.main === module) {
 	const params = cli().then((params) => {
-
-		main(params)
+		// CLI is always verbose
+		main({ ...params, verbose: true })
 			.then((results) => {
-				if (params.verbose) console.log('\n\nRESULTS:\n\n', u.json(results));
+				console.log('\n\nRESULTS:\n\n', u.json(results));
 			})
 			.catch((e) => {
 				console.log('\n\nUH OH! something went wrong; the error is:\n\n');

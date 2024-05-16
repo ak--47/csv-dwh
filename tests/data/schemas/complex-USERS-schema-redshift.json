@@ -21,11 +21,11 @@
     },
     {
         "name": "anonymousIds",
-        "type": "VARCHAR"
+        "type": "SUPER"
     },
     {
         "name": "sessionIds",
-        "type": "VARCHAR"
+        "type": "SUPER"
     },
     {
         "name": "title",
@@ -37,7 +37,7 @@
     },
     {
         "name": "experiment",
-        "type": "VARCHAR"
+        "type": "SUPER"
     },
     {
         "name": "spiritAnimal",
@@ -45,7 +45,7 @@
     },
     {
         "name": "timezone",
-        "type": "VARCHAR"
+        "type": "SUPER"
     },
     {
         "name": "ip",
@@ -53,6 +53,6 @@
     },
     {
         "name": "lastCart",
-        "type": "VARCHAR"
+        "type": "SUPER"
     }
 ]

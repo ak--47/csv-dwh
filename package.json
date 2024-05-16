@@ -33,7 +33,6 @@
   "dependencies": {
     "@aws-sdk/client-redshift-data": "^3.576.0",
     "@google-cloud/bigquery": "^7.7.0",
-    "ak-fetch": "^1.0.15",
     "ak-tools": "^1.0.57",
     "chance": "^1.1.11",
     "date-fns": "^3.6.0",

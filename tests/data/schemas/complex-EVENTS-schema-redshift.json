@@ -33,7 +33,7 @@
     },
     {
         "name": "device",
-        "type": "VARCHAR"
+        "type": "SUPER"
     },
     {
         "name": "company_id",
@@ -57,7 +57,7 @@
     },
     {
         "name": "hashTags",
-        "type": "VARCHAR"
+        "type": "SUPER"
     },
     {
         "name": "watchTimeSec",
@@ -113,6 +113,6 @@
     },
     {
         "name": "cart",
-        "type": "VARCHAR"
+        "type": "SUPER"
     }
 ]

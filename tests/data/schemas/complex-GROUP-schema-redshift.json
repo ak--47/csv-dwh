@@ -25,6 +25,6 @@
     },
     {
         "name": "products",
-        "type": "VARCHAR"
+        "type": "SUPER"
     }
 ]
