@@ -2,9 +2,9 @@
 
 ## 🤨 wat.
 
-**local csv files → cloud data warehouses.**
+**local csv/json file → ☁️ data warehouse table**
 
-schematize and bulk insert local CSV or JSON files to various data warehouse... _easily_ currently supporting BigQuery, Snowflake, and Redshift.
+schematize and bulk insert local CSV or JSON files to various data warehouses... currently supporting BigQuery, Snowflake, and Redshift!
 
 
 ## 👔 tldr;
@@ -14,7 +14,7 @@ this module can be used in _two ways_:
 - **as a [CLI](#cli)**, standalone script via:
 
 ```bash
-npx csv-dwh file --options
+npx csv-dwh file.csv --options
 ```
 
 - **as a [module](#mod)** in code via
