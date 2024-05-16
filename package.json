@@ -1,46 +1,47 @@
 {
-  "name": "csv-dwh",
-  "version": "1.0.0",
-  "description": "get data from csv and insert into cloud data warehouse",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon scratch.mjs",
-    "test": "jest --runInBand",
-    "deps": "./scripts/deps.sh",
-    "post": "npm publish",
-    "prune": "rm -rf logs/*",
-    "coverage": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --coverage && open ./coverage/lcov-report/index.html",
-    "scratch": "nodemon scratch.mjs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ak--47/csv-dwh.git"
-  },
-  "bin": {
-    "csv-dwh": "./index.js"
-  },
-  "author": "AK",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ak--47/csv-dwh.git/issues"
-  },
-  "homepage": "https://github.com/ak--47/csv-dwh#readme",
-  "devDependencies": {
-    "jest": "^29.7.0",
-    "nodemon": "^3.1.0"
-  },
-  "dependencies": {
-    "@aws-sdk/client-redshift-data": "^3.576.0",
-    "@google-cloud/bigquery": "^7.7.0",
-    "ak-tools": "^1.0.57",
-    "chance": "^1.1.11",
-    "date-fns": "^3.6.0",
-    "dayjs": "^1.11.11",
-    "dotenv": "^16.4.5",
-    "make-mp-data": "^1.2.25",
-    "papaparse": "^5.4.1",
-    "snowflake-sdk": "^1.10.1",
-    "yargs": "^17.7.2"
-  }
+	"name": "csv-dwh",
+	"version": "1.0.0",
+	"description": "local csv files → various cloud data warehouses",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js",
+		"dev": "nodemon scratch.mjs",
+		"test": "jest --runInBand",
+		"deps": "./scripts/deps.sh",
+		"post": "npm publish",
+		"prune": "rm -rf logs/*",
+		"coverage": "node --no-warnings --experimental-vm-modules node_modules/jest/bin/jest.js --coverage && open ./coverage/lcov-report/index.html",
+		"scratch": "nodemon scratch.mjs"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ak--47/csv-dwh.git"
+	},
+	"bin": {
+		"csv-dwh": "./index.js"
+	},
+	"author": "AK",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/ak--47/csv-dwh.git/issues"
+	},
+	"homepage": "https://github.com/ak--47/csv-dwh#readme",
+	"devDependencies": {
+		"jest": "^29.7.0",
+		"nodemon": "^3.1.0"
+	},
+	"dependencies": {
+		"@aws-sdk/client-redshift-data": "^3.576.0",
+		"@google-cloud/bigquery": "^7.7.0",
+		"ak-fetch": "^1.0.15",
+		"ak-tools": "^1.0.57",
+		"chance": "^1.1.11",
+		"date-fns": "^3.6.0",
+		"dayjs": "^1.11.11",
+		"dotenv": "^16.4.5",
+		"make-mp-data": "^1.2.25",
+		"papaparse": "^5.4.1",
+		"snowflake-sdk": "^1.10.1",
+		"yargs": "^17.7.2"
+	}
 }
