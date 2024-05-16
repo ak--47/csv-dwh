@@ -1,0 +1,30 @@
+[
+    {
+        "name": "company_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "_name",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_email",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "__of_employees",
+        "type": "INTEGER"
+    },
+    {
+        "name": "industry",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "segment",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "products",
+        "type": "SUPER"
+    }
+]

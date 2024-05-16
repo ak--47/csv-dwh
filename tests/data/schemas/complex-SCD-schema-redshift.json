@@ -1,0 +1,34 @@
+[
+    {
+        "name": "distinct_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "plan",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "MRR",
+        "type": "INTEGER"
+    },
+    {
+        "name": "NPS",
+        "type": "INTEGER"
+    },
+    {
+        "name": "marketingOptIn",
+        "type": "BOOLEAN"
+    },
+    {
+        "name": "dateOfRenewal",
+        "type": "DATE"
+    },
+    {
+        "name": "startTime",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "insertTime",
+        "type": "TIMESTAMP"
+    }
+]

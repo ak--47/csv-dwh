@@ -1,0 +1,118 @@
+[
+    {
+        "name": "event",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_source",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "time",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "_user_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "variants",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "flows",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "flags",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "experiment_ids",
+        "type": "INTEGER"
+    },
+    {
+        "name": "multiVariate",
+        "type": "BOOLEAN"
+    },
+    {
+        "name": "platform",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "currentTheme",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_insert_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "videoCategory",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "isFeaturedItem",
+        "type": "BOOLEAN"
+    },
+    {
+        "name": "watchTimeSec",
+        "type": "INTEGER"
+    },
+    {
+        "name": "quality",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "format",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "uploader_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "amount",
+        "type": "INTEGER"
+    },
+    {
+        "name": "currency",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "coupon",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "numItems",
+        "type": "INTEGER"
+    },
+    {
+        "name": "itemCategory",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "dateItemListed",
+        "type": "DATE"
+    },
+    {
+        "name": "itemId",
+        "type": "INTEGER"
+    },
+    {
+        "name": "page",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "utm_source",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "rating",
+        "type": "INTEGER"
+    },
+    {
+        "name": "reviews",
+        "type": "INTEGER"
+    }
+]

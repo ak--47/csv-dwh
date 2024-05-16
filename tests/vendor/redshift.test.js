@@ -5,32 +5,29 @@ const main = require("../../index.js");
 require('dotenv').config();
 const { cleanName } = require('../../components/inference.js');
 const TIMEOUT = process.env.TIMEOUT || 1000 * 60 * 5; // 5 minutes
-const BATCH_SIZE = process.env.BATCH_SIZE || 500;
+let BATCH_SIZE = process.env.BATCH_SIZE || 500;
+BATCH_SIZE = 250;
 
 /** @typedef {import('../types').JobConfig} PARAMS */
 
-
-
-
-const { snowflake_account,
-	snowflake_user,
-	snowflake_password,
-	snowflake_database,
-	snowflake_schema,
-	snowflake_warehouse,
-	snowflake_role } = process.env;
+const { redshift_workgroup,
+	redshift_database,
+	redshift_access_key_id,
+	redshift_secret_access_key,
+	redshift_schema_name,
+	redshift_region } = process.env;
 
 /** @type {PARAMS} */
 const commonParams = {
-	snowflake_account,
-	snowflake_user,
-	snowflake_password,
-	snowflake_database,
-	snowflake_schema,
-	snowflake_warehouse,
-	snowflake_role,
+	redshift_workgroup,
+	redshift_database,
+	redshift_access_key_id,
+	redshift_secret_access_key,
+	redshift_schema_name,
+	redshift_region,
 	batch_size: BATCH_SIZE,
-	warehouse: "snowflake"
+	warehouse: "redshift",
+	dry_run: false
 };
 
 //MVP CASES
@@ -126,7 +123,7 @@ test("simple: events", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
 		csv_file: "./tests/data/mp_types/simple-EVENTS.csv",
-		table_name: "test-simpleEvents",
+		table_name: "test-simple-Events",
 		...commonParams
 	};
 	const expectedRows = 1111;
@@ -134,15 +131,13 @@ test("simple: events", async () => {
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
 	const result = results[0];
-	const { schema, dataset, table, insert } = result;
-	expect(dataset).toBe(PARAMS.snowflake_database);
-	expect(table).toBe(cleanName(PARAMS.table_name));
+	const { schema, insert } = result;
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./tests/data/schemas/simple-EVENTS-schema-snowflake.json', true);
+	const expectedSchema = await u.load('./tests/data/schemas/simple-EVENTS-schema-redshift.json', true);
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
 
@@ -158,15 +153,13 @@ test("simple: users", async () => {
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
 	const result = results[0];
-	const { schema, dataset, table, insert } = result;
-	expect(dataset).toBe(PARAMS.snowflake_database);
-	expect(table).toBe(cleanName(PARAMS.table_name));
+	const { schema, insert } = result;
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./tests/data/schemas/simple-USERS-schema-snowflake.json', true);
+	const expectedSchema = await u.load('./tests/data/schemas/simple-USERS-schema-redshift.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -177,22 +170,21 @@ test("complex: events", async () => {
 	const PARAMS = {
 		csv_file: "./tests/data/mp_types/complex-EVENTS.csv",
 		table_name: "test-complex-EVENTS",
-		...commonParams
+		...commonParams,
+		batch_size: 100
 	};
 	const expectedRows = 1111;
 	const job = await main(PARAMS);
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
 	const result = results[0];
-	const { schema, dataset, table, insert } = result;
-	expect(dataset).toBe(PARAMS.snowflake_database);
-	expect(table).toBe(cleanName(PARAMS.table_name));
+	const { schema, insert } = result;
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-EVENTS-schema-snowflake.json', true);
+	const expectedSchema = await u.load('./tests/data/schemas/complex-EVENTS-schema-redshift.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -202,22 +194,21 @@ test("complex: users", async () => {
 	const PARAMS = {
 		csv_file: "./tests/data/mp_types/complex-USERS.csv",
 		table_name: "test-complex-USERS",
-		...commonParams
+		...commonParams,
+		batch_size: 25
 	};
 	const expectedRows = 100;
 	const job = await main(PARAMS);
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
 	const result = results[0];
-	const { schema, dataset, table, insert } = result;
-	expect(dataset).toBe(PARAMS.snowflake_database);
-	expect(table).toBe(cleanName(PARAMS.table_name));
+	const { schema, insert } = result;
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-USERS-schema-snowflake.json', true);
+	const expectedSchema = await u.load('./tests/data/schemas/complex-USERS-schema-redshift.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -234,15 +225,14 @@ test("complex: groups", async () => {
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
 	const result = results[0];
-	const { schema, dataset, table, insert } = result;
-	expect(dataset).toBe(PARAMS.snowflake_database);
-	expect(table).toBe(cleanName(PARAMS.table_name));
+	const { schema, insert } = result;
+
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-GROUP-schema-snowflake.json', true);
+	const expectedSchema = await u.load('./tests/data/schemas/complex-GROUP-schema-redshift.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -260,15 +250,14 @@ test("complex: lookups", async () => {
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
 	const result = results[0];
-	const { schema, dataset, table, insert } = result;
-	expect(dataset).toBe(PARAMS.snowflake_database);
-	expect(table).toBe(cleanName(PARAMS.table_name));
+	const { schema, insert } = result;
+
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-LOOKUP-schema-snowflake.json', true);
+	const expectedSchema = await u.load('./tests/data/schemas/complex-LOOKUP-schema-redshift.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
@@ -286,15 +275,13 @@ test("complex: scd", async () => {
 	const { totalRows, results } = job;
 	expect(totalRows).toBe(expectedRows);
 	const result = results[0];
-	const { schema, dataset, table, insert } = result;
-	expect(dataset).toBe(PARAMS.snowflake_database);
-	expect(table).toBe(cleanName(PARAMS.table_name));
+	const { schema, insert } = result;
 	expect(insert.success).toBe(expectedRows);
 	expect(insert.failed).toBe(0);
 	expect(insert.duration).toBeGreaterThan(0);
 	expect(insert.errors.length).toBe(0);
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-SCD-schema-snowflake.json', true);
+	const expectedSchema = await u.load('./tests/data/schemas/complex-SCD-schema-redshift.json', true);
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);

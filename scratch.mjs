@@ -37,13 +37,22 @@ timerDev.start();
 
 
 const commonParams = {
-	warehouse: "snowflake",
+	warehouse: "redshift",
 	bigquery_dataset: "sandbox",
-	table_name: "baby_first_table",
-	dry_run: true
-}
+	table_name: "baby_complex_table",
+	dry_run: false,
+	batch_size: 5
+};
 
-const files = (await u.ls('./testData')).filter(f => f.endsWith('.csv'));
+const files = [
+	"/Users/ak/code/csv-dwh/moarTestData/very-simple-EVENTS.csv",
+	"/Users/ak/code/csv-dwh/moarTestData/simple-EVENTS.csv",
+	"/Users/ak/code/csv-dwh/moarTestData/complex-objects.csv",
+	"/Users/ak/code/csv-dwh/moarTestData/complex-arrays.csv",
+
+];
+
+// const files = (await u.ls('./moarTestData/')).filter(f => f.endsWith('.csv'));
 
 for (const file of files) {
 	const PARAMS = { ...commonParams, csv_file: file };

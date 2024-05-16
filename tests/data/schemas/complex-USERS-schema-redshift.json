@@ -1,0 +1,58 @@
+[
+    {
+        "name": "distinct_id",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_name",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_email",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_avatar",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "_created",
+        "type": "TIMESTAMP"
+    },
+    {
+        "name": "anonymousIds",
+        "type": "SUPER"
+    },
+    {
+        "name": "sessionIds",
+        "type": "SUPER"
+    },
+    {
+        "name": "title",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "luckyNumber",
+        "type": "INTEGER"
+    },
+    {
+        "name": "experiment",
+        "type": "SUPER"
+    },
+    {
+        "name": "spiritAnimal",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "timezone",
+        "type": "SUPER"
+    },
+    {
+        "name": "ip",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "lastCart",
+        "type": "SUPER"
+    }
+]

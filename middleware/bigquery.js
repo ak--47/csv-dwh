@@ -40,6 +40,7 @@ async function loadToBigQuery(schema, batches, PARAMS) {
 	batches = batches.map(batch => batch.map(row => u.rnKeys(row, headerMap)));
 
 	// build a specific schema for BigQuery
+	// @ts-ignore
 	schema = schemaToBQS(schema);
 
 	if (dry_run) {
@@ -136,15 +137,6 @@ function schemaToBQS(schema) {
 		};
 
 
-		// arrays require an item type
-		// if (field.type.toUpperCase() === 'ARRAY') {
-		// 	fieldSchema.type = 'JSON';
-		// 	fieldSchema.mode = 'REPEATED';
-		// }
-		// // For RECORD types, handle subfields if any
-		// if (field.type.toUpperCase() === 'OBJECT' && field.fields) {
-		//     fieldSchema.fields = schemaToBQS(field.fields);
-		// }
 
 		return fieldSchema;
 	});
