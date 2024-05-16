@@ -194,7 +194,7 @@ function batchData(data, batchSize = 0) {
 function summarize(results, PARAMS) {
 	if (!results) return {};
 	let { upload, dataset = "", schema, table } = results;
-	if (!dataset) dataset = PARAMS.bigquery_dataset || PARAMS.snowflake_database || 'unknown';
+	if (!dataset) dataset = PARAMS.bigquery_dataset || PARAMS.snowflake_database || PARAMS.redshift_database || 'unknown';
 	const uploadSummary = upload.reduce((acc, batch) => {
 		acc.success += batch.insertedRows || 0;
 		acc.failed += batch.failedRows || 0;

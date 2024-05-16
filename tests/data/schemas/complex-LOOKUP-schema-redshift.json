@@ -1,0 +1,34 @@
+[
+    {
+        "name": "product_id",
+        "type": "INTEGER"
+    },
+    {
+        "name": "category",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "demand",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "supply",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "manufacturer",
+        "type": "VARCHAR"
+    },
+    {
+        "name": "price",
+        "type": "INTEGER"
+    },
+    {
+        "name": "rating",
+        "type": "INTEGER"
+    },
+    {
+        "name": "reviews",
+        "type": "INTEGER"
+    }
+]

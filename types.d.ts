@@ -1,5 +1,6 @@
-type SimulationConfig = import("make-mp-data").Config;
+import { Config as SimulationConfig } from "make-mp-data";
 
+// Job configuration interface
 export interface JobConfig {
   demoDataConfig?: SimulationConfig;
   csv_file: string;
@@ -10,20 +11,20 @@ export interface JobConfig {
   dry_run?: boolean;
   verbose?: boolean;
 
-  // for csv imports
+  // for CSV imports
   table_name?: string;
 
-  // for auto created data
+  // for auto-created data
   event_table_name?: string;
   user_table_name?: string;
   scd_table_name?: string;
   lookup_table_name?: string;
   group_table_name?: string;
 
-  // BIGQUERY
+  // BigQuery specific
   bigquery_dataset?: string;
 
-  // SNOWFLAKE
+  // Snowflake specific
   snowflake_account?: string;
   snowflake_user?: string;
   snowflake_password?: string;
@@ -32,7 +33,7 @@ export interface JobConfig {
   snowflake_warehouse?: string;
   snowflake_role?: string;
 
-  // redshift
+  // Redshift specific
   redshift_workgroup?: string;
   redshift_database?: string;
   redshift_access_key_id?: string;
@@ -47,39 +48,39 @@ type JSONType = "ARRAY" | "OBJECT" | "JSON";
 type NumberType = "FLOAT" | "INT";
 type DateType = "DATE" | "TIMESTAMP";
 type SpecialType = "PRIMARY_KEY" | "FOREIGN_KEY" | "LOOKUP_KEY";
-type BasicType =
-  | "STRING"
-  | "BOOLEAN"
-  | JSONType
-  | NumberType
-  | DateType
-  | SpecialType;
+type BasicType = "STRING" | "BOOLEAN" | JSONType | NumberType | DateType | SpecialType;
 
-// vendor types
-type SnowflakeTypes = "VARIANT";
+// Vendor-specific types
+type BigQueryTypes = "STRING" | "BOOLEAN" | "INTEGER" | "FLOAT" | "TIMESTAMP";
+type SnowflakeTypes = "VARIANT" | "STRING" | "BOOLEAN" | "NUMBER" | "FLOAT" | "TIMESTAMP" | "DATE";
+type RedshiftTypes = "SUPER" | "VARCHAR" | "BOOLEAN" | "INTEGER" | "REAL" | "TIMESTAMP" | "DATE";
 
+// Schema field interface
 export interface SchemaField {
   name: string;
-  type: BasicType | SnowflakeTypes;
+  type: BasicType | BigQueryTypes | SnowflakeTypes | RedshiftTypes;
 }
 
+// Schema type
 export type Schema = SchemaField[];
 
+// CSV record and batch types
 export type csvRecord = {
   [key: string]: string;
 };
 
 export type csvBatch = csvRecord[];
 
+// Warehouse upload result interface
 export interface WarehouseUploadResult {
   dataset?: string; // Identifier for the dataset used or created
   database?: string; // Identifier for the database used or created
-
   table: string; // Identifier for the table used or created
   schema: Schema; // Schema as applied in the warehouse
   upload: InsertResult[]; // Array of results for each batch processed
 }
 
+// Insert result type
 export type InsertResult = {
   status: "success" | "error"; // Status of the insert operation
   insertedRows?: number; // Number of rows successfully inserted
@@ -88,13 +89,4 @@ export type InsertResult = {
   errors?: any[]; // Any errors encountered during the operation
   errorMessage?: string; // Error message if the operation failed
   meta?: any; // Additional metadata
-};
-
-type InsertResult = {
-  status: string;
-  insertedRows: number;
-  failedRows: number;
-  duration: number;
-  errors?: any;
-  errorMessage?: string;
 };

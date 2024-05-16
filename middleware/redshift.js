@@ -1,4 +1,4 @@
-const { RedshiftDataClient, ExecuteStatementCommand, BatchExecuteStatementCommand } = require('@aws-sdk/client-redshift-data');
+const { RedshiftDataClient, ExecuteStatementCommand, GetStatementResultCommand, DescribeStatementCommand } = require('@aws-sdk/client-redshift-data');
 const u = require('ak-tools');
 const { prepHeaders, cleanName } = require('../components/inference');
 require('dotenv').config();
@@ -37,25 +37,28 @@ async function loadToRedshift(schema, batches, PARAMS) {
 	if (process.env.redshift_region) redshift_region = process.env.redshift_region;
 	if (process.env.redshift_schema) redshift_schema_name = process.env.redshift_schema;
 
-	const credentials = {
-		accessKeyId: redshift_access_key_id || "",
-		secretAccessKey: redshift_secret_access_key || "",
-	};
-	if (redshift_session_token) credentials.sessionToken = redshift_session_token;
-
-
+	//ensure we have everything we need
 	if (!redshift_database) throw new Error('redshift_database is required');
 	if (!redshift_workgroup) throw new Error('redshift_workgroup is required');
 	if (!table_name) throw new Error('table_name is required');
 	if (!redshift_schema_name) throw new Error('redshift_schema_name is required');
+	if (!redshift_access_key_id) throw new Error('redshift_access_key_id is required');
+	if (!redshift_secret_access_key) throw new Error('redshift_secret_access_key is required');
 
+	// Set the global variables
 	database = redshift_database;
 	workgroup = redshift_workgroup;
 	region = redshift_region;
 
+	const credentials = {
+		accessKeyId: redshift_access_key_id,
+		secretAccessKey: redshift_secret_access_key,
+	};
+	if (redshift_session_token) credentials.sessionToken = redshift_session_token;
+
 	table_name = cleanName(table_name);
 
-	schema = schema.map(field => prepareRedshiftSchema(field));
+	schema = schema.map(field => generalSchemaToRedshiftSchema(field));
 	const columnHeaders = schema.map(field => field.name);
 	const headerMap = prepHeaders(columnHeaders);
 	const headerReplacePairs = prepHeaders(columnHeaders, true);
@@ -63,30 +66,27 @@ async function loadToRedshift(schema, batches, PARAMS) {
 	schema = schema.map(field => u.rnVals(field, headerReplacePairs));
 	batches = batches.map(batch => batch.map(row => u.rnKeys(row, headerMap)));
 
-
 	/** @type {import('@aws-sdk/client-redshift-data').RedshiftDataClientConfig} */
-	const clientConfig = { region: redshift_region, credentials };
-
+	const clientConfig = { region: region, credentials };
 	const redshiftClient = new RedshiftDataClient(clientConfig);
 	const tableSchemaSQL = schemaToRedshiftSQL(schema);
 
 	/** @type {import('../types').InsertResult[]} */
 	const upload = [];
 
-	let createTableSQL;
+
 	try {
-		createTableSQL = `CREATE TABLE IF NOT EXISTS ${redshift_schema_name}.${table_name} (${tableSchemaSQL})`;
-		const tableCreate = await executeSQL(redshiftClient, createTableSQL);
+		// const createTableSQL = `CREATE TABLE IF NOT EXISTS ${redshift_schema_name}.${table_name} (${tableSchemaSQL})`;
+		const dropAndCreateTableSQL = `
+    DROP TABLE IF EXISTS ${redshift_schema_name}.${table_name};
+    CREATE TABLE ${redshift_schema_name}.${table_name} (${tableSchemaSQL});
+`.trim();
+		const tableCreate = await executeSQL(redshiftClient, dropAndCreateTableSQL);
 		console.log(`Table ${table_name} created or verified successfully`);
 	} catch (error) {
 		console.error(`Error creating table; ${error.message}`);
 		debugger;
 	}
-
-	//insert statements
-	const columnNames = schema.map(f => f.name).join(", ");
-	// const placeholders = schema.map(() => '?').join(", ");
-	// const insertSQL = `INSERT INTO ${table_name} (${columnNames}) VALUES (${placeholders})`;
 
 	console.log('\n\n');
 
@@ -94,6 +94,9 @@ async function loadToRedshift(schema, batches, PARAMS) {
 		console.log('Dry run requested. Skipping Redshift upload.');
 		return { schema, database: redshift_database, table: table_name || "", upload: [] };
 	}
+
+	//insert statements
+	const columnNames = schema.map(f => f.name).join(", ");
 
 	// Process each batch
 	for (const batch of batches) {
@@ -111,10 +114,11 @@ async function loadToRedshift(schema, batches, PARAMS) {
 		// Execute the batch insert
 		const start = Date.now();
 		try {
-			const response = await executeSQL(redshiftClient, insertSQL);
+			const response = await executeSQL(redshiftClient, insertSQL, true);
 			const duration = Date.now() - start;
-			const numRows = batch.length; // todo better parsing of response
-			upload.push({ duration, status: 'success', insertedRows: numRows, failedRows: 0, meta: response?.$metadata });
+			const insertedRows = response || 0; // If response is null, assume 0 rows inserted
+			const failedRows = batch.length - insertedRows;
+			upload.push({ duration, status: 'success', insertedRows, failedRows });
 			console.log(`Batch ${batches.indexOf(batch) + 1} of ${batches.length} sent successfully.`);
 		} catch (error) {
 			const duration = Date.now() - start;
@@ -137,38 +141,41 @@ async function loadToRedshift(schema, batches, PARAMS) {
  * Executes a given SQL query on the Redshift Serverless connection
  * @param {RedshiftDataClient} client 
  * @param {string} sql 
- * @param {any[] | any} [binds] 
- * @returns {Promise<any>}
+ * @param {boolean} isBatch
+ * @returns {Promise<number | null>}
  */
-async function executeSQL(client, sql, binds = false) {
-	console.log(`Executing SQL: ${sql}`);  // Debug output to inspect SQL value
-	if (!sql) {
-		console.error('SQL command is null');
-		throw new Error('SQL command is null');
-	}
-
-	let command;
-	// if (binds) {
-	// 	command = new BatchExecuteStatementCommand({
-	// 		Sqls: sql,
-	// 		Database: database,
-	// 		WorkgroupName: workgroup,
-	// 		// parameterSets: binds 
-	// 	});
-	// }
-
-	if (!binds) {
-		command = new ExecuteStatementCommand({
-			Sql: sql,
-			Database: database,
-			WorkgroupName: workgroup
-		});
-
-	}
+async function executeSQL(client, sql, isBatch = false) {
+	const executeCommand = new ExecuteStatementCommand({
+		Sql: sql,
+		Database: database,
+		WorkgroupName: workgroup,
+	});
 
 	try {
-		const response = await client.send(command);
-		return response;
+		const statement = await client.send(executeCommand);
+		if (!isBatch) return null;
+		// Wait for the statement to complete
+		const statementId = statement.Id;
+		const describeCommand = new DescribeStatementCommand({ Id: statementId });
+		let statementStatus;
+		let describeResponse;
+		do {
+			describeResponse = await client.send(describeCommand);
+			statementStatus = describeResponse.Status;
+			if (statementStatus === 'FAILED' || statementStatus === 'ABORTED') {
+				throw new Error(`Statement ${statementStatus}: ${describeResponse.Error}`);
+			}
+			// Wait for a while before checking the status again
+			if (statementStatus !== 'FINISHED') {
+				const waitTime = u.rand(250, 420);
+				console.log(`Statement ${statementId} is ${statementStatus}. Waiting ${waitTime}ms before checking again...`);
+				await u.sleep(waitTime);
+			}
+		} while (statementStatus !== 'FINISHED');
+		//query is done;
+		const { ResultRows = null } = describeResponse;
+		return ResultRows;
+
 	} catch (error) {
 		console.error('Failed executing SQL:', error);
 		throw error;
@@ -176,9 +183,28 @@ async function executeSQL(client, sql, binds = false) {
 }
 
 
-module.exports = loadToRedshift;
-
-
+function formatSQLValue(value, type) {
+	if (value === null || value === undefined || value === "") return 'NULL';
+	switch (type) {
+		case 'INTEGER':
+			return parseInt(value);			
+		case 'REAL':
+			return parseFloat(value);
+		case 'BOOLEAN':
+			return value ? 'TRUE' : 'FALSE';
+		case 'STRING':
+			return `'${value}'`;
+		case 'VARCHAR':
+			return `'${value}'`;
+		case 'DATE':
+		case 'TIMESTAMP':
+			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
+		case 'SUPER': // For JSON types
+			return `'${value}'`; // Escape and convert to JSON string
+		default:
+			return value;
+	}
+}
 
 /**
  * Translates a schema definition to Redshift SQL data types
@@ -196,66 +222,20 @@ function schemaToRedshiftSQL(schema) {
 			case 'DATE': type = 'DATE'; break;
 			case 'TIMESTAMP': type = 'TIMESTAMP'; break;
 			case 'JSON': type = 'SUPER'; break;
+			case 'OBJECT': type = 'SUPER'; break;
+			case 'ARRAY': type = 'SUPER'; break;
 			// Add other type mappings as necessary
 		}
 		return `${field.name} ${type}`;
 	}).join(', ');
 }
 
-function formatSQLValue(value, type) {
-    if (value === null || value === undefined) return 'NULL';
-    switch (type) {
-        case 'INTEGER':
-        case 'REAL':
-            return value;
-        case 'BOOLEAN':
-            return value ? 'TRUE' : 'FALSE';
-        case 'STRING':
-			return `'${value}'`
-		case 'VARCHAR':
-			return `'${value}'`
-        case 'DATE':
-        case 'TIMESTAMP':
-            return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
-        case 'SUPER': // For JSON types
-            return `'${JSON.stringify(value).replace(/'/g, "''")}'`; // Escape and convert to JSON string
-        default:
-            return value;
-    }
-}
-
-
-/**
- * Formats a value based on its schema definition type for Redshift.
- * @param {any} value
- * @param {string} type
- * @returns {any}
- */
-function formatBindValue(value, type) {
-	if (value === null || value === undefined || value === "null" || value.trim() === "") {
-		return null;
-	}
-	switch (type) {
-		case 'INTEGER':
-			return parseInt(value);
-		case 'REAL':
-			return parseFloat(value);
-		case 'BOOLEAN':
-			return value.toLowerCase() === 'true';
-		case 'SUPER':
-			return JSON.stringify(value);
-		default:
-			return value;
-	}
-}
-
-
 /**
  * Prepares the schema for Redshift based on the field types provided.
  * @param {import('../types').SchemaField} field
  * @returns {import('../types').SchemaField}
  */
-function prepareRedshiftSchema(field) {
+function generalSchemaToRedshiftSchema(field) {
 	const redshiftTypes = {
 		'INT': 'INTEGER',
 		'FLOAT': 'REAL',
@@ -263,7 +243,9 @@ function prepareRedshiftSchema(field) {
 		'BOOLEAN': 'BOOLEAN',
 		'DATE': 'DATE',
 		'TIMESTAMP': 'TIMESTAMP',
-		'JSON': 'SUPER'  // Redshift supports SUPER for semi-structured data
+		'JSON': 'SUPER',
+		'OBJECT': 'SUPER',
+		'ARRAY': 'SUPER'
 	};
 
 	let redshiftType = redshiftTypes[field.type.toUpperCase()] || 'VARCHAR';  // Default to VARCHAR if not mapped
