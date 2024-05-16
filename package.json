@@ -3,6 +3,21 @@
 	"version": "1.0.0",
 	"description": "local csv files → various cloud data warehouses",
 	"main": "index.js",
+	"types": "types.d.ts",
+	"keywords": [
+		"csv",
+		"data warehouse",
+		"warehouse",
+		"bigquery",
+		"snowflake",
+		"redshift",
+		"mixpanel",
+		"stream",
+		"analytics",
+		"tracking",
+		"server",
+		"CLI"
+	],
 	"scripts": {
 		"start": "node index.js",
 		"dev": "nodemon scratch.mjs",
