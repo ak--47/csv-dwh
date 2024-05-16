@@ -9,12 +9,15 @@ const dataMaker = require('make-mp-data');
 const Papa = require("papaparse");
 
 const cli = require('./components/cli');
+const log = require('./components/logger.js');
 const { generateSchema } = require('./components/inference.js');
 
 
 const loadToBigQuery = require('./middleware/bigquery');
 const loadToSnowflake = require('./middleware/snowflake');
 const loadToRedshift = require('./middleware/redshift');
+
+
 
 /**
  * @typedef {import('./types').JobConfig} Config
@@ -62,6 +65,16 @@ async function main(PARAMS) {
 		snowflake_schema = '',
 		snowflake_warehouse = '',
 		snowflake_role = '',
+		snowflake_access_url = '',
+
+		//redshift requires:
+		redshift_workgroup = '',
+		redshift_database = '',
+		redshift_access_key_id = '',
+		redshift_secret_access_key = '',
+		redshift_schema_name = '',
+		redshift_region = '',
+		redshift_session_token = '',
 
 		//options
 		verbose = false,
@@ -69,6 +82,9 @@ async function main(PARAMS) {
 		...rest
 
 	} = PARAMS;
+
+	// set verbose logging
+	log.verbose(verbose);
 
 	if (!warehouse) throw new Error('warehouse is required');
 	if (!table_name) console.warn('no table name specified; i will make one up'); table_name = u.makeName(2, '_');
@@ -82,7 +98,7 @@ async function main(PARAMS) {
 		group_table_name = prefix + '_groups';
 	}
 
-	//CSV or JSON
+	//CSV or JSON (or generated data)
 	if (csv_file && json_file) throw new Error('cannot specify both csv_file and json_file');
 	if (!csv_file && !json_file) throw new Error('csv_file or json_file is required');
 	if (csv_file) if (!existsSync(csv_file)) throw new Error(`file not found: ${csv_file}`);
@@ -90,7 +106,7 @@ async function main(PARAMS) {
 	let file;
 	if (csv_file) file = csv_file;
 	if (json_file) file = json_file;
-
+	if (!file && !demoDataConfig) throw new Error('no data source specified');
 
 	// clean PARAMS
 	for (const key in PARAMS) {
@@ -109,14 +125,17 @@ async function main(PARAMS) {
 		const filePath = path.resolve(csv_file || json_file);
 		const isCSV = filePath.endsWith('.csv');
 		const isJSON = filePath.endsWith('.json');
+
 		if (isCSV) {
 			const fileData = await u.load(filePath);
 			const parseJob = Papa.parse(fileData, { header: true, skipEmptyLines: false, fastMode: false });
 			parsed = parseJob.data;
 		}
+
 		if (isJSON) {
 			parsed = (await u.load(filePath)).split('\n').filter(a => a).map(JSON.parse);
 		}
+
 		schema = generateSchema(parsed);
 		intermediateSchema = u.clone(schema);
 		data = { sourceFileData: parsed };
@@ -160,7 +179,7 @@ async function main(PARAMS) {
 		intermediateSchema
 	};
 
-	console.log('JOB SUMMARY:\n\n', jobSummary);
+	log('JOB SUMMARY:\n\n', jobSummary);
 
 
 	// @ts-ignore
@@ -191,8 +210,7 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 		}
 	}
 	catch (e) {
-		console.log('WAREHOUSE ERROR', warehouse);
-		console.error(e);
+		log('WAREHOUSE ERROR', { warehouse }, e);
 		debugger;
 	}
 
@@ -239,16 +257,21 @@ function summarize(results, PARAMS) {
 
 
 
+
 // this is for CLI
 if (require.main === module) {
+	log.cli(true);
 	const params = cli().then((params) => {
 		// CLI is always verbose
 		main({ ...params, verbose: true })
 			.then((results) => {
-				console.log('\n\nRESULTS:\n\n', u.json(results));
+				log('\n\nRESULTS:\n\n');
+				log(JSON.stringify(results));
+				//todo: write a log file?
+
 			})
 			.catch((e) => {
-				console.log('\n\nUH OH! something went wrong; the error is:\n\n');
+				log('\n\nUH OH! something went wrong; the error is:\n\n');
 				console.error(e);
 				process.exit(1);
 			})
@@ -259,6 +282,8 @@ if (require.main === module) {
 }
 
 
-
+main.bigquery = loadToBigQuery;
+main.snowflake = loadToSnowflake;
+main.redshift = loadToRedshift;
 module.exports = main;
 

@@ -1,12 +1,14 @@
 const { BigQuery } = require('@google-cloud/bigquery');
 const u = require('ak-tools');
 const { prepHeaders, cleanName } = require('../components/inference');
+const log = require('../components/logger.js');
+require('dotenv').config();
 
-const client = new BigQuery(); // use application default credentials; todo: override with service account
+let client;  // use application default credentials; todo: override with service account
 let datasetId = '';
 let tableId = '';
 
-/** @typedef { "INT64" | "FLOAT64" | "DATE" | "TIMESTAMP" | "BOOLEAN" | "STRING" | "ARRAY" | "STRUCT" | "JSON" | "RECORD"} BQTypes */
+/** @typedef { import('../types').BigQueryTypes } BQTypes */
 
 /**
 * BigQuery middleware
@@ -20,14 +22,50 @@ async function loadToBigQuery(schema, batches, PARAMS) {
 	let {
 		bigquery_dataset = '',
 		table_name = '',
+		bigquery_project = '',
+		bigquery_keyfile = '',
+		bigquery_service_account = '',
+		bigquery_service_account_pass = '',
 		dry_run = false,
+		verbose = false
 	} = PARAMS;
+
+	// override with environment variables if available
+	if (process.env.bigquery_dataset) bigquery_dataset = process.env.bigquery_dataset;
+	if (process.env.table_name) table_name = process.env.table_name;
+	if (process.env.bigquery_project) bigquery_project = process.env.bigquery_project;
+	if (process.env.bigquery_keyfile) bigquery_keyfile = process.env.bigquery_keyfile;
+	if (process.env.bigquery_service_account) bigquery_service_account = process.env.bigquery_service_account;
+	if (process.env.bigquery_service_account_pass) bigquery_service_account_pass = process.env.bigquery_service_account_pass;
 
 	if (!bigquery_dataset) throw new Error('bigquery_dataset is required');
 	if (!table_name) throw new Error('table_name is required');
+	if (!bigquery_project) throw new Error('bigquery_project is required');
+	if (!bigquery_keyfile && (!bigquery_service_account || !bigquery_service_account_pass)) throw new Error('bigquery_keyfile or bigquery_service_account + bigquery_service_account_pass is required');
 	if (!schema) throw new Error('schema is required');
 	if (!batches) throw new Error('batches is required');
 	if (batches.length === 0) throw new Error('batches is empty');
+
+	// credentials or keyfile or application default credentials
+	/** @type {import('@google-cloud/bigquery').BigQueryOptions} */
+	const auth = {};
+	if (bigquery_keyfile) {
+		auth.keyFilename = bigquery_keyfile;
+		auth.keyFile = bigquery_keyfile;
+	}
+	if (bigquery_project) auth.projectId = bigquery_project;
+	if (bigquery_service_account && bigquery_service_account_pass) {
+		auth.credentials = {
+			client_email: bigquery_service_account,
+			private_key: bigquery_service_account_pass
+		};
+	}
+
+	client = new BigQuery(auth);
+
+	const validCredentials = await verifyBigQueryCredentials();
+	if (typeof validCredentials === 'boolean' && !validCredentials) throw new Error(`Invalid BigQuery credentials; Got Message: ${validCredentials}`);
+
 	table_name = cleanName(table_name);
 	datasetId = bigquery_dataset;
 	tableId = table_name;
@@ -44,17 +82,17 @@ async function loadToBigQuery(schema, batches, PARAMS) {
 	schema = schemaToBQS(schema);
 
 	if (dry_run) {
-		console.log('Dry run requested. Skipping BigQuery upload.');
-		return { schema, dataset: datasetId, table: tableId, upload: [] };
-	
+		log('Dry run requested. Skipping BigQuery upload.');
+		return { schema, dataset: datasetId, table: tableId, upload: [], logs: log.getLog() };
 	}
 
 	// do work
 	const dataset = await createDataset();
 	const table = await createTable(schema);
 	const upload = await insertData(schema, batches);
+	const logs = log.getLog();
 
-	const uploadJob = { schema, dataset, table, upload };
+	const uploadJob = { schema, dataset, table, upload, logs };
 
 	// @ts-ignore
 	return uploadJob;
@@ -67,15 +105,13 @@ async function createDataset() {
 
 	if (!datasetExists) {
 		const [dataset] = await client.createDataset(datasetId);
-		console.log(`Dataset ${dataset.id} created.\n`);
+		log(`Dataset ${dataset.id} created.\n`);
 		return datasetId;
 	} else {
-		console.log(`Dataset ${datasetId} already exists.\n`);
+		log(`Dataset ${datasetId} already exists.\n`);
 		return datasetId;
 	}
 }
-
-
 
 /**
  * @param  {import('../types').Schema} schema
@@ -95,9 +131,9 @@ function schemaToBQS(schema) {
 				break;
 			case 'ARRAY':
 				bqType = 'JSON';
-				
+
 				break;
-			case 'JSON': 
+			case 'JSON':
 				bqType = 'JSON';
 
 				break;
@@ -164,13 +200,17 @@ function convertField(value, type) {
 			if (typeof value === 'number') return value === 1;
 			if (typeof value === 'string') return value?.toLowerCase() === 'true';
 		case 'RECORD':
-			if (Array.isArray(value)) return value;
-			if (typeof value === 'object') return value;
-			if (typeof value === 'string') return JSON.parse(value);
+			if (Array.isArray(value)) return JSON.stringify(value);
+			if (typeof value === 'object') return JSON.stringify(value);
+			if (typeof value === 'string') return value;
+		case 'JSON':
+			if (Array.isArray(value)) return JSON.stringify(value);
+			if (typeof value === 'object') return JSON.stringify(value);
+			if (typeof value === 'string') return value;
 		case 'STRUCT':
-			if (Array.isArray(value)) return value;
-			if (typeof value === 'object') return value;
-			if (typeof value === 'string') return JSON.parse(value);
+			if (Array.isArray(value)) return JSON.stringify(value);
+			if (typeof value === 'object') return JSON.stringify(value);
+			if (typeof value === 'string') return value;
 		default:
 			return value;
 	}
@@ -183,7 +223,7 @@ function prepareRowsForInsertion(batch, schema) {
 			//sparse CSVs will have missing fields
 			if (row[field.name] !== '') {
 				try {
-				newRow[field.name] = convertField(row[field.name], field.type.toUpperCase());
+					newRow[field.name] = convertField(row[field.name], field.type.toUpperCase());
 				}
 				catch (error) {
 					debugger;
@@ -197,50 +237,49 @@ function prepareRowsForInsertion(batch, schema) {
 	});
 }
 
-
 async function waitForTableToBeReady(table, retries = 20, maxInsertAttempts = 20) {
-	console.log('Checking if table exits...');
+	log('Checking if table exits...');
 
 	tableExists: for (let i = 0; i < retries; i++) {
 		const [exists] = await table.exists();
 		if (exists) {
-			console.log(`\tTable is confirmed to exist on attempt ${i + 1}.`);
+			log(`\tTable is confirmed to exist on attempt ${i + 1}.`);
 			break tableExists;
 		}
 		const sleepTime = u.rand(1000, 5000);
-		console.log(`sleeping for ${u.prettyTime(sleepTime)}; waiting for table exist; attempt ${i + 1}`);
+		log(`sleeping for ${u.prettyTime(sleepTime)}; waiting for table exist; attempt ${i + 1}`);
 		await u.sleep(sleepTime);
 
 		if (i === retries - 1) {
-			console.log(`Table does not exist after ${retries} attempts.`);
+			log(`Table does not exist after ${retries} attempts.`);
 			return false;
 		}
 	}
 
-	console.log('\nChecking if table is ready for operations...');
+	log('\nChecking if table is ready for operations...');
 	let insertAttempt = 0;
 	while (insertAttempt < maxInsertAttempts) {
 		try {
 			// Attempt a dummy insert that SHOULD fail, but not because 404
 			const dummyRecord = { [u.uid()]: u.uid() };
 			await table.insert([dummyRecord]);
-			console.log('...should never get here...');
+			log('...should never get here...');
 			return true; // If successful, return true immediately
 		} catch (error) {
 			if (error.code === 404) {
 				const sleepTime = u.rand(1000, 5000);
-				console.log(`\tTable not ready for operations, sleeping ${u.prettyTime(sleepTime)} retrying... attempt #${insertAttempt + 1}`);
+				log(`\tTable not ready for operations, sleeping ${u.prettyTime(sleepTime)} retrying... attempt #${insertAttempt + 1}`);
 				await u.sleep(sleepTime);
 				insertAttempt++;
 			}
 
 			else if (error.name === 'PartialFailureError') {
-				console.log('\tTable is ready for operations\n');
+				log('\tTable is ready for operations\n');
 				return true;
 			}
 
 			else {
-				console.log('should never get here either');
+				log('should never get here either');
 				debugger;
 			}
 
@@ -257,10 +296,10 @@ async function insertData(schema, batches) {
 	// Check if table is ready
 	const tableReady = await waitForTableToBeReady(table);
 	if (!tableReady) {
-		console.log('\nTable is NOT ready after all attempts. Aborting data insertion.');
+		log('\nTable is NOT ready after all attempts. Aborting data insertion.');
 		process.exit(1);
 	}
-	console.log('Starting data insertion...\n');
+	log('Starting data insertion...\n');
 	const results = [];
 
 	/** @type {import('@google-cloud/bigquery').InsertRowsOptions} */
@@ -278,20 +317,26 @@ async function insertData(schema, batches) {
 		const start = Date.now();
 		try {
 			const rows = prepareRowsForInsertion(batch, schema);
-			const [job] = await table.insert(rows, options);
+			const [response] = await table.insert(rows, options);
 			const duration = Date.now() - start;
-			//todo: get row count from job
 			results.push({ status: 'success', insertedRows: rows.length, failedRows: 0, duration });
-			u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
+			if (log.isVerbose()) u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
 
 		} catch (error) {
 			const duration = Date.now() - start;
-			results.push({ status: 'error', errorMessage: error.message, errors: error, duration });
-			console.error(`\n\nError inserting batch ${currentBatch}; ${error.message}\n\n`);
+			if (error.name === 'PartialFailureError') {
+				const failedRows = error.errors.length;
+				const insertedRows = batch.length - failedRows;
+				const uniqueErrors = Array.from(new Set(error.errors.map(e => e.errors.map(e => e.message)).flat()));;
+				results.push({ status: 'error', type: "partial failure", failedRows, insertedRows, errors: uniqueErrors, duration });
+				log(`Partial failure inserting batch ${currentBatch}; will continue`);
+			}
+			batch;
 			debugger;
+			throw error;
 		}
 	}
-	console.log('\n\tData insertion complete.\n');
+	log('\n\tData insertion complete.\n');
 	return results;
 }
 
@@ -301,19 +346,30 @@ async function createTable(schema) {
 	const [tableExists] = await table.exists();
 
 	if (tableExists) {
-		console.log(`Table ${tableId} already exists. Deleting existing table.`);
+		log(`Table ${tableId} already exists. Deleting existing table.`);
 		await table.delete();
-		console.log(`Table ${tableId} has been deleted.`);
+		log(`Table ${tableId} has been deleted.`);
 	}
 
 	// Proceed to create a new table with the new schema
 	const options = { schema: schemaToBQS(schema) };
 	const [newTable] = await dataset.createTable(tableId, options);
-	console.log(`New table ${newTable.id} created with the updated schema.\n`);
+	log(`New table ${newTable.id} created with the updated schema.\n`);
 	const newTableExists = await newTable.exists();
 	return newTable.id;
 }
 
+async function verifyBigQueryCredentials() {
+	const query = 'SELECT 1';
+	try {
+		const [rows] = await client.query(query);
+		log('BigQuery credentials are valid');
+		return true;
+	} catch (error) {
+		log('Error verifying BigQuery credentials:', error);
+		return error.message;
+	}
+}
 
 
 

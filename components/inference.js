@@ -3,6 +3,8 @@ const { parseISO, isValid } = require('date-fns');
 
 function inferType(value) {
 	//complex objects
+	if (Array.isArray(value)) return 'ARRAY';
+	if (typeof value === 'object') return 'OBJECT';
 	if (isBoolean(value)) return 'BOOLEAN';
 	if (isJSONStr(value)) return inferJSONType(value);
 	if (isNumber(value)) return inferNumberType(value);

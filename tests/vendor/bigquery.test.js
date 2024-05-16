@@ -7,6 +7,9 @@ const { cleanName } = require('../../components/inference.js');
 
 const TIMEOUT = process.env.TIMEOUT || 1000 * 60 * 5; // 5 minutes
 const BATCH_SIZE = process.env.BATCH_SIZE || 500;
+// Automatically set verbose mode based on debug mode
+const isDebugMode = process.env.NODE_OPTIONS?.includes('--inspect') || process.env.NODE_OPTIONS?.includes('--inspect-brk');
+const VERBOSE = isDebugMode || process.env.VERBOSE === 'true';
 
 /** @typedef {import('../types').JobConfig} PARAMS */
 
@@ -16,7 +19,8 @@ const BATCH_SIZE = process.env.BATCH_SIZE || 500;
 const commonParams = {
 	bigquery_dataset: "csv_dwh",
 	batch_size: BATCH_SIZE,
-	warehouse: "bigquery"
+	warehouse: "bigquery",
+	verbose: VERBOSE
 };
 
 
@@ -31,7 +35,7 @@ const [arrays, objects, simple, sparse] = [
 
 
 
-describe('mvp', ()=>{
+describe('mvp', () => {
 	test("mvp: simple", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -51,8 +55,8 @@ describe('mvp', ()=>{
 		expect(duration).toBeGreaterThan(0);
 		expect(errors.length).toBe(0);
 	}, TIMEOUT);
-	
-	
+
+
 	test("mvp: sparse", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -72,7 +76,7 @@ describe('mvp', ()=>{
 		expect(duration).toBeGreaterThan(0);
 		expect(errors.length).toBe(0);
 	}, TIMEOUT);
-	
+
 	test("mvp: arrays", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -92,7 +96,7 @@ describe('mvp', ()=>{
 		expect(duration).toBeGreaterThan(0);
 		expect(errors.length).toBe(0);
 	}, TIMEOUT);
-	
+
 	test("mvp: objects", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -114,14 +118,14 @@ describe('mvp', ()=>{
 	}, TIMEOUT);
 
 
-})
+});
 
-describe('csv', ()=>{
+describe('csv', () => {
 	test("simple: events", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
 			csv_file: "./tests/data/mp_types/simple-EVENTS.csv",
-			table_name: "test-simpleEvents",
+			table_name: "test-simple-Events",
 			...commonParams
 		};
 		const expectedRows = 1111;
@@ -136,11 +140,11 @@ describe('csv', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 		const expectedSchema = await u.load('./tests/data/schemas/simple-EVENTS-schema-bigquery.json', true);
 		expect(schema).toEqual(expectedSchema);
 	}, TIMEOUT);
-	
+
 	test("simple: users", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -160,12 +164,12 @@ describe('csv', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 		const expectedSchema = await u.load('./tests/data/schemas/simple-USERS-schema-bigquery.json', true);
-	
+
 		expect(schema).toEqual(expectedSchema);
 	}, TIMEOUT);
-	
+
 	test("complex: events", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -185,12 +189,12 @@ describe('csv', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 		const expectedSchema = await u.load('./tests/data/schemas/complex-EVENTS-schema-bigquery.json', true);
-	
+
 		expect(schema).toEqual(expectedSchema);
 	}, TIMEOUT);
-	
+
 	test("complex: users", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -210,12 +214,12 @@ describe('csv', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 		const expectedSchema = await u.load('./tests/data/schemas/complex-USERS-schema-bigquery.json', true);
-	
+
 		expect(schema).toEqual(expectedSchema);
 	}, TIMEOUT);
-	
+
 	test("complex: groups", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -235,12 +239,12 @@ describe('csv', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 		const expectedSchema = await u.load('./tests/data/schemas/complex-GROUP-schema-bigquery.json', true);
-	
+
 		expect(schema).toEqual(expectedSchema);
 	}, TIMEOUT);
-	
+
 	test("complex: lookups", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -260,12 +264,12 @@ describe('csv', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 		const expectedSchema = await u.load('./tests/data/schemas/complex-LOOKUP-schema-bigquery.json', true);
-	
+
 		expect(schema).toEqual(expectedSchema);
 	}, TIMEOUT);
-	
+
 	test("complex: scd", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -285,20 +289,20 @@ describe('csv', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 		const expectedSchema = await u.load('./tests/data/schemas/complex-SCD-schema-bigquery.json', true);
-	
+
 		expect(schema).toEqual(expectedSchema);
 	}, TIMEOUT);
-})
+});
 
 
-describe('json', ()=>{
+describe('json', () => {
 	test("simple: events", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
 			json_file: "./tests/data/mp_types/simple-EVENTS.json",
-			table_name: "test-simpleEvents-json",
+			table_name: "test-simple-Events-json",
 			...commonParams
 		};
 		const expectedRows = 1111;
@@ -313,10 +317,10 @@ describe('json', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 
 	}, TIMEOUT);
-	
+
 	test("simple: users", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -336,10 +340,10 @@ describe('json', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 
 	}, TIMEOUT);
-	
+
 	test("complex: events", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -359,10 +363,10 @@ describe('json', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 
 	}, TIMEOUT);
-	
+
 	test("complex: users", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -382,10 +386,10 @@ describe('json', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 
 	}, TIMEOUT);
-	
+
 	test("complex: groups", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -405,10 +409,10 @@ describe('json', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 
 	}, TIMEOUT);
-	
+
 	test("complex: scd", async () => {
 		/** @type {PARAMS} */
 		const PARAMS = {
@@ -428,9 +432,9 @@ describe('json', ()=>{
 		expect(insert.failed).toBe(0);
 		expect(insert.duration).toBeGreaterThan(0);
 		expect(insert.errors.length).toBe(0);
-	
+
 
 	}, TIMEOUT);
-	
+
 });
 

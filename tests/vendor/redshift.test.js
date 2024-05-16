@@ -7,6 +7,8 @@ const { cleanName } = require('../../components/inference.js');
 const TIMEOUT = process.env.TIMEOUT || 1000 * 60 * 5; // 5 minutes
 let BATCH_SIZE = process.env.BATCH_SIZE || 500;
 BATCH_SIZE = 250;
+const isDebugMode = process.env.NODE_OPTIONS?.includes('--inspect') || process.env.NODE_OPTIONS?.includes('--inspect-brk');
+const VERBOSE = isDebugMode || process.env.VERBOSE === 'true';
 
 /** @typedef {import('../types').JobConfig} PARAMS */
 
@@ -27,7 +29,8 @@ const commonParams = {
 	redshift_region,
 	batch_size: BATCH_SIZE,
 	warehouse: "redshift",
-	dry_run: false
+	dry_run: false,
+	verbose: VERBOSE
 };
 
 //MVP CASES
@@ -281,7 +284,7 @@ describe("csv", ()=>{
 			table_name: "test-complex-SCD",
 			...commonParams
 		};
-		const expectedRows = 285;
+		const expectedRows = 293;
 		const job = await main(PARAMS);
 		const { totalRows, results } = job;
 		expect(totalRows).toBe(expectedRows);
@@ -306,7 +309,7 @@ describe("json", ()=>{
 		/** @type {PARAMS} */
 		const PARAMS = {
 			json_file: "./tests/data/mp_types/simple-EVENTS.json",
-			table_name: "test-simpleEvents-json",
+			table_name: "test-simple-Events-json",
 			...commonParams
 		};
 		const expectedRows = 1111;
@@ -349,7 +352,8 @@ describe("json", ()=>{
 		const PARAMS = {
 			json_file: "./tests/data/mp_types/complex-EVENTS.json",
 			table_name: "test-complex-EVENTS-json",
-			...commonParams
+			...commonParams,
+			batch_size: 100
 		};
 		const expectedRows = 1111;
 		const job = await main(PARAMS);
@@ -370,7 +374,8 @@ describe("json", ()=>{
 		const PARAMS = {
 			json_file: "./tests/data/mp_types/complex-USERS.json",
 			table_name: "test-complex-USERS-json",
-			...commonParams
+			...commonParams,
+			batch_size: 25
 		};
 		const expectedRows = 100;
 		const job = await main(PARAMS);

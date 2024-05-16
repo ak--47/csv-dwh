@@ -1,6 +1,7 @@
 const { RedshiftDataClient, ExecuteStatementCommand, GetStatementResultCommand, DescribeStatementCommand } = require('@aws-sdk/client-redshift-data');
 const u = require('ak-tools');
 const { prepHeaders, cleanName } = require('../components/inference');
+const log = require('../components/logger.js');
 require('dotenv').config();
 
 let workgroup;
@@ -71,6 +72,9 @@ async function loadToRedshift(schema, batches, PARAMS) {
 	const redshiftClient = new RedshiftDataClient(clientConfig);
 	const tableSchemaSQL = schemaToRedshiftSQL(schema);
 
+	const validCredentials = await verifyRedshiftCredentials(redshiftClient);
+	if (typeof validCredentials === 'boolean' && !validCredentials) throw new Error(`Invalid BigQuery credentials; Got Message: ${validCredentials}`);
+
 	/** @type {import('../types').InsertResult[]} */
 	const upload = [];
 
@@ -82,17 +86,17 @@ async function loadToRedshift(schema, batches, PARAMS) {
     CREATE TABLE ${redshift_schema_name}.${table_name} (${tableSchemaSQL});
 `.trim();
 		const tableCreate = await executeSQL(redshiftClient, dropAndCreateTableSQL);
-		console.log(`Table ${table_name} created or verified successfully`);
+		log(`Table ${table_name} created or verified successfully`);
 	} catch (error) {
 		console.error(`Error creating table; ${error.message}`);
 		debugger;
 	}
 
-	console.log('\n\n');
+	log('\n\n');
 
 	if (dry_run) {
-		console.log('Dry run requested. Skipping Redshift upload.');
-		return { schema, database: redshift_database, table: table_name || "", upload: [] };
+		log('Dry run requested. Skipping Redshift upload.');
+		return { schema, database: redshift_database, table: table_name || "", upload: [], logs: log.getLog()};
 	}
 
 	//insert statements
@@ -119,19 +123,20 @@ async function loadToRedshift(schema, batches, PARAMS) {
 			const insertedRows = response || 0; // If response is null, assume 0 rows inserted
 			const failedRows = batch.length - insertedRows;
 			upload.push({ duration, status: 'success', insertedRows, failedRows });
-			console.log(`Batch ${batches.indexOf(batch) + 1} of ${batches.length} sent successfully.`);
+			if (log.isVerbose()) u.progress(`\tsent batch ${batches.indexOf(batch) + 1} of ${u.comma(batches.length)} batches`);
 		} catch (error) {
 			const duration = Date.now() - start;
 			upload.push({ status: 'error', errorMessage: error.message, errors: error, duration });
-			console.error(`Error inserting batch ${batches.indexOf(batch) + 1}: ${error.message}`);
+			log(`Error inserting batch ${batches.indexOf(batch) + 1}: ${error.message}`, error, batch);
 			debugger;
 		}
 	}
 
-	console.log('\n\nData insertion complete.\n');
+	log('\n\nData insertion complete.\n');
 
+	const logs = log.getLog();
 	/** @type {import('../types').WarehouseUploadResult} */
-	const uploadJob = { schema, database: redshift_database, table: table_name || "", upload };
+	const uploadJob = { schema, database: redshift_database, table: table_name || "", upload, logs };
 
 	return uploadJob;
 }
@@ -168,7 +173,7 @@ async function executeSQL(client, sql, isBatch = false) {
 			// Wait for a while before checking the status again
 			if (statementStatus !== 'FINISHED') {
 				const waitTime = u.rand(250, 420);
-				// console.log(`Statement ${statementId} is ${statementStatus}. Waiting ${waitTime}ms before checking again...`);
+				log(`Statement ${statementId} is ${statementStatus}. Waiting ${waitTime}ms before checking again...`);
 				await u.sleep(waitTime);
 			}
 		} while (statementStatus !== 'FINISHED');
@@ -188,11 +193,11 @@ function formatSQLValue(value, type) {
 	if (value === null || value === undefined || value === "") return 'NULL';
 	switch (type) {
 		case 'INTEGER':
-            return parseInt(value, 10);
-        case 'REAL':
-            return parseFloat(value);
-        case 'BOOLEAN':
-            return value.toString().toLowerCase() === 'true' ? 'TRUE' : 'FALSE'; // Ensure boolean conversion
+			return parseInt(value, 10);
+		case 'REAL':
+			return parseFloat(value);
+		case 'BOOLEAN':
+			return value.toString().toLowerCase() === 'true' ? 'TRUE' : 'FALSE'; // Ensure boolean conversion
 		case 'STRING':
 			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
 		case 'VARCHAR':
@@ -202,7 +207,11 @@ function formatSQLValue(value, type) {
 		case 'TIMESTAMP':
 			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
 		case 'SUPER': // For JSON types
-			return `'${value.replace(/'/g, "''")}'`; // Escape single quotes
+			if (typeof value === 'string') return `'${value.replace(/'/g, "''")}'`;
+			if (typeof value === 'object') return `'${JSON.stringify(value).replace(/'/g, "''")}'`;
+			if (Array.isArray(value)) return `'${JSON.stringify(value).replace(/'/g, "''")}'`;
+			//never should get here
+			debugger;
 		default:
 			return value;
 	}
@@ -252,6 +261,28 @@ function generalSchemaToRedshiftSchema(field) {
 
 	let redshiftType = redshiftTypes[field.type.toUpperCase()] || 'VARCHAR';  // Default to VARCHAR if not mapped
 	return { ...field, type: redshiftType };
+}
+
+/**
+ * @param  {RedshiftDataClient} redshiftClient
+ */
+async function verifyRedshiftCredentials(redshiftClient) {
+	const sql = 'SELECT 1';
+	const command = new ExecuteStatementCommand({
+		Sql: sql,
+		Database: database,
+		WorkgroupName: workgroup
+
+	});
+
+	try {
+		await redshiftClient.send(command);
+		log('Redshift credentials are valid');
+		return true;
+	} catch (error) {
+		log(`Error verifying Redshift credentials:\n${error.message}`, error);
+		return error.message;
+	}
 }
 
 module.exports = loadToRedshift;

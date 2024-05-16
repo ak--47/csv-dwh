@@ -5,7 +5,7 @@ declare namespace main {
   export interface JobConfig {
     demoDataConfig?: SimulationConfig;
     csv_file?: string;
-	json_file?: string;
+    json_file?: string;
 
     warehouse: "bigquery" | "snowflake" | "redshift";
     region: string;
@@ -25,6 +25,10 @@ declare namespace main {
 
     // BigQuery specific
     bigquery_dataset?: string;
+    bigquery_project?: string;
+    bigquery_keyfile?: string;
+    bigquery_service_account?: string;
+    bigquery_service_account_pass?: string;
 
     // Snowflake specific
     snowflake_account?: string;
@@ -34,6 +38,7 @@ declare namespace main {
     snowflake_schema?: string;
     snowflake_warehouse?: string;
     snowflake_role?: string;
+    snowflake_access_url?: string;
 
     // Redshift specific
     redshift_workgroup?: string;
@@ -59,7 +64,18 @@ declare namespace main {
     | SpecialType;
 
   // Vendor-specific types
-  type BigQueryTypes = "STRING" | "BOOLEAN" | "INTEGER" | "FLOAT" | "TIMESTAMP";
+  type BigQueryTypes =
+    | "TIMESTAMP"
+    | "INT64"
+    | "FLOAT64"
+    | "DATE"
+    | "TIMESTAMP"
+    | "BOOLEAN"
+    | "STRING"
+    | "ARRAY"
+    | "STRUCT"
+    | "JSON"
+    | "RECORD";
   type SnowflakeTypes =
     | "VARIANT"
     | "STRING"
@@ -100,7 +116,12 @@ declare namespace main {
     table: string; // Identifier for the table used or created
     schema: Schema; // Schema as applied in the warehouse
     upload: InsertResult[]; // Array of results for each batch processed
+    logs: logEntry[]; // Array of logs for each batch processed
   }
+
+  export type logEntry = StringOnlyTuple | StringObjectTuple;
+  type StringOnlyTuple = [string];
+  type StringObjectTuple = [string, object];
 
   // Insert result type
   export type InsertResult = {
@@ -121,7 +142,7 @@ declare namespace main {
     clockTime: string;
     recordsPerSec: number;
     totalRows: number;
-	intermediateSchema: Schema;
+    intermediateSchema: Schema;
   };
 }
 

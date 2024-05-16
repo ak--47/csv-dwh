@@ -1,6 +1,7 @@
 const snowflake = require('snowflake-sdk');
 const u = require('ak-tools');
 const { prepHeaders, cleanName } = require('../components/inference');
+const log = require('../components/logger.js');
 require('dotenv').config();
 
 
@@ -19,14 +20,16 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 	PARAMS.snowflake_schema = PARAMS.snowflake_schema || process.env.snowflake_schema;
 	PARAMS.snowflake_warehouse = PARAMS.snowflake_warehouse || process.env.snowflake_warehouse;
 	PARAMS.snowflake_role = PARAMS.snowflake_role || process.env.snowflake_role;
-
-	const conn = await createSnowflakeConnection(PARAMS);
-	const isConnectionValid = await conn.isValidAsync();
+	PARAMS.snowflake_access_url = PARAMS.snowflake_access_url || process.env.snowflake_access_url;
 
 	let { snowflake_database, table_name, dry_run } = PARAMS;
 	if (!snowflake_database) throw new Error('snowflake_database is required');
 	if (!table_name) throw new Error('table_name is required');
 
+	const conn = await createSnowflakeConnection(PARAMS);
+	const isConnectionValid = await conn.isValidAsync();
+	if (typeof isConnectionValid === 'boolean' && !isConnectionValid) throw new Error(`Invalid Snowflake credentials`);
+	
 	table_name = cleanName(table_name);
 	// @ts-ignore
 	schema = schema.map(prepareSnowflakeSchema);
@@ -46,26 +49,20 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 		// Create or replace table
 		createTableSQL = `CREATE OR REPLACE TABLE ${table_name} (${snowflake_table_schema})`;
 		const tableCreation = await executeSQL(conn, createTableSQL);
-		console.log(`Table ${table_name} created (or replaced) successfully`);
+		log(`Table ${table_name} created (or replaced) successfully`);
 	}
 	catch (error) {
-		console.error(`Error creating table; ${error.message}`);
+		log(`Error creating table; ${error.message}`, error, { createTableSQL });
 		debugger;
 	}
 
 
-	// // Prepare insert statement
-	// const columnNames = schema.map(f => f.name).join(", ");
-	// // const placeholders = schema.map(f => f.type === 'VARIANT' ? `PARSE_JSON(?)` : '?').join(", ");
-	// const placeholders = schema.map(f => '?').join(", ");
-	// const insertSQLOLD = `INSERT INTO ${table_name} (${columnNames}) VALUES (${placeholders})`;
-
-	console.log('\n\n');
+	log('\n\n');
 
 	let currentBatch = 0;
 	if (dry_run) {
-		console.log('Dry run requested. Skipping Snowflake upload.');
-		return { schema, database: snowflake_database, table: table_name || "no table", upload: [] };
+		log('Dry run requested. Skipping Snowflake upload.');
+		return { schema, database: snowflake_database, table: table_name || "no table", upload: [], logs: log.getLog() };
 	}
 	// Insert data
 	for (const batch of batches) {
@@ -88,18 +85,20 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 			const insertedRows = task?.[0]?.['number of rows inserted'] || 0;
 			const failedRows = batch.length - insertedRows;
 			upload.push({ duration, status: 'success', insertedRows, failedRows });
-			u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
+			if (log.isVerbose()) u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
 		} catch (error) {
 			const duration = Date.now() - start;
 			upload.push({ status: 'error', errorMessage: error.message, errors: error, duration });
-			console.error(`\n\nError inserting batch ${currentBatch}; ${error.message}\n\n`);
+			log(`Error inserting batch ${currentBatch}: ${error.message}`, error, batch);
 		}
 	}
+	log('\n\nData insertion complete; Terminating Connection...\n');
 
+	const logs = log.getLog();
 	/** @type {import('../types').WarehouseUploadResult} */
-	const uploadJob = { schema, database: snowflake_database, table: table_name || "", upload };
+	const uploadJob = { schema, database: snowflake_database, table: table_name || "", upload, logs };
 
-	console.log('\n\nData insertion complete; Terminating Connection...\n');
+
 
 	//conn.destroy(terminationHandler);
 	// @ts-ignore
@@ -142,7 +141,13 @@ function prepareComplexRows(row, schema) {
 	const variantCols = schema.filter(f => f.type === 'VARIANT');
 	for (const col of variantCols) {
 		if (row[col.name]) {
-			row[col.name] = JSON.parse(row[col.name]);
+			try {
+				if (typeof row[col.name] === 'string') row[col.name] = JSON.parse(row[col.name]);
+			}
+			catch (e) {
+				debugger;
+				log(`Error inserting batch ${col.name}; ${e.message}`, e);				
+			}
 		}
 	}
 
@@ -265,10 +270,9 @@ function executeSQL(conn, sql, binds) {
 			...options,
 			complete: (err, stmt, rows) => {
 				if (err) {
-					console.error('Failed executing SQL:', err);
+					log(`Failed executing SQL: ${err.message}`, err, options);
 					reject(err);
 				} else {
-					// console.log('SQL executed successfully');
 					resolve(rows);
 				}
 			}
@@ -284,14 +288,16 @@ function executeSQL(conn, sql, binds) {
  * @returns {Promise<snowflake.Connection>}
  */
 async function createSnowflakeConnection(PARAMS) {
-	console.log('Attempting to connect to Snowflake...');
+	log('Attempting to connect to Snowflake...');
 	const { snowflake_account = "",
 		snowflake_user = "",
 		snowflake_password = "",
 		snowflake_database = "",
 		snowflake_schema = "",
 		snowflake_warehouse = "",
-		snowflake_role = "" } = PARAMS;
+		snowflake_role = "",
+		snowflake_access_url = ""
+	} = PARAMS;
 	if (!snowflake_account) throw new Error('snowflake_account is required');
 	if (!snowflake_user) throw new Error('snowflake_user is required');
 	if (!snowflake_password) throw new Error('snowflake_password is required');
@@ -313,20 +319,17 @@ async function createSnowflakeConnection(PARAMS) {
 			schema: snowflake_schema,
 			warehouse: snowflake_warehouse,
 			role: snowflake_role,
-			accessUrl: 'https://xjcqygf-pj72746.snowflakecomputing.com',
-			// jsonColumnVariantParser: rawColumnValue => JSON.parse(rawColumnValue),
-
-
+			accessUrl: snowflake_access_url,
 		});
 
 
 		connection.connect((err, conn) => {
 			if (err) {
+				log('Failed to connect to Snowflake:', err);				
 				debugger;
-				console.error('Unable to connect to Snowflake:', err);
 				reject(err);
 			} else {
-				console.log('Successfully connected to Snowflake');
+				log('Successfully connected to Snowflake');
 				resolve(conn);
 			}
 		});
@@ -338,7 +341,7 @@ function terminationHandler(err, conn) {
 	if (err) {
 		console.error('Unable to disconnect: ' + err.message);
 	} else {
-		console.log('\tDisconnected connection with id: ' + conn.getId());
+		log('\tDisconnected connection with id: ' + conn.getId());
 	}
 }
 
