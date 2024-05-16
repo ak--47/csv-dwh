@@ -4,7 +4,8 @@ declare namespace main {
   // Job configuration interface
   export interface JobConfig {
     demoDataConfig?: SimulationConfig;
-    csv_file: string;
+    csv_file?: string;
+	json_file?: string;
 
     warehouse: "bigquery" | "snowflake" | "redshift";
     region: string;

@@ -298,3 +298,149 @@ test("complex: scd", async () => {
 
 	expect(schema).toEqual(expectedSchema);
 }, TIMEOUT);
+
+
+
+
+describe("mvp", ()=>{
+
+	
+
+})
+
+
+describe("csv", ()=>{
+
+	
+	
+})
+
+describe("json", ()=>{
+	test("simple: events", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/simple-EVENTS.json",
+			table_name: "test-simpleEvents-json",
+			...commonParams
+		};
+		const expectedRows = 1111;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+
+	}, TIMEOUT);
+	
+	test("simple: users", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/simple-USERS.json",
+			table_name: "test-simple-USERS-json",
+			...commonParams
+		};
+		const expectedRows = 100;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+
+	}, TIMEOUT);
+	
+	test("complex: events", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-EVENTS.json",
+			table_name: "test-complex-EVENTS-json",
+			...commonParams
+		};
+		const expectedRows = 1111;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+
+	}, TIMEOUT);
+	
+	test("complex: users", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-USERS.json",
+			table_name: "test-complex-USERS-json",
+			...commonParams
+		};
+		const expectedRows = 100;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+
+	}, TIMEOUT);
+	
+	test("complex: groups", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-GROUP.json",
+			table_name: "test-complex-GROUP-json",
+			...commonParams
+		};
+		const expectedRows = 350;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+
+	}, TIMEOUT);
+	
+	test("complex: scd", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-SCD.json",
+			table_name: "test-complex-SCD-json",
+			...commonParams
+		};
+		const expectedRows = 285;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+
+	}, TIMEOUT);
+	
+	
+})

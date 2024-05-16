@@ -9,8 +9,7 @@ async function cliParams() {
 		.usage(`${welcome}\n\nusage:\nnpx $0 [data] [options]
 
 ex:
-npx $0 ./payloads.json --url https://foo.com
-npx $0 --payload '[{"foo": "bar", "baz": "qux"}]' --url https://foo.com
+npx $0 ./myfile.csv --warehouse bigquery
 
 DOCS: https://github.com/ak--47/csv-dwh`)
 		.command('$0', 'bulk fetch calls', () => { })
@@ -27,43 +26,13 @@ DOCS: https://github.com/ak--47/csv-dwh`)
 			type: 'number',
 			default: 1000
 		})
-		.option("event_table_name", {
-			demandOption: false,
-			describe: 'table to send events to',
-			type: 'string',			
-		})
-		.option("user_table_name", {
-			demandOption: false,
-			describe: 'delay between requests',
-			type: 'string',
-
-		})
-		.option("scd_table_name", {
-			demandOption: false,
-			describe: '# of retries on 4xx/5xx',
-			type: 'string',
-
-		})
-		.option("lookup_table_name", {
-			alias: 'retryDelay',
-			demandOption: false,
-			describe: 'delay between retries',
-			type: 'string',
-
-		})
-		.option("group_table_name", {
-
-		})
-		.option("bigquery_dataset", {
-
-		})
 		.option("verbose", {
+			alias: 'v',
 			demandOption: false,
 			default: true,
 			describe: 'show progress bar',
 			type: 'boolean'
-		})
-		
+		})		
 		.help()
 		.wrap(null)
 		.argv;
@@ -106,7 +75,14 @@ DOCS: https://github.com/ak--47/csv-dwh`)
 }
 
 const hero = String.raw`
-                                                                                                  
+
+██████╗███████╗██╗   ██╗    ██████╗ ██╗    ██╗██╗  ██╗
+██╔════╝██╔════╝██║   ██║    ██╔══██╗██║    ██║██║  ██║
+██║     ███████╗██║   ██║    ██║  ██║██║ █╗ ██║███████║
+██║     ╚════██║╚██╗ ██╔╝    ██║  ██║██║███╗██║██╔══██║
+╚██████╗███████║ ╚████╔╝     ██████╔╝╚███╔███╔╝██║  ██║
+ ╚═════╝╚══════╝  ╚═══╝      ╚═════╝  ╚══╝╚══╝ ╚═╝  ╚═╝
+
 `;
 
 const banner = `... insert CSVs into DWHs ... with little fuss! (v${version || 2})

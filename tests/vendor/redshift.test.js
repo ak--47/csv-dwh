@@ -38,6 +38,13 @@ const [arrays, objects, simple, sparse] = [
 	'./tests/data/mvp/mvp-sparse.csv'
 ].map(p => path.resolve(p));
 
+
+
+
+
+describe("mvp", ()=>{
+
+	
 test("mvp: simple", async () => {
 	/** @type {PARAMS} */
 	const PARAMS = {
@@ -119,169 +126,307 @@ test("mvp: objects", async () => {
 }, TIMEOUT);
 
 
-test("simple: events", async () => {
-	/** @type {PARAMS} */
-	const PARAMS = {
-		csv_file: "./tests/data/mp_types/simple-EVENTS.csv",
-		table_name: "test-simple-Events",
-		...commonParams
-	};
-	const expectedRows = 1111;
-	const job = await main(PARAMS);
-	const { totalRows, results } = job;
-	expect(totalRows).toBe(expectedRows);
-	const result = results[0];
-	const { schema, insert } = result;
-	expect(insert.success).toBe(expectedRows);
-	expect(insert.failed).toBe(0);
-	expect(insert.duration).toBeGreaterThan(0);
-	expect(insert.errors.length).toBe(0);
-
-	const expectedSchema = await u.load('./tests/data/schemas/simple-EVENTS-schema-redshift.json', true);
-	expect(schema).toEqual(expectedSchema);
-}, TIMEOUT);
-
-test("simple: users", async () => {
-	/** @type {PARAMS} */
-	const PARAMS = {
-		csv_file: "./tests/data/mp_types/simple-USERS.csv",
-		table_name: "test-simple-USERS",
-		...commonParams
-	};
-	const expectedRows = 100;
-	const job = await main(PARAMS);
-	const { totalRows, results } = job;
-	expect(totalRows).toBe(expectedRows);
-	const result = results[0];
-	const { schema, insert } = result;
-	expect(insert.success).toBe(expectedRows);
-	expect(insert.failed).toBe(0);
-	expect(insert.duration).toBeGreaterThan(0);
-	expect(insert.errors.length).toBe(0);
-
-	const expectedSchema = await u.load('./tests/data/schemas/simple-USERS-schema-redshift.json', true);
-
-	expect(schema).toEqual(expectedSchema);
-}, TIMEOUT);
+})
 
 
-test("complex: events", async () => {
-	/** @type {PARAMS} */
-	const PARAMS = {
-		csv_file: "./tests/data/mp_types/complex-EVENTS.csv",
-		table_name: "test-complex-EVENTS",
-		...commonParams,
-		batch_size: 100
-	};
-	const expectedRows = 1111;
-	const job = await main(PARAMS);
-	const { totalRows, results } = job;
-	expect(totalRows).toBe(expectedRows);
-	const result = results[0];
-	const { schema, insert } = result;
-	expect(insert.success).toBe(expectedRows);
-	expect(insert.failed).toBe(0);
-	expect(insert.duration).toBeGreaterThan(0);
-	expect(insert.errors.length).toBe(0);
+describe("csv", ()=>{
+	test("simple: events", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			csv_file: "./tests/data/mp_types/simple-EVENTS.csv",
+			table_name: "test-simple-Events",
+			...commonParams
+		};
+		const expectedRows = 1111;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+		const expectedSchema = await u.load('./tests/data/schemas/simple-EVENTS-schema-redshift.json', true);
+		expect(schema).toEqual(expectedSchema);
+	}, TIMEOUT);
+	
+	test("simple: users", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			csv_file: "./tests/data/mp_types/simple-USERS.csv",
+			table_name: "test-simple-USERS",
+			...commonParams
+		};
+		const expectedRows = 100;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+		const expectedSchema = await u.load('./tests/data/schemas/simple-USERS-schema-redshift.json', true);
+	
+		expect(schema).toEqual(expectedSchema);
+	}, TIMEOUT);
+	
+	
+	test("complex: events", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			csv_file: "./tests/data/mp_types/complex-EVENTS.csv",
+			table_name: "test-complex-EVENTS",
+			...commonParams,
+			batch_size: 100
+		};
+		const expectedRows = 1111;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+		const expectedSchema = await u.load('./tests/data/schemas/complex-EVENTS-schema-redshift.json', true);
+	
+		expect(schema).toEqual(expectedSchema);
+	}, TIMEOUT);
+	
+	test("complex: users", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			csv_file: "./tests/data/mp_types/complex-USERS.csv",
+			table_name: "test-complex-USERS",
+			...commonParams,
+			batch_size: 25
+		};
+		const expectedRows = 100;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+		const expectedSchema = await u.load('./tests/data/schemas/complex-USERS-schema-redshift.json', true);
+	
+		expect(schema).toEqual(expectedSchema);
+	}, TIMEOUT);
+	
+	test("complex: groups", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			csv_file: "./tests/data/mp_types/complex-GROUP.csv",
+			table_name: "test-complex-GROUP",
+			...commonParams
+		};
+		const expectedRows = 350;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, insert } = result;
+	
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+		const expectedSchema = await u.load('./tests/data/schemas/complex-GROUP-schema-redshift.json', true);
+	
+		expect(schema).toEqual(expectedSchema);
+	}, TIMEOUT);
+	
+	
+	test("complex: lookups", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			csv_file: "./tests/data/mp_types/complex-LOOKUP.csv",
+			table_name: "test-complex-LOOKUP",
+			...commonParams
+		};
+		const expectedRows = 1000;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, insert } = result;
+	
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+		const expectedSchema = await u.load('./tests/data/schemas/complex-LOOKUP-schema-redshift.json', true);
+	
+		expect(schema).toEqual(expectedSchema);
+	}, TIMEOUT);
+	
+	
+	test("complex: scd", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			csv_file: "./tests/data/mp_types/complex-SCD.csv",
+			table_name: "test-complex-SCD",
+			...commonParams
+		};
+		const expectedRows = 285;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
+		const expectedSchema = await u.load('./tests/data/schemas/complex-SCD-schema-redshift.json', true);
+	
+		expect(schema).toEqual(expectedSchema);
+	}, TIMEOUT);
+	
+	
+})
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-EVENTS-schema-redshift.json', true);
 
-	expect(schema).toEqual(expectedSchema);
-}, TIMEOUT);
+describe("json", ()=>{
+	test("simple: events", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/simple-EVENTS.json",
+			table_name: "test-simpleEvents-json",
+			...commonParams
+		};
+		const expectedRows = 1111;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
 
-test("complex: users", async () => {
-	/** @type {PARAMS} */
-	const PARAMS = {
-		csv_file: "./tests/data/mp_types/complex-USERS.csv",
-		table_name: "test-complex-USERS",
-		...commonParams,
-		batch_size: 25
-	};
-	const expectedRows = 100;
-	const job = await main(PARAMS);
-	const { totalRows, results } = job;
-	expect(totalRows).toBe(expectedRows);
-	const result = results[0];
-	const { schema, insert } = result;
-	expect(insert.success).toBe(expectedRows);
-	expect(insert.failed).toBe(0);
-	expect(insert.duration).toBeGreaterThan(0);
-	expect(insert.errors.length).toBe(0);
+	}, TIMEOUT);
+	
+	test("simple: users", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/simple-USERS.json",
+			table_name: "test-simple-USERS-json",
+			...commonParams
+		};
+		const expectedRows = 100;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-USERS-schema-redshift.json', true);
+	}, TIMEOUT);
+	
+	test("complex: events", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-EVENTS.json",
+			table_name: "test-complex-EVENTS-json",
+			...commonParams
+		};
+		const expectedRows = 1111;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
 
-	expect(schema).toEqual(expectedSchema);
-}, TIMEOUT);
+	}, TIMEOUT);
+	
+	test("complex: users", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-USERS.json",
+			table_name: "test-complex-USERS-json",
+			...commonParams
+		};
+		const expectedRows = 100;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
 
-test("complex: groups", async () => {
-	/** @type {PARAMS} */
-	const PARAMS = {
-		csv_file: "./tests/data/mp_types/complex-GROUP.csv",
-		table_name: "test-complex-GROUP",
-		...commonParams
-	};
-	const expectedRows = 350;
-	const job = await main(PARAMS);
-	const { totalRows, results } = job;
-	expect(totalRows).toBe(expectedRows);
-	const result = results[0];
-	const { schema, insert } = result;
+	}, TIMEOUT);
+	
+	test("complex: groups", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-GROUP.json",
+			table_name: "test-complex-GROUP-json",
+			...commonParams
+		};
+		const expectedRows = 350;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
 
-	expect(insert.success).toBe(expectedRows);
-	expect(insert.failed).toBe(0);
-	expect(insert.duration).toBeGreaterThan(0);
-	expect(insert.errors.length).toBe(0);
+	}, TIMEOUT);
+	
+	test("complex: scd", async () => {
+		/** @type {PARAMS} */
+		const PARAMS = {
+			json_file: "./tests/data/mp_types/complex-SCD.json",
+			table_name: "test-complex-SCD-json",
+			...commonParams
+		};
+		const expectedRows = 285;
+		const job = await main(PARAMS);
+		const { totalRows, results } = job;
+		expect(totalRows).toBe(expectedRows);
+		const result = results[0];
+		const { schema, dataset, table, insert } = result;
+		expect(insert.success).toBe(expectedRows);
+		expect(insert.failed).toBe(0);
+		expect(insert.duration).toBeGreaterThan(0);
+		expect(insert.errors.length).toBe(0);
+	
 
-	const expectedSchema = await u.load('./tests/data/schemas/complex-GROUP-schema-redshift.json', true);
-
-	expect(schema).toEqual(expectedSchema);
-}, TIMEOUT);
-
-
-test("complex: lookups", async () => {
-	/** @type {PARAMS} */
-	const PARAMS = {
-		csv_file: "./tests/data/mp_types/complex-LOOKUP.csv",
-		table_name: "test-complex-LOOKUP",
-		...commonParams
-	};
-	const expectedRows = 1000;
-	const job = await main(PARAMS);
-	const { totalRows, results } = job;
-	expect(totalRows).toBe(expectedRows);
-	const result = results[0];
-	const { schema, insert } = result;
-
-	expect(insert.success).toBe(expectedRows);
-	expect(insert.failed).toBe(0);
-	expect(insert.duration).toBeGreaterThan(0);
-	expect(insert.errors.length).toBe(0);
-
-	const expectedSchema = await u.load('./tests/data/schemas/complex-LOOKUP-schema-redshift.json', true);
-
-	expect(schema).toEqual(expectedSchema);
-}, TIMEOUT);
-
-
-test("complex: scd", async () => {
-	/** @type {PARAMS} */
-	const PARAMS = {
-		csv_file: "./tests/data/mp_types/complex-SCD.csv",
-		table_name: "test-complex-SCD",
-		...commonParams
-	};
-	const expectedRows = 293;
-	const job = await main(PARAMS);
-	const { totalRows, results } = job;
-	expect(totalRows).toBe(expectedRows);
-	const result = results[0];
-	const { schema, insert } = result;
-	expect(insert.success).toBe(expectedRows);
-	expect(insert.failed).toBe(0);
-	expect(insert.duration).toBeGreaterThan(0);
-	expect(insert.errors.length).toBe(0);
-
-	const expectedSchema = await u.load('./tests/data/schemas/complex-SCD-schema-redshift.json', true);
-
-	expect(schema).toEqual(expectedSchema);
-}, TIMEOUT);
+	}, TIMEOUT);
+	
+	
+})

@@ -12,8 +12,12 @@ function inferType(value) {
 }
 
 function isBoolean(value) {
-	const val = value.toLowerCase();
-	return val === 'true' || val === 'false';
+	if (typeof value === 'boolean') return true;
+	if (typeof value === 'string') {
+		const val = value?.toLowerCase();
+		return val === 'true' || val === 'false';
+	}
+	return false;
 }
 
 function isNumber(value) {
@@ -21,15 +25,15 @@ function isNumber(value) {
 }
 
 function inferNumberType(value) {
-	return value.includes('.') ? 'FLOAT' : 'INT';
+	return value?.toString()?.includes('.') ? 'FLOAT' : 'INT';
 }
 
 function inferDateType(value) {
 
-	if (value.includes('T')) {
+	if (value?.includes('T')) {
 		return 'TIMESTAMP';
 	}
-	if (value.includes('Z')) {
+	if (value?.includes('Z')) {
 		return 'TIMESTAMP';
 	}
 
@@ -37,10 +41,10 @@ function inferDateType(value) {
 }
 
 function inferJSONType(value) {
-	if (value.startsWith('[') && value.endsWith(']')) {
+	if (value?.startsWith('[') && value?.endsWith(']')) {
 		return 'ARRAY';
 	}
-	if (value.startsWith('{') && value.endsWith('}')) {
+	if (value?.startsWith('{') && value?.endsWith('}')) {
 		return 'OBJECT';
 	};
 	return 'JSON';
@@ -57,7 +61,13 @@ function range(a, b, step = 1) {
 
 
 function isValidDate(value) {
-	return isValid(parseISO(value));
+	try {
+		return isValid(parseISO(value));
+	}
+	catch (e) {
+		return false;
+
+	}
 }
 
 
@@ -70,7 +80,7 @@ function getUniqueKeys(data) {
 }
 
 
-function generateSchema(data, type) {
+function generateSchema(data) {
 	const copyData = clone(data);
 	const keys = getUniqueKeys(copyData);
 	//assume everything is a string

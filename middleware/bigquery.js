@@ -150,7 +150,7 @@ function schemaToBQS(schema) {
 function convertField(value, type) {
 	switch (type) {
 		case 'STRING':
-			return value.toString();
+			return value?.toString();
 		case 'TIMESTAMP':
 			return value;
 		case 'DATE':
@@ -160,11 +160,17 @@ function convertField(value, type) {
 		case 'FLOAT64':
 			return parseFloat(value);
 		case 'BOOLEAN':
-			return value.toLowerCase() === 'true';
+			if (typeof value === 'boolean') return value;
+			if (typeof value === 'number') return value === 1;
+			if (typeof value === 'string') return value?.toLowerCase() === 'true';
 		case 'RECORD':
-			return JSON.parse(value);
+			if (Array.isArray(value)) return value;
+			if (typeof value === 'object') return value;
+			if (typeof value === 'string') return JSON.parse(value);
 		case 'STRUCT':
-			return JSON.parse(value);;
+			if (Array.isArray(value)) return value;
+			if (typeof value === 'object') return value;
+			if (typeof value === 'string') return JSON.parse(value);
 		default:
 			return value;
 	}
@@ -176,9 +182,16 @@ function prepareRowsForInsertion(batch, schema) {
 		schema.forEach(field => {
 			//sparse CSVs will have missing fields
 			if (row[field.name] !== '') {
+				try {
 				newRow[field.name] = convertField(row[field.name], field.type.toUpperCase());
+				}
+				catch (error) {
+					debugger;
+				}
 			}
 			if (row[field.name] === '') delete newRow[field.name];
+			if (row[field.name] === undefined) delete newRow[field.name];
+			if (row[field.name] === null) delete newRow[field.name];
 		});
 		return newRow;
 	});
@@ -267,6 +280,7 @@ async function insertData(schema, batches) {
 			const rows = prepareRowsForInsertion(batch, schema);
 			const [job] = await table.insert(rows, options);
 			const duration = Date.now() - start;
+			//todo: get row count from job
 			results.push({ status: 'success', insertedRows: rows.length, failedRows: 0, duration });
 			u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
 

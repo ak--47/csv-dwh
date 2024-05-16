@@ -177,6 +177,7 @@ async function executeSQL(client, sql, isBatch = false) {
 		return ResultRows;
 
 	} catch (error) {
+		debugger;
 		console.error('Failed executing SQL:', error);
 		throw error;
 	}

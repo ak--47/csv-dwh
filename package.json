@@ -1,6 +1,6 @@
 {
 	"name": "csv-dwh",
-	"version": "1.0.0",
+	"version": "1.0.01",
 	"description": "local csv files → various cloud data warehouses",
 	"main": "index.js",
 	"types": "types.d.ts",
@@ -21,7 +21,7 @@
 	"scripts": {
 		"start": "node index.js",
 		"dev": "nodemon scratch.mjs",
-		"test": "jest --runInBand",
+		"test": "jest",
 		"deps": "./scripts/deps.sh",
 		"post": "npm publish",
 		"prune": "rm -rf logs/*",

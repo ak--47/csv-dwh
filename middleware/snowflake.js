@@ -85,8 +85,9 @@ async function loadToSnowflake(schema, batches, PARAMS) {
 		try {
 			const task = await executeSQL(conn, insertSQL, data);
 			const duration = Date.now() - start;
-			const numRows = task?.[0]?.['number of rows inserted'] || batch.length;
-			upload.push({ duration, status: 'success', insertedRows: numRows, failedRows: 0 });
+			const insertedRows = task?.[0]?.['number of rows inserted'] || 0;
+			const failedRows = batch.length - insertedRows;
+			upload.push({ duration, status: 'success', insertedRows, failedRows });
 			u.progress(`\tsent batch ${u.comma(currentBatch)} of ${u.comma(batches.length)} batches`);
 		} catch (error) {
 			const duration = Date.now() - start;
@@ -156,7 +157,7 @@ function prepareComplexRows(row, schema) {
 }
 
 function formatBindValue(value, type) {
-	if (value === null || value === undefined || value === "null" || value.trim() === "") {
+	if (value === null || value === undefined || value === "null" || value === "" || value?.toString()?.trim() === "") {
 		return null; // Convert null-like strings to actual null
 	}
 	else if (type === 'VARIANT') {
@@ -301,7 +302,7 @@ async function createSnowflakeConnection(PARAMS) {
 
 	//todo: dev logging configuration
 	snowflake.configure({ keepAlive: true, logLevel: 'WARN' });
-	
+
 
 	return new Promise((resolve, reject) => {
 		const connection = snowflake.createConnection({

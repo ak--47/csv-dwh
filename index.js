@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 const u = require("ak-tools");
 const { version } = require('./package.json');
+const { existsSync } = require('fs');
 
 const path = require('path');
 require('dotenv').config({ debug: false, override: false });
@@ -48,6 +49,7 @@ async function main(PARAMS) {
 		//byo data requires:
 		table_name = "",
 		csv_file = '',
+		json_file = '',
 
 		//bigquery requires:
 		bigquery_dataset = '',
@@ -69,8 +71,7 @@ async function main(PARAMS) {
 	} = PARAMS;
 
 	if (!warehouse) throw new Error('warehouse is required');
-	if (!csv_file && !demoDataConfig) throw new Error('csv_file or demoDataConfig is required');
-	if (!table_name && csv_file) console.warn('no table name specified; i will make one up'); table_name = u.makeName(2, '_');
+	if (!table_name) console.warn('no table name specified; i will make one up'); table_name = u.makeName(2, '_');
 	if (demoDataConfig && !event_table_name) {
 		console.warn('no table name specified; i will make one up');
 		const prefix = u.makeName(2, '_');
@@ -80,6 +81,16 @@ async function main(PARAMS) {
 		lookup_table_name = prefix + '_lookup';
 		group_table_name = prefix + '_groups';
 	}
+
+	//CSV or JSON
+	if (csv_file && json_file) throw new Error('cannot specify both csv_file and json_file');
+	if (!csv_file && !json_file) throw new Error('csv_file or json_file is required');
+	if (csv_file) if (!existsSync(csv_file)) throw new Error(`file not found: ${csv_file}`);
+	if (json_file) if (!existsSync(json_file)) throw new Error(`file not found: ${json_file}`);
+	let file;
+	if (csv_file) file = csv_file;
+	if (json_file) file = json_file;
+
 
 	// clean PARAMS
 	for (const key in PARAMS) {
@@ -91,16 +102,24 @@ async function main(PARAMS) {
 	let data;
 	let schema;
 	let intermediateSchema;
+	let parsed;
 
-	// user supplied csv file
-	if (csv_file) {
-		const filePath = path.resolve(csv_file);
-		const fileData = await u.load(filePath);
-		const parseJob = Papa.parse(fileData, { header: true, skipEmptyLines: false, fastMode: false });
-		const { data: parsed } = parseJob;
-		schema = generateSchema(parsed, 'csv');
+	// user supplied csv or JSON file
+	if (file) {
+		const filePath = path.resolve(csv_file || json_file);
+		const isCSV = filePath.endsWith('.csv');
+		const isJSON = filePath.endsWith('.json');
+		if (isCSV) {
+			const fileData = await u.load(filePath);
+			const parseJob = Papa.parse(fileData, { header: true, skipEmptyLines: false, fastMode: false });
+			parsed = parseJob.data;
+		}
+		if (isJSON) {
+			parsed = (await u.load(filePath)).split('\n').filter(a => a).map(JSON.parse);
+		}
+		schema = generateSchema(parsed);
 		intermediateSchema = u.clone(schema);
-		data = { csvData: parsed };
+		data = { sourceFileData: parsed };
 	}
 
 	// generated data essentially needs to treated as multiple csvs
@@ -111,7 +130,7 @@ async function main(PARAMS) {
 	}
 
 	const batched = u.objMap(data, (value) => batchData(value, batch_size));
-	const { eventData, userProfilesData, scdTableData, groupProfilesData, lookupTableData, csvData } = batched;
+	const { eventData, userProfilesData, scdTableData, groupProfilesData, lookupTableData, sourceFileData } = batched;
 
 
 	const results = [];
@@ -122,7 +141,7 @@ async function main(PARAMS) {
 	if (group_table_name) results.push(await loadCSVtoDataWarehouse(groupProfilesData, warehouse, PARAMS));
 
 	//this is the only one that matters
-	if (table_name) results.push(await loadCSVtoDataWarehouse(schema, csvData, warehouse, PARAMS));
+	if (table_name) results.push(await loadCSVtoDataWarehouse(schema, sourceFileData, warehouse, PARAMS));
 
 	const endTime = Date.now();
 	const e2eDuration = endTime - startTime;
