@@ -48,6 +48,12 @@ declare namespace main {
     redshift_session_token?: string;
     redshift_region?: string;
     redshift_schema_name?: string;
+
+    //databricks specific
+    databricks_host?: string;
+    databricks_http_path?: string;
+    databricks_token?: string;
+    databricks_database?: string;
   }
 
   // TypeScript types for inferred schema

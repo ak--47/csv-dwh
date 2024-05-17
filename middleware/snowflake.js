@@ -1,3 +1,9 @@
+/*
+----
+SNOWFLAKE MIDDLEWARE
+----
+*/
+
 const snowflake = require('snowflake-sdk');
 const u = require('ak-tools');
 const { prepHeaders, cleanName } = require('../components/inference');

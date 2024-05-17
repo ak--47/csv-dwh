@@ -1,3 +1,8 @@
+/*
+----
+BIQUERY MIDDLEWARE
+----
+*/
 const { BigQuery } = require('@google-cloud/bigquery');
 const u = require('ak-tools');
 const { prepHeaders, cleanName } = require('../components/inference');

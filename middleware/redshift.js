@@ -1,3 +1,8 @@
+/*
+----
+REDSHIFT MIDDLEWARE
+----
+*/
 const { RedshiftDataClient, ExecuteStatementCommand, GetStatementResultCommand, DescribeStatementCommand } = require('@aws-sdk/client-redshift-data');
 const u = require('ak-tools');
 const { prepHeaders, cleanName } = require('../components/inference');
