@@ -12,7 +12,7 @@ async function cliParams() {
 
   ex:
 npx $0 ./myfile.csv --warehouse bigquery
-npx $0 ./myfile.json --warehouse snowflake --batch_size 1000
+npx $0 ./myfile.json --warehouse snowflake, redshift --batch_size 1000 --write_logs --table_name foo
 
 DOCS: https://github.com/ak--47/csv-dwh`)
 		.command('$0', 'bulk fetch calls', () => { })
@@ -20,7 +20,9 @@ DOCS: https://github.com/ak--47/csv-dwh`)
 			alias: 'w',
 			demandOption: true,
 			describe: 'warehouse to send data to',
-			type: 'string'
+			type: 'string',
+			coerce: (arg) => arg.split(',').map(item => item.trim())  // Coerce into an array
+
 		})
 		.option("batch_size", {
 			alias: 'b',
@@ -41,6 +43,13 @@ DOCS: https://github.com/ak--47/csv-dwh`)
 			demandOption: false,
 			default: false,
 			describe: 'do not actually insert data',
+			type: 'boolean'
+		})
+		.option("write_logs", {
+			alias: 'l',
+			demandOption: false,
+			default: false,
+			describe: 'write logs to file',
 			type: 'boolean'
 		})
 		.option("table_name", {

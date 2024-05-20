@@ -1,5 +1,5 @@
 // @ts-nocheck
-const { generateSchema, getUniqueKeys, inferType, prepHeaders, cleanName } = require('../components/inference.js');
+const { generateSchema, getUniqueKeys, inferType, prepHeaders, cleanName, validate } = require('../components/inference.js');
 
 describe('INFER', () => {
 	test('STRING', () => {
@@ -51,6 +51,296 @@ describe('INFER', () => {
 	});
 });
 
+
+describe('VALIDATE', ()=>{
+	test('no params', () => {
+		const params = {};
+		expect(() => validate(params)).toThrow('warehouse is required');
+	});
+
+	test('warehouse non-array', () => {
+		const params = { warehouse: 'bigquery' };
+		expect(() => validate(params)).toThrow('warehouse must be an array');
+	});
+
+	test('table name missing', () => {
+		const params = { warehouse: ['bigquery'] };
+		expect(() => validate(params)).toThrow('table_name is required');
+	});
+
+	test('csv or json missing', () => {
+		const params = { warehouse: ['bigquery'], table_name: 'test_table' };
+		expect(() => validate(params)).toThrow('csv_file or json_file is required');
+	});
+
+	test('batch size missing', () => {
+		const params = { warehouse: ['bigquery'], table_name: 'test_table', csv_file: 'test.csv' };
+		expect(() => validate(params)).toThrow('batch_size is required');
+	
+	})
+
+	test('csv and json provided', () => {
+		const params = { warehouse: ['bigquery'], batch_size: 250, table_name: 'test_table', csv_file: 'test.csv', json_file: 'test.json' };
+		expect(() => validate(params)).toThrow('cannot specify both csv_file and json_file');
+	});
+
+	test('missing file', () => {
+		const params = { warehouse: ['bigquery'],  batch_size: 250, table_name: 'test_table', csv_file: "test.csv" };
+		expect(() => validate(params)).toThrow('file not found: test.csv');
+	});
+
+	test('bq project missing', () => {
+		const params = { warehouse: ['bigquery'],  batch_size: 250, table_name: 'test_table', json_file: "./package.json" };
+		expect(() => validate(params)).toThrow('bigquery_project is required');
+	});
+
+	test('bq dataset missing', () => {
+		const params = { warehouse: ['bigquery'],  batch_size: 250, table_name: 'test_table', json_file: "./package.json", bigquery_project: 'test_project' };
+		expect(() => validate(params)).toThrow('bigquery_dataset is required');
+	});
+
+	test('bq creds missing', () => {
+		const params = {
+			warehouse: ['bigquery'],
+			table_name: 'test_table',
+			json_file: "./package.json",
+			batch_size: 250,
+			bigquery_project: 'test_project',
+			bigquery_dataset: 'test_dataset'
+		};
+		expect(() => validate(params)).toThrow('bigquery_keyfile or bigquery_service_account + bigquery_service_account_pass is required');
+	});
+
+	test('bq: all required params', () => {
+		const params = {
+			warehouse: ['bigquery'],
+			table_name: 'test_table',
+			json_file: "./package.json",
+			batch_size: 1000,
+			bigquery_project: 'test_project',
+			bigquery_dataset: 'test_dataset',
+			bigquery_service_account: 'test_account',
+			bigquery_service_account_pass: 'test_pass'
+		};
+		expect(() => validate(params)).not.toThrow();
+	});
+
+
+	test('snowflake_account missing', () => {
+		const params = { warehouse: ['snowflake'], table_name: 'test_table', json_file: "./package.json",  batch_size: 250, };
+		expect(() => validate(params)).toThrow('snowflake_account is required');
+	});
+
+	test('redshift_workgroup missing', () => {
+		const params = { warehouse: ['redshift'], table_name: 'test_table', json_file: "./package.json",  batch_size: 250, };
+		expect(() => validate(params)).toThrow('redshift_workgroup is required');
+	});
+
+
+	test('snowflake: all required params', () => {
+		const params = {
+			warehouse: ['snowflake'],
+			table_name: 'test_table',
+			json_file: "./package.json",
+			batch_size: 1000,
+			snowflake_account: 'test_account',
+			snowflake_user: 'test_user',
+			snowflake_password: 'test_password',
+			snowflake_database: 'test_database',
+			snowflake_schema: 'test_schema',
+			snowflake_warehouse: 'test_warehouse',
+			snowflake_role: 'test_role',
+			snowflake_access_url: 'test_url'
+		};
+		expect(() => validate(params)).not.toThrow();
+	});
+
+	test('redshift: all required params', () => {
+		const params = {
+			warehouse: ['redshift'],
+			table_name: 'test_table',
+			json_file: "./package.json",
+			batch_size: 1000,
+			redshift_workgroup: 'test_workgroup',
+			redshift_database: 'test_database',
+			redshift_access_key_id: 'test_access_key_id',
+			redshift_secret_access_key: 'test_secret_access_key',
+			redshift_schema_name: 'test_schema',
+			redshift_region: 'test_region'
+		};
+		expect(() => validate(params)).not.toThrow();
+	});
+
+		// Additional tests for Snowflake
+		test('snowflake_user missing', () => {
+			const params = {
+				warehouse: ['snowflake'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				snowflake_account: 'test_account',
+				snowflake_password: 'test_password',
+				snowflake_database: 'test_database',
+				snowflake_schema: 'test_schema',
+				snowflake_warehouse: 'test_warehouse',
+				snowflake_role: 'test_role',
+				snowflake_access_url: 'test_url'
+			};
+			expect(() => validate(params)).toThrow('snowflake_user is required');
+		});
+	
+		test('snowflake_password missing', () => {
+			const params = {
+				warehouse: ['snowflake'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				snowflake_account: 'test_account',
+				snowflake_user: 'test_user',
+				snowflake_database: 'test_database',
+				snowflake_schema: 'test_schema',
+				snowflake_warehouse: 'test_warehouse',
+				snowflake_role: 'test_role',
+				snowflake_access_url: 'test_url'
+			};
+			expect(() => validate(params)).toThrow('snowflake_password is required');
+		});
+	
+		test('snowflake_database missing', () => {
+			const params = {
+				warehouse: ['snowflake'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				snowflake_account: 'test_account',
+				snowflake_user: 'test_user',
+				snowflake_password: 'test_password',
+				snowflake_schema: 'test_schema',
+				snowflake_warehouse: 'test_warehouse',
+				snowflake_role: 'test_role',
+				snowflake_access_url: 'test_url'
+			};
+			expect(() => validate(params)).toThrow('snowflake_database is required');
+		});
+	
+		// Additional tests for Redshift
+		test('redshift_database missing', () => {
+			const params = {
+				warehouse: ['redshift'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				redshift_workgroup: 'test_workgroup',
+				redshift_access_key_id: 'test_access_key_id',
+				redshift_secret_access_key: 'test_secret_access_key',
+				redshift_schema_name: 'test_schema',
+				redshift_region: 'test_region'
+			};
+			expect(() => validate(params)).toThrow('redshift_database is required');
+		});
+	
+		test('redshift_access_key_id missing', () => {
+			const params = {
+				warehouse: ['redshift'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				redshift_workgroup: 'test_workgroup',
+				redshift_database: 'test_database',
+				redshift_secret_access_key: 'test_secret_access_key',
+				redshift_schema_name: 'test_schema',
+				redshift_region: 'test_region'
+			};
+			expect(() => validate(params)).toThrow('redshift_access_key_id is required');
+		});
+	
+		test('redshift_secret_access_key missing', () => {
+			const params = {
+				warehouse: ['redshift'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				redshift_workgroup: 'test_workgroup',
+				redshift_database: 'test_database',
+				redshift_access_key_id: 'test_access_key_id',
+				redshift_schema_name: 'test_schema',
+				redshift_region: 'test_region'
+			};
+			expect(() => validate(params)).toThrow('redshift_secret_access_key is required');
+		});
+	
+		// Combining different warehouse types
+		test('multiple warehouses specified', () => {
+			const params = {
+				warehouse: ['bigquery', 'snowflake'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				bigquery_project: 'test_project',
+				bigquery_dataset: 'test_dataset',
+				bigquery_service_account: 'test_account',
+				bigquery_service_account_pass: 'test_pass',
+				snowflake_account: 'test_account',
+				snowflake_user: 'test_user',
+				snowflake_password: 'test_password',
+				snowflake_database: 'test_database',
+				snowflake_schema: 'test_schema',
+				snowflake_warehouse: 'test_warehouse',
+				snowflake_role: 'test_role',
+				snowflake_access_url: 'test_url'
+			};
+			expect(() => validate(params)).not.toThrow();
+		});
+	
+		// Minimal valid parameters for each warehouse type
+		test('minimal valid parameters for bigquery', () => {
+			const params = {
+				warehouse: ['bigquery'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				bigquery_project: 'test_project',
+				bigquery_dataset: 'test_dataset',
+				bigquery_service_account: 'test_account',
+				bigquery_service_account_pass: 'test_pass'
+			};
+			expect(() => validate(params)).not.toThrow();
+		});
+	
+		test('minimal valid parameters for snowflake', () => {
+			const params = {
+				warehouse: ['snowflake'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				snowflake_account: 'test_account',
+				snowflake_user: 'test_user',
+				snowflake_password: 'test_password',
+				snowflake_database: 'test_database',
+				snowflake_schema: 'test_schema',
+				snowflake_warehouse: 'test_warehouse',
+				snowflake_role: 'test_role',
+				snowflake_access_url: 'test_url'
+			};
+			expect(() => validate(params)).not.toThrow();
+		});
+	
+		test('minimal valid parameters for redshift', () => {
+			const params = {
+				warehouse: ['redshift'],
+				table_name: 'test_table',
+				json_file: './package.json',
+				batch_size: 1000,
+				redshift_workgroup: 'test_workgroup',
+				redshift_database: 'test_database',
+				redshift_access_key_id: 'test_access_key_id',
+				redshift_secret_access_key: 'test_secret_access_key',
+				redshift_schema_name: 'test_schema',
+				redshift_region: 'test_region'
+			};
+			expect(() => validate(params)).not.toThrow();
+		});
+})
 
 describe("GENERATE", () => {
 	test('correct schema', () => {

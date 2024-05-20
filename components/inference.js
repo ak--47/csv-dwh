@@ -1,5 +1,17 @@
 const { isJSONStr, clone } = require('ak-tools');
 const { parseISO, isValid } = require('date-fns');
+const { existsSync } = require('fs');
+
+
+
+/**
+ * @typedef {import('../types').JobConfig} Config
+ * @typedef {import('../types').WarehouseUploadResult} WarehouseResult
+ * @typedef {import('../types').Schema} Schema
+ * @typedef {import('../types').JobResult} JobResult
+ * 
+ */
+
 
 function inferType(value) {
 	//complex objects
@@ -81,7 +93,10 @@ function getUniqueKeys(data) {
 	return Array.from(keysSet);
 }
 
-
+/**
+ * @param  {any[]} data
+ * @return {Schema}
+ */
 function generateSchema(data) {
 	const copyData = clone(data);
 	const keys = getUniqueKeys(copyData);
@@ -104,6 +119,7 @@ function generateSchema(data) {
 		}
 		return template;
 	});
+
 	return schema;
 }
 
@@ -198,6 +214,99 @@ function cleanName(name) {
 	}
 }
 
+/**
+ * Validates environment variables; returns found and missing values.
+ * @param  {string[]} keysToCheck - Array of keys to check in the environment variables.
+ * @param  {Object} params - hash of variables to enrich with found values.
+ * @returns {Object} An object containing the found values, missing values, and updated variables.
+ */
+function checkEnv(keysToCheck = [], params = {}) {
+	const valsFound = {};
+	const valsMissing = [];
+
+	if (typeof keysToCheck === 'string') keysToCheck = [keysToCheck];
+
+	for (const [index, key] of keysToCheck.entries()) {
+		const found = process.env[key] || process.env[key?.toUpperCase()] || process.env[key?.toLowerCase()];
+		if (found) {
+			valsFound[key] = found;
+			params[key] = found;
+		} else {
+			valsMissing.push(key);
+		}
+	}
+	return { valsFound, valsMissing };
+}
+
+/**
+ * @param  {Config} PARAMS
+ */
+function validate(PARAMS) {
+	for (const key in PARAMS) {
+		if (PARAMS[key] === undefined) delete PARAMS[key];
+		if (PARAMS[key] === '') delete PARAMS[key];
+		if (PARAMS[key] === null) delete PARAMS[key];
+	}
+	const errors = [];
+	const { warehouse = "", table_name = "", csv_file = "", json_file = "", batch_size = "", dry_run = "", verbose = "", write_logs = "" } = PARAMS;
+	// BIGQUERY
+	const { bigquery_project = "", bigquery_dataset = "", bigquery_service_account = "", bigquery_service_account_pass = "", bigquery_keyfile = "" } = PARAMS;
+	// SNOWFLAKE
+	const { snowflake_account = "", snowflake_user = "", snowflake_password = "", snowflake_database = "", snowflake_schema = "", snowflake_warehouse = "", snowflake_role = "", snowflake_access_url = "" } = PARAMS;
+	// REDSHIFT
+	const { redshift_workgroup = "", redshift_database = "", redshift_access_key_id = "", redshift_secret_access_key = "", redshift_session_token = "", redshift_region = "", redshift_schema_name = "" } = PARAMS;
+
+	// everything requires
+	if (!warehouse) errors.push(new Error('warehouse is required'));
+	if (!Array.isArray(warehouse)) errors.push(new Error('warehouse must be an array'));
+	if (!table_name) errors.push(new Error('table_name is required'));
+	if (!csv_file && !json_file) errors.push(new Error('csv_file or json_file is required'));
+	if (!batch_size) errors.push(new Error('batch_size is required'));
+	
+	//supplied data
+	if (csv_file && json_file) errors.push(new Error('cannot specify both csv_file and json_file'));
+	if (!csv_file && !json_file) errors.push(new Error('csv_file or json_file is required'));
+	if (csv_file) if (!existsSync(csv_file)) errors.push(new Error(`file not found: ${csv_file}`));
+	if (json_file) if (!existsSync(json_file)) errors.push(new Error(`file not found: ${json_file}`));
+
+	// bigquery
+	if (warehouse.includes('bigquery')) {
+		if (!bigquery_project) errors.push(new Error('bigquery_project is required'));
+		if (!bigquery_dataset) errors.push(new Error('bigquery_dataset is required'));
+		if (!bigquery_keyfile && (!bigquery_service_account || !bigquery_service_account_pass)) errors.push(new Error('bigquery_keyfile or bigquery_service_account + bigquery_service_account_pass is required'));
+	}
+
+	// snowflake
+	if (warehouse.includes('snowflake')) {
+		if (!snowflake_account) errors.push(new Error('snowflake_account is required'));
+		if (!snowflake_user) errors.push(new Error('snowflake_user is required'));
+		if (!snowflake_password) errors.push(new Error('snowflake_password is required'));
+		if (!snowflake_database) errors.push(new Error('snowflake_database is required'));
+		if (!snowflake_schema) errors.push(new Error('snowflake_schema is required'));
+		if (!snowflake_warehouse) errors.push(new Error('snowflake_warehouse is required'));
+		if (!snowflake_role) errors.push(new Error('snowflake_role is required'));
+		if (!snowflake_access_url) errors.push(new Error('snowflake_access_url is required'));
+	}
+
+	// redshift
+	if (warehouse.includes('redshift')) {
+		if (!redshift_workgroup) errors.push(new Error('redshift_workgroup is required'));
+		if (!redshift_database) errors.push(new Error('redshift_database is required'));
+		if (!redshift_access_key_id) errors.push(new Error('redshift_access_key_id is required'));
+		if (!redshift_secret_access_key) errors.push(new Error('redshift_secret_access_key is required'));
+		if (!redshift_region) errors.push(new Error('redshift_region is required'));
+		if (!redshift_schema_name) errors.push(new Error('redshift_schema_name is required'));
+	}
+
+	if (errors.length) {
+		errors.forEach(error => console.error(error.message));
+		// throw the first error
+		throw new Error(errors.shift()?.message || "unknown error");
+
+	}
+
+	return PARAMS;
+}
 
 module.exports = {
 	inferType,
@@ -210,5 +319,7 @@ module.exports = {
 	isJSONStr,
 	generateSchema,
 	prepHeaders,
-	cleanName
+	cleanName,
+	checkEnv,
+	validate
 };

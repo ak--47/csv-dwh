@@ -5,7 +5,7 @@ REDSHIFT MIDDLEWARE
 */
 const { RedshiftDataClient, ExecuteStatementCommand, GetStatementResultCommand, DescribeStatementCommand } = require('@aws-sdk/client-redshift-data');
 const u = require('ak-tools');
-const { prepHeaders, cleanName } = require('../components/inference');
+const { prepHeaders, cleanName, checkEnv } = require('../components/inference');
 const log = require('../components/logger.js');
 require('dotenv').config();
 
@@ -30,18 +30,9 @@ async function loadToRedshift(schema, batches, PARAMS) {
 		redshift_access_key_id,
 		redshift_secret_access_key,
 		redshift_session_token,
-		redshift_region = "us-east-1",
+		redshift_region,
 		redshift_schema_name = "public"
 	} = PARAMS;
-
-	// override with environment variables if available
-	if (process.env.redshift_workgroup) redshift_workgroup = process.env.redshift_workgroup;
-	if (process.env.redshift_database) redshift_database = process.env.redshift_database;
-	if (process.env.redshift_access_key_id) redshift_access_key_id = process.env.redshift_access_key_id;
-	if (process.env.redshift_secret_access_key) redshift_secret_access_key = process.env.redshift_secret_access_key;
-	if (process.env.redshift_session_token) redshift_session_token = process.env.redshift_session_token;
-	if (process.env.redshift_region) redshift_region = process.env.redshift_region;
-	if (process.env.redshift_schema) redshift_schema_name = process.env.redshift_schema;
 
 	//ensure we have everything we need
 	if (!redshift_database) throw new Error('redshift_database is required');
@@ -50,6 +41,7 @@ async function loadToRedshift(schema, batches, PARAMS) {
 	if (!redshift_schema_name) throw new Error('redshift_schema_name is required');
 	if (!redshift_access_key_id) throw new Error('redshift_access_key_id is required');
 	if (!redshift_secret_access_key) throw new Error('redshift_secret_access_key is required');
+	if (!redshift_region) throw new Error('redshift_region is required');
 
 	// Set the global variables
 	database = redshift_database;
@@ -101,7 +93,7 @@ async function loadToRedshift(schema, batches, PARAMS) {
 
 	if (dry_run) {
 		log('Dry run requested. Skipping Redshift upload.');
-		return { schema, database: redshift_database, table: table_name || "", upload: [], logs: log.getLog()};
+		return { schema, database: redshift_database, table: table_name || "", upload: [], logs: log.getLog() };
 	}
 
 	//insert statements

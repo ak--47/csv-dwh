@@ -1,27 +1,31 @@
 declare namespace main {
   import { Config as SimulationConfig } from "make-mp-data";
 
+  export type Warehouses = "bigquery" | "snowflake" | "redshift" | "databricks";
+
   // Job configuration interface
   export interface JobConfig {
-    demoDataConfig?: SimulationConfig;
+    
     csv_file?: string;
     json_file?: string;
 
-    warehouse: "bigquery" | "snowflake" | "redshift";
-    region: string;
+    warehouse: Warehouses[];
     batch_size?: number;
-    dry_run?: boolean;
+    
+	dry_run?: boolean;
     verbose?: boolean;
+	write_logs?: boolean | string;
 
     // for CSV imports
     table_name?: string;
 
-    // for auto-created data
-    event_table_name?: string;
-    user_table_name?: string;
-    scd_table_name?: string;
-    lookup_table_name?: string;
-    group_table_name?: string;
+    // // for auto-created data
+	// demoDataConfig?: SimulationConfig;
+    // event_table_name?: string;
+    // user_table_name?: string;
+    // scd_table_name?: string;
+    // lookup_table_name?: string;
+    // group_table_name?: string;
 
     // BigQuery specific
     bigquery_dataset?: string;
