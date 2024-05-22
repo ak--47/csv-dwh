@@ -18,7 +18,7 @@ DOCS: https://github.com/ak--47/csv-dwh`)
 		.command('$0', 'bulk fetch calls', () => { })
 		.option("warehouse", {
 			alias: 'w',
-			demandOption: true,
+			demandOption: false,
 			describe: 'warehouse to send data to',
 			type: 'string',
 			coerce: (arg) => arg.split(',').map(item => item.trim())  // Coerce into an array
@@ -172,26 +172,36 @@ DOCS: https://github.com/ak--47/csv-dwh`)
 			describe: "redshift schema to use",
 			type: 'string'
 		})
+		.options("creds", {
+			demandOption: false,
+			default: false,
+			describe: 'create a .env file with default params',
+			alias: 'p',
+			type: 'boolean',
+			coerce: boolCoerce
+		})
 
 		.help()
 		.wrap(null)
 		.argv;
 	// @ts-ignore
-	if (args._.length === 0) {
+	if (args._.length === 0 && !args.creds) {
 		// @ts-ignore
 		yargs.showHelp();
 		process.exit();
 	}
+	if (!args.creds) {
+		const file = args._[0];
 
-	const file = args._[0];
-	const filePath = path.resolve(file);
-	const exists = existsSync(filePath);
-	if (!exists) throw new Error(`file not found: ${filePath}`);
-	if (filePath.endsWith('.csv')) args.csv_file = filePath;
-	if (filePath.endsWith('.json')) args.json_file = filePath;
-	if (filePath.endsWith('.jsonl')) args.json_file = filePath;
-	if (filePath.endsWith('.ndjson')) args.json_file = filePath;
-	if (!args.csv_file && !args.json_file) throw new Error('file must be .csv or .json');
+		const filePath = path.resolve(file);
+		const exists = existsSync(filePath);
+		if (!exists) throw new Error(`file not found: ${filePath}`);
+		if (filePath.endsWith('.csv')) args.csv_file = filePath;
+		if (filePath.endsWith('.json')) args.json_file = filePath;
+		if (filePath.endsWith('.jsonl')) args.json_file = filePath;
+		if (filePath.endsWith('.ndjson')) args.json_file = filePath;
+		if (!args.csv_file && !args.json_file) throw new Error('file must be .csv or .json');
+	}
 	return args;
 }
 
@@ -209,6 +219,17 @@ const banner = `CSVs (and JSON) files → ☁️ data warehouse\nby AK (ak@mixpa
 
 const welcome = hero.concat('\n').concat(banner);
 cliParams.welcome = welcome;
+
+
+
+function boolCoerce(value, foo) {
+	if (typeof value === 'boolean') return value;
+	if (typeof value === 'string') {
+		return value.toLowerCase() === 'true';
+	}
+	return value;
+
+}
 
 
 /** 

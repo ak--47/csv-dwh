@@ -133,9 +133,9 @@ async function main(PARAMS) {
 	const { sourceFileData } = batched;
 	const results = [];
 	for (const wh of warehouse) {
-		results.push(await loadCSVtoDataWarehouse(schema, sourceFileData, wh, PARAMS));	
+		results.push(await loadCSVtoDataWarehouse(schema, sourceFileData, wh, PARAMS));
 	}
-	
+
 
 	const endTime = Date.now();
 	const e2eDuration = endTime - startTime;
@@ -184,7 +184,8 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 			// 	// result = await loadToDatabricks(records, schema, PARAMS);
 			// 	break;
 			default:
-				throw new Error(`Unknown warehouse: ${warehouse}`);
+				log(`Unknown warehouse: ${warehouse}`);
+				result = {};
 		}
 	}
 	catch (e) {
@@ -244,33 +245,53 @@ function summarize(results, PARAMS) {
 if (require.main === module) {
 	log.cli(true);
 	const params = cli().then((params) => {
+		const { creds = false, warehouse = [] } = params;
 
-		// CLI is always verbose
-		main({ ...params, verbose: true })
-			.then((results) => {
-				log('\n\nRESULTS:\n\n');
-				log(JSON.stringify(results));
-				if (params.write_logs) {
-					const logText = log.getLog();
-					let logPath;
-					if (typeof params.write_logs === 'string') logPath = path.resolve(params.write_logs);
-					else logPath = path.resolve('./log.txt');
-					const writtenLog = u.touch(logPath, logText).then(() => {
-						log(`\nwrote log to ${logPath}`);
-					});
-				}
-
-
-
-			})
-			.catch((e) => {
-				log('\n\nUH OH! something went wrong; the error is:\n\n');
-				console.error(e);
+		if (creds) {
+			const sampleEnv = path.resolve(__dirname, 'sample.env');
+			u.load(sampleEnv).then((env) => u.touch('.env', env))
+				.then((res) => {
+					console.log('wrote .env file to', res);
+				})
+				.catch((e) => {
+					console.error('could not write .env file', e);
+				})
+				.finally(() => {
+					console.log('now you should customize the .env file with your credentials and run the program again.');
+					process.exit(0);
+				});
+		}
+		if (!creds) {
+			if (warehouse.length === 0) {
+				console.error('no warehouse specified; exiting');
 				process.exit(1);
-			})
-			.finally(() => {
-				process.exit(0);
-			});
+			}
+			main({ ...params, verbose: true })
+				.then((results) => {
+					log('\n\nRESULTS:\n\n');
+					log(JSON.stringify(results));
+					if (params.write_logs) {
+						const logText = log.getLog();
+						let logPath;
+						if (typeof params.write_logs === 'string') logPath = path.resolve(params.write_logs);
+						else logPath = path.resolve('./log.txt');
+						const writtenLog = u.touch(logPath, logText).then(() => {
+							log(`\nwrote log to ${logPath}`);
+						});
+					}
+
+
+
+				})
+				.catch((e) => {
+					log('\n\nUH OH! something went wrong; the error is:\n\n');
+					console.error(e);
+					process.exit(1);
+				})
+				.finally(() => {
+					process.exit(0);
+				});
+		}
 	});
 }
 

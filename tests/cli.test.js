@@ -5,7 +5,7 @@ const { execSync } = require("child_process");
 const u = require('ak-tools');
 const timeout = 60000;
 
-const TIMEOUT = process.env.TIMEOUT || 1000 * 60 * 5; // 5 minutes
+const TIMEOUT = process.env.TIMEOUT || 1000 * 60 * 2; // 2 minutes
 const BATCH_SIZE = process.env.BATCH_SIZE || 1000;
 
 /** @typedef {import('../types').JobConfig} PARAMS */
