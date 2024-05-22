@@ -1,6 +1,6 @@
 {
 	"name": "csv-dwh",
-	"version": "1.0.01",
+	"version": "1.0.03",
 	"description": "local csv files → various cloud data warehouses",
 	"main": "index.js",
 	"types": "types.d.ts",
@@ -47,6 +47,7 @@
 	},
 	"dependencies": {
 		"@aws-sdk/client-redshift-data": "^3.576.0",
+		"@databricks/sql": "^1.8.4",
 		"@google-cloud/bigquery": "^7.7.0",
 		"ak-fetch": "^1.0.15",
 		"ak-tools": "^1.0.57",

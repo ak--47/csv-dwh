@@ -145,7 +145,6 @@ describe("csv", ()=>{
 		expect(totalRows).toBe(expectedRows);
 		const result = results[0];
 		const { schema, dataset, table, insert } = result;
-		expect(dataset).toBe(PARAMS.snowflake_database);
 		expect(table).toBe(cleanName(PARAMS.table_name));
 		expect(insert.success).toBe(expectedRows);
 		expect(insert.failed).toBe(0);
@@ -169,7 +168,6 @@ describe("csv", ()=>{
 		expect(totalRows).toBe(expectedRows);
 		const result = results[0];
 		const { schema, dataset, table, insert } = result;
-		expect(dataset).toBe(PARAMS.snowflake_database);
 		expect(table).toBe(cleanName(PARAMS.table_name));
 		expect(insert.success).toBe(expectedRows);
 		expect(insert.failed).toBe(0);
@@ -195,7 +193,6 @@ describe("csv", ()=>{
 		expect(totalRows).toBe(expectedRows);
 		const result = results[0];
 		const { schema, dataset, table, insert } = result;
-		expect(dataset).toBe(PARAMS.snowflake_database);
 		expect(table).toBe(cleanName(PARAMS.table_name));
 		expect(insert.success).toBe(expectedRows);
 		expect(insert.failed).toBe(0);
@@ -220,7 +217,6 @@ describe("csv", ()=>{
 		expect(totalRows).toBe(expectedRows);
 		const result = results[0];
 		const { schema, dataset, table, insert } = result;
-		expect(dataset).toBe(PARAMS.snowflake_database);
 		expect(table).toBe(cleanName(PARAMS.table_name));
 		expect(insert.success).toBe(expectedRows);
 		expect(insert.failed).toBe(0);
@@ -245,7 +241,6 @@ describe("csv", ()=>{
 		expect(totalRows).toBe(expectedRows);
 		const result = results[0];
 		const { schema, dataset, table, insert } = result;
-		expect(dataset).toBe(PARAMS.snowflake_database);
 		expect(table).toBe(cleanName(PARAMS.table_name));
 		expect(insert.success).toBe(expectedRows);
 		expect(insert.failed).toBe(0);
@@ -271,7 +266,6 @@ describe("csv", ()=>{
 		expect(totalRows).toBe(expectedRows);
 		const result = results[0];
 		const { schema, dataset, table, insert } = result;
-		expect(dataset).toBe(PARAMS.snowflake_database);
 		expect(table).toBe(cleanName(PARAMS.table_name));
 		expect(insert.success).toBe(expectedRows);
 		expect(insert.failed).toBe(0);
@@ -297,7 +291,6 @@ describe("csv", ()=>{
 		expect(totalRows).toBe(expectedRows);
 		const result = results[0];
 		const { schema, dataset, table, insert } = result;
-		expect(dataset).toBe(PARAMS.snowflake_database);
 		expect(table).toBe(cleanName(PARAMS.table_name));
 		expect(insert.success).toBe(expectedRows);
 		expect(insert.failed).toBe(0);

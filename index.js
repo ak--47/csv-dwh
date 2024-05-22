@@ -5,18 +5,17 @@ const { existsSync } = require('fs');
 
 const path = require('path');
 require('dotenv').config({ debug: false, override: false });
-const dataMaker = require('make-mp-data');
+// const dataMaker = require('make-mp-data');
 const Papa = require("papaparse");
 
 const cli = require('./components/cli');
 const log = require('./components/logger.js');
-const { generateSchema } = require('./components/inference.js');
+const { generateSchema, checkEnv, validate } = require('./components/inference.js');
 
 
 const loadToBigQuery = require('./middleware/bigquery');
 const loadToSnowflake = require('./middleware/snowflake');
 const loadToRedshift = require('./middleware/redshift');
-
 
 
 /**
@@ -36,84 +35,69 @@ const loadToRedshift = require('./middleware/redshift');
  */
 async function main(PARAMS) {
 	const startTime = Date.now();
+
+	//% ENV VARS
+	const keysToCheck = [
+		// generic
+		'table_name',
+
+		// bigquery
+		'bigquery_dataset',
+		'bigquery_project',
+		'bigquery_keyfile',
+		'bigquery_service_account',
+		'bigquery_service_account_pass',
+
+		// snowflake
+		'snowflake_account',
+		'snowflake_user',
+		'snowflake_password',
+		'snowflake_database',
+		'snowflake_schema',
+		'snowflake_warehouse',
+		'snowflake_role',
+		'snowflake_access_url',
+
+		// redshift
+		"redshift_workgroup",
+		"redshift_database",
+		"redshift_access_key_id",
+		"redshift_secret_access_key",
+		"redshift_session_token",
+		"redshift_region",
+		"redshift_schema_name"
+	];
+
+	const { valsFound, valsMissing, vars } = checkEnv(keysToCheck, PARAMS);
+	log('FOUND ENV VARS', Object.keys(valsFound));
+
 	let {
 		//everything requires:
-		warehouse = "",
+		warehouse,
 		batch_size = 1000,
-
-		//generated data requires:
-		demoDataConfig,
-		event_table_name = '',
-		user_table_name = '',
-		scd_table_name = '',
-		lookup_table_name = '',
-		group_table_name = '',
+		// demoDataConfig,
 
 		//byo data requires:
 		table_name = "",
 		csv_file = '',
 		json_file = '',
 
-		//bigquery requires:
-		bigquery_dataset = '',
-
-		//snowflake requires:
-		snowflake_account = '',
-		snowflake_user = '',
-		snowflake_password = '',
-		snowflake_database = '',
-		snowflake_schema = '',
-		snowflake_warehouse = '',
-		snowflake_role = '',
-		snowflake_access_url = '',
-
-		//redshift requires:
-		redshift_workgroup = '',
-		redshift_database = '',
-		redshift_access_key_id = '',
-		redshift_secret_access_key = '',
-		redshift_schema_name = '',
-		redshift_region = '',
-		redshift_session_token = '',
-
 		//options
 		verbose = false,
 		dry_run = false,
+		write_logs = false,
 		...rest
-
 	} = PARAMS;
 
 	// set verbose logging
 	log.verbose(verbose);
-
 	if (!warehouse) throw new Error('warehouse is required');
+	if (!Array.isArray(warehouse)) warehouse = [warehouse];
+	PARAMS.warehouse = warehouse;
 	if (!table_name) console.warn('no table name specified; i will make one up'); table_name = u.makeName(2, '_');
-	if (demoDataConfig && !event_table_name) {
-		console.warn('no table name specified; i will make one up');
-		const prefix = u.makeName(2, '_');
-		event_table_name = prefix + '_events';
-		user_table_name = prefix + '_users';
-		scd_table_name = prefix + '_scd';
-		lookup_table_name = prefix + '_lookup';
-		group_table_name = prefix + '_groups';
-	}
 
-	//CSV or JSON (or generated data)
-	if (csv_file && json_file) throw new Error('cannot specify both csv_file and json_file');
-	if (!csv_file && !json_file) throw new Error('csv_file or json_file is required');
-	if (csv_file) if (!existsSync(csv_file)) throw new Error(`file not found: ${csv_file}`);
-	if (json_file) if (!existsSync(json_file)) throw new Error(`file not found: ${json_file}`);
-	let file;
-	if (csv_file) file = csv_file;
-	if (json_file) file = json_file;
-	if (!file && !demoDataConfig) throw new Error('no data source specified');
-
-	// clean PARAMS
-	for (const key in PARAMS) {
-		if (PARAMS[key] === undefined) delete PARAMS[key];
-		if (PARAMS[key] === '') delete PARAMS[key];
-		if (PARAMS[key] === null) delete PARAMS[key];
-	}
+	// clean + validate PARAMS
+	validate(PARAMS);
 
 	let data;
 	let schema;
@@ -121,6 +105,9 @@ async function main(PARAMS) {
 	let parsed;
 
 	// user supplied csv or JSON file
+	let file;
+	if (csv_file) file = csv_file;
+	if (json_file) file = json_file;
 	if (file) {
 		const filePath = path.resolve(csv_file || json_file);
 		const isCSV = filePath.endsWith('.csv');
@@ -141,26 +128,14 @@ async function main(PARAMS) {
 		data = { sourceFileData: parsed };
 	}
 
-	// generated data essentially needs to treated as multiple csvs
-	if (demoDataConfig) {
-		data = await dataMaker(demoDataConfig);
-		//todo: multiple schemas YIKES
-		intermediateSchema = {};
-	}
 
 	const batched = u.objMap(data, (value) => batchData(value, batch_size));
-	const { eventData, userProfilesData, scdTableData, groupProfilesData, lookupTableData, sourceFileData } = batched;
-
-
+	const { sourceFileData } = batched;
 	const results = [];
-	if (event_table_name) results.push(await loadCSVtoDataWarehouse(eventData, warehouse, PARAMS));
-	if (user_table_name) results.push(await loadCSVtoDataWarehouse(userProfilesData, warehouse, PARAMS));
-	if (scd_table_name) results.push(await loadCSVtoDataWarehouse(scdTableData, warehouse, PARAMS));
-	if (lookup_table_name) results.push(await loadCSVtoDataWarehouse(lookupTableData, warehouse, PARAMS));
-	if (group_table_name) results.push(await loadCSVtoDataWarehouse(groupProfilesData, warehouse, PARAMS));
+	for (const wh of warehouse) {
+		results.push(await loadCSVtoDataWarehouse(schema, sourceFileData, wh, PARAMS));
+	}
 
-	//this is the only one that matters
-	if (table_name) results.push(await loadCSVtoDataWarehouse(schema, sourceFileData, warehouse, PARAMS));
 
 	const endTime = Date.now();
 	const e2eDuration = endTime - startTime;
@@ -181,13 +156,16 @@ async function main(PARAMS) {
 
 	log('JOB SUMMARY:\n\n', jobSummary);
 
-
-	// @ts-ignore
 	return jobSummary;
-
 }
 
 
+/**
+ * @param  {Schema} schema
+ * @param  {any[][]} batches
+ * @param  {import('./types').Warehouses} warehouse
+ * @param  {Config} PARAMS
+ */
 async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 	let result;
 	try {
@@ -206,7 +184,8 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 			// 	// result = await loadToDatabricks(records, schema, PARAMS);
 			// 	break;
 			default:
-				throw new Error(`Unknown warehouse: ${warehouse}`);
+				log(`Unknown warehouse: ${warehouse}`);
+				result = {};
 		}
 	}
 	catch (e) {
@@ -219,6 +198,10 @@ async function loadCSVtoDataWarehouse(schema, batches, warehouse, PARAMS) {
 }
 
 
+/**
+ * @param  {any[]} data
+ * @param  {number} batchSize=0
+ */
 function batchData(data, batchSize = 0) {
 	if (!batchSize) return [data];
 	const batches = [];
@@ -262,24 +245,57 @@ function summarize(results, PARAMS) {
 if (require.main === module) {
 	log.cli(true);
 	const params = cli().then((params) => {
-		// CLI is always verbose
-		main({ ...params, verbose: true })
-			.then((results) => {
-				log('\n\nRESULTS:\n\n');
-				log(JSON.stringify(results));
-				//todo: write a log file?
+		const { creds = false, warehouse = [] } = params;
 
-			})
-			.catch((e) => {
-				log('\n\nUH OH! something went wrong; the error is:\n\n');
-				console.error(e);
+		if (creds) {
+			const sampleEnv = path.resolve(__dirname, 'sample.env');
+			u.load(sampleEnv).then((env) => u.touch('.env', env))
+				.then((res) => {
+					console.log('wrote .env file to', res);
+				})
+				.catch((e) => {
+					console.error('could not write .env file', e);
+				})
+				.finally(() => {
+					console.log('now you should customize the .env file with your credentials and run the program again.');
+					process.exit(0);
+				});
+		}
+		if (!creds) {
+			if (warehouse.length === 0) {
+				console.error('no warehouse specified; exiting');
 				process.exit(1);
-			})
-			.finally(() => {
-				process.exit(0);
-			});
+			}
+			main({ ...params, verbose: true })
+				.then((results) => {
+					log('\n\nRESULTS:\n\n');
+					log(JSON.stringify(results));
+					if (params.write_logs) {
+						const logText = log.getLog();
+						let logPath;
+						if (typeof params.write_logs === 'string') logPath = path.resolve(params.write_logs);
+						else logPath = path.resolve('./log.txt');
+						const writtenLog = u.touch(logPath, logText).then(() => {
+							log(`\nwrote log to ${logPath}`);
+						});
+					}
+
+
+
+				})
+				.catch((e) => {
+					log('\n\nUH OH! something went wrong; the error is:\n\n');
+					console.error(e);
+					process.exit(1);
+				})
+				.finally(() => {
+					process.exit(0);
+				});
+		}
 	});
 }
+
+
 
 
 main.bigquery = loadToBigQuery;

@@ -1,6 +1,12 @@
+/*
+----
+SNOWFLAKE MIDDLEWARE
+----
+*/
+
 const snowflake = require('snowflake-sdk');
 const u = require('ak-tools');
-const { prepHeaders, cleanName } = require('../components/inference');
+const { prepHeaders, cleanName, checkEnv } = require('../components/inference');
 const log = require('../components/logger.js');
 require('dotenv').config();
 
@@ -13,23 +19,27 @@ require('dotenv').config();
  * @returns {Promise<import('../types').WarehouseUploadResult>}
  */
 async function loadToSnowflake(schema, batches, PARAMS) {
-	PARAMS.snowflake_account = PARAMS.snowflake_account || process.env.snowflake_account;
-	PARAMS.snowflake_user = PARAMS.snowflake_user || process.env.snowflake_user;
-	PARAMS.snowflake_password = PARAMS.snowflake_password || process.env.snowflake_password;
-	PARAMS.snowflake_database = PARAMS.snowflake_database || process.env.snowflake_database;
-	PARAMS.snowflake_schema = PARAMS.snowflake_schema || process.env.snowflake_schema;
-	PARAMS.snowflake_warehouse = PARAMS.snowflake_warehouse || process.env.snowflake_warehouse;
-	PARAMS.snowflake_role = PARAMS.snowflake_role || process.env.snowflake_role;
-	PARAMS.snowflake_access_url = PARAMS.snowflake_access_url || process.env.snowflake_access_url;
+	let {
+		snowflake_account = '',
+		snowflake_user = '',
+		snowflake_password = '',
+		snowflake_database = '',
+		snowflake_schema = '',
+		snowflake_warehouse = '',
+		snowflake_role = '',
+		snowflake_access_url = '',
+		dry_run = false,
+		verbose = false,
+		table_name = ''
+	} = PARAMS;
 
-	let { snowflake_database, table_name, dry_run } = PARAMS;
 	if (!snowflake_database) throw new Error('snowflake_database is required');
 	if (!table_name) throw new Error('table_name is required');
 
 	const conn = await createSnowflakeConnection(PARAMS);
 	const isConnectionValid = await conn.isValidAsync();
 	if (typeof isConnectionValid === 'boolean' && !isConnectionValid) throw new Error(`Invalid Snowflake credentials`);
-	
+
 	table_name = cleanName(table_name);
 	// @ts-ignore
 	schema = schema.map(prepareSnowflakeSchema);
@@ -146,7 +156,7 @@ function prepareComplexRows(row, schema) {
 			}
 			catch (e) {
 				debugger;
-				log(`Error inserting batch ${col.name}; ${e.message}`, e);				
+				log(`Error inserting batch ${col.name}; ${e.message}`, e);
 			}
 		}
 	}
@@ -325,7 +335,7 @@ async function createSnowflakeConnection(PARAMS) {
 
 		connection.connect((err, conn) => {
 			if (err) {
-				log('Failed to connect to Snowflake:', err);				
+				log('Failed to connect to Snowflake:', err);
 				debugger;
 				reject(err);
 			} else {

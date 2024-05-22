@@ -1,6 +1,11 @@
+/*
+----
+BIQUERY MIDDLEWARE
+----
+*/
 const { BigQuery } = require('@google-cloud/bigquery');
 const u = require('ak-tools');
-const { prepHeaders, cleanName } = require('../components/inference');
+const { prepHeaders, cleanName, checkEnv } = require('../components/inference');
 const log = require('../components/logger.js');
 require('dotenv').config();
 
@@ -21,22 +26,13 @@ let tableId = '';
 async function loadToBigQuery(schema, batches, PARAMS) {
 	let {
 		bigquery_dataset = '',
-		table_name = '',
 		bigquery_project = '',
 		bigquery_keyfile = '',
 		bigquery_service_account = '',
 		bigquery_service_account_pass = '',
 		dry_run = false,
-		verbose = false
+		table_name = ''
 	} = PARAMS;
-
-	// override with environment variables if available
-	if (process.env.bigquery_dataset) bigquery_dataset = process.env.bigquery_dataset;
-	if (process.env.table_name) table_name = process.env.table_name;
-	if (process.env.bigquery_project) bigquery_project = process.env.bigquery_project;
-	if (process.env.bigquery_keyfile) bigquery_keyfile = process.env.bigquery_keyfile;
-	if (process.env.bigquery_service_account) bigquery_service_account = process.env.bigquery_service_account;
-	if (process.env.bigquery_service_account_pass) bigquery_service_account_pass = process.env.bigquery_service_account_pass;
 
 	if (!bigquery_dataset) throw new Error('bigquery_dataset is required');
 	if (!table_name) throw new Error('table_name is required');
