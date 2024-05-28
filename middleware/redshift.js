@@ -70,7 +70,7 @@ async function loadToRedshift(schema, batches, PARAMS) {
 	const tableSchemaSQL = schemaToRedshiftSQL(schema);
 
 	const validCredentials = await verifyRedshiftCredentials(redshiftClient);
-	if (typeof validCredentials === 'boolean' && !validCredentials) throw new Error(`Invalid BigQuery credentials; Got Message: ${validCredentials}`);
+	if (typeof validCredentials === 'boolean' && !validCredentials) throw new Error(`Invalid Redshift credentials; Got Message: ${validCredentials}`);
 
 	/** @type {import('../types').InsertResult[]} */
 	const upload = [];
@@ -155,7 +155,7 @@ async function executeSQL(client, sql, isBatch = false) {
 
 	try {
 		const statement = await client.send(executeCommand);
-		if (!isBatch) return null;
+		if (isBatch) return null;
 		// Wait for the statement to complete
 		const statementId = statement.Id;
 		const describeCommand = new DescribeStatementCommand({ Id: statementId });
@@ -170,7 +170,7 @@ async function executeSQL(client, sql, isBatch = false) {
 			// Wait for a while before checking the status again
 			if (statementStatus !== 'FINISHED') {
 				const waitTime = u.rand(250, 420);
-				log(`Statement ${statementId} is ${statementStatus}. Waiting ${waitTime}ms before checking again...`);
+				// log(`Statement ${statementId} is ${statementStatus}. Waiting ${waitTime}ms before checking again...`);
 				await u.sleep(waitTime);
 			}
 		} while (statementStatus !== 'FINISHED');

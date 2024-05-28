@@ -270,8 +270,6 @@ function schemaToSnowflakeSQL(schema) {
  */
 function executeSQL(conn, sql, binds) {
 	return new Promise((resolve, reject) => {
-
-
 		const options = { sqlText: sql };
 		if (binds) options.binds = binds;
 		if (binds) options.parameters = { MULTI_STATEMENT_COUNT: 1 };
@@ -288,8 +286,6 @@ function executeSQL(conn, sql, binds) {
 			}
 		});
 	});
-
-
 }
 
 /**

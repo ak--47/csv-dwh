@@ -31,6 +31,11 @@ const result = await csvDwh({
 });
 ```
 
+<div id="demo"></div>
+
+## 🍿 Demo
+<a href="https://youtu.be/-5dgQRMeiy0" target="_blank"><img src="https://aktunes.neocities.org/csvdwh.png" /></a>
+
 <div id="cli"></div>
 
 ### 💻 CLI usage
