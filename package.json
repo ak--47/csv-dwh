@@ -1,6 +1,6 @@
 {
 	"name": "csv-dwh",
-	"version": "1.0.04",
+	"version": "1.0.05",
 	"description": "local csv files → various cloud data warehouses",
 	"main": "index.js",
 	"types": "types.d.ts",

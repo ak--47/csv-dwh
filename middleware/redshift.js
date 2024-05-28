@@ -155,7 +155,7 @@ async function executeSQL(client, sql, isBatch = false) {
 
 	try {
 		const statement = await client.send(executeCommand);
-		if (isBatch) return null;
+		if (!isBatch) return null;
 		// Wait for the statement to complete
 		const statementId = statement.Id;
 		const describeCommand = new DescribeStatementCommand({ Id: statementId });
